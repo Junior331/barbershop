@@ -2,9 +2,34 @@
 
 ## App
 
-- https://barbershop.vercel.app/
+- https://barbershop-plum.vercel.app/
 
 #### O Produto
+
+![screen-splash](https://github.com/user-attachments/assets/740b2ede-8ad4-4283-b6af-c8a061ee8702)
+![screen-login](https://github.com/user-attachments/assets/8a2aeaeb-56f8-4b23-b553-1158d8b92f04)
+
+####
+
+![Home (2)](https://github.com/user-attachments/assets/4ec321d6-8b1e-40b7-a241-d7f3cb7ad3e3)
+![Services](https://github.com/user-attachments/assets/c5999f20-54be-4ef6-aad1-1472485e1de2)
+
+####
+
+![Calendary](https://github.com/user-attachments/assets/46a32a55-53ef-4fcc-85d3-b47be6c347d9)
+![Confirm](https://github.com/user-attachments/assets/11076e19-a4c9-4a16-b0e5-7f20992463e6)
+
+####
+
+![My bookings](https://github.com/user-attachments/assets/66bdba4a-633f-4242-8f65-171e32599727)
+![My bookings (1)](https://github.com/user-attachments/assets/f3c43baf-8b4c-4df6-b3f6-dd91632268ed)
+![My bookings (2)](https://github.com/user-attachments/assets/397160ca-05f7-46f9-b549-45fe8026724c)
+
+####
+
+![Account](https://github.com/user-attachments/assets/9e3a8b56-8d5d-4973-aab3-f021690d71ba)
+![Profile](https://github.com/user-attachments/assets/ec2350b0-7ccd-4118-b3b4-6f8ca015b502)
+![Paymants](https://github.com/user-attachments/assets/18361f72-38fe-455b-be91-9d0d618297af)
 
 ## Principais Tecnologias utilizadas
 
