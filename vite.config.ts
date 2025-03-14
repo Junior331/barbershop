@@ -13,21 +13,21 @@ export default defineConfig({
         name: 'Barbershop',
         short_name: 'Barbershop',
         description: 'Agende seu corte em poucos clicks',
-        theme_color: '#f7f8fd',
-        background_color: '#f7f8fd',
+        theme_color: '#F7F8FD',
+        background_color: '#F7F8FD',
         icons: [  
             {
-              src: '/app_icon_ia.png', // Ícone do app (192x192)
+              src: '/app_icon_ia.png',
               sizes: '192x192',
               type: 'image/png',
             },
             {
-              src: '/splash_icon.png', // Ícone da splash screen (512x512)
+              src: '/app_icon_ia.png',
               sizes: '512x512',
               type: 'image/png',
             },
             {
-              src: '/splash_icon.png', // Ícone para dispositivos com tela maior
+              src: '/app_icon_ia.png',
               sizes: '1024x1024',
               type: 'image/png',
               purpose: 'maskable',
