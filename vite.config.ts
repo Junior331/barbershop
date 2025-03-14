@@ -11,17 +11,17 @@ export default defineConfig({
       registerType: 'autoUpdate',
       manifest: {
         name: '',
-        short_name: 'PWA',
-        description: 'Um projeto PWA com React, Vite, Tailwind e Framer Motion',
+        short_name: 'Barbershop',
+        description: 'Agende seu corte em poucos clicks',
         theme_color: '#ffffff',
         icons: [
           {
-            src: 'icon-192x192.png',
+            src: 'src/assets/icons/app_icon_ia.png',
             sizes: '192x192',
             type: 'image/png',
           },
           {
-            src: 'icon-512x512.png',
+            src: 'src/assets/icons/app_icon_ia.png',
             sizes: '512x512',
             type: 'image/png',
           },
