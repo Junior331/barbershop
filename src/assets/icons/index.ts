@@ -15,7 +15,9 @@ import profile_active from "./profile_active.svg";
 import clock_outlined from "./clock_outlined.svg";
 import social_facebook from "./social_facebook.svg";
 import calendar_active from "./calendar_active.svg";
+import arrow_circle_left from "./arrow_circle_left.svg";
 import location_outlined from "./location_outlined.svg";
+import calendar_solid_white from "./calendar_solid_white.svg";
 
 export const icons = {
   pole,
@@ -35,7 +37,9 @@ export const icons = {
   profile_active,
   calendar_active,
   social_facebook,
+  arrow_circle_left,
   location_outlined,
+  calendar_solid_white,
 };
 
 type IIcons = keyof typeof icons;

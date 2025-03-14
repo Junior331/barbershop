@@ -10,7 +10,6 @@ export const Home = () => {
   return (
     <Layout>
       <div className="flex flex-col pt-[27px] px-3 pr-1 justify-start items-start h-screen w-full">
-        {/* Header */}
         <div className="w-full mb-6">
           <h2 className="font-[300] flex flex-col text-[#283046] max-w-[145px] inter text-[32px] leading-[36px]">
             Hi,
@@ -18,8 +17,7 @@ export const Home = () => {
           </h2>
         </div>
 
-        {/* Content with Scroll */}
-        <div className="flex flex-1 flex-col w-full h-full items-start justify-start overflow-y-auto">
+        <div className="flex flex-1 flex-col w-full h-full items-start justify-start overflow-y-auto pb-20">
           <div className="flex flex-col items-center w-full pr-2">
             <div className="flex items-center justify-between w-full gap-1">
               <label className="text-[#000] inter text-base font-bold leading-[150%]">

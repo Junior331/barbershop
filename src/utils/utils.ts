@@ -42,3 +42,35 @@ export const convertSecondsToDays = (seconds: number): number => {
   const secondsInADay = 86400;
   return Math.floor(seconds / secondsInADay);
 };
+
+export const getCurrentDate = (): {
+  dayOfWeek: string;
+  formattedDate: string;
+} => {
+  const date = new Date();
+
+  const dayOfWeek = new Intl.DateTimeFormat("pt-BR", {
+    weekday: "long",
+  }).format(date);
+
+  const formattedDate = new Intl.DateTimeFormat("pt-BR", {
+    day: "2-digit",
+    month: "long",
+  }).format(date);
+
+  return { dayOfWeek, formattedDate };
+};
+
+export const formatDateTime = (dateString: string, type: "date" | "time") => {
+  const date = new Date(dateString);
+
+  if (type === "date") {
+    return date.toLocaleDateString("en-US");
+  }
+
+  return date.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+};

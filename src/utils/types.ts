@@ -43,3 +43,14 @@ export type randomMessage = {
   title: string;
   message: string;
 };
+export type service = {
+  id: number;
+  date: string;
+  name: string;
+  time: number;
+  icon: string;
+  price: number;
+  barber: string;
+  location: string;
+  status: "completed" | "pending";
+};
