@@ -7,7 +7,7 @@ import { getIcons } from "@/assets/icons";
 export const Home = () => {
   return (
     <Layout>
-      <div className="flex flex-col pt-[27px] px-5 justify-start items-start h-screen w-full">
+      <div className="flex flex-col pt-[27px] px-3 pr-1 justify-start items-start h-screen w-full">
         <h2
           className="font-[300]
           flex flex-col
@@ -18,7 +18,7 @@ export const Home = () => {
         </h2>
 
         <div className="flex flex-1 flex-col w-full h-full items-start justify-start overflow-y-auto">
-          <div className="flex flex-col items-center w-full mt-5">
+          <div className="flex flex-col items-center w-full mt-5 pr-2">
             <div className="flex items-center justify-between w-full gap-1">
               <label className="text-[#000] inter text-base font-bold leading-[150%]">
                 Promotions of week
@@ -60,7 +60,7 @@ export const Home = () => {
             </div>
           </div>
 
-          <div className="flex flex-col items-center w-full mt-5">
+          <div className="flex flex-col items-center w-full mt-5 pr-2">
             <div className="flex items-center justify-between w-full gap-1">
               <label className="text-[#000] inter text-base font-bold leading-[150%]">
                 Your orders
@@ -129,13 +129,13 @@ export const Home = () => {
               </label>
               <button
                 type="button"
-                className="btn p-0 m-0 btn-link border-none !no-underline text-[#000] font-[500] text-[15px] inter"
+                className="btn p-0 m-0 btn-link border-none !no-underline text-[#000] font-[500] text-[15px] inter pr-2"
               >
                 see all
               </button>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-[10px] w-full overflow-auto max-w-full pb-[10px]">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-[5px] w-full overflow-auto max-w-full pb-[10px] 5 pr-1">
               {barbers.map((item) => {
                 return (
                   <div
@@ -154,11 +154,11 @@ export const Home = () => {
                         <img
                           src={item.image}
                           alt={`Barber ${item.name}`}
-                          className="min-w-[66px] min-h-[70px] max-w-[66px] max-h-[70px] object-cover"
+                          className="min-w-[66px] min-h-[70px] max-w-[66px] max-h-[70px] object-cover border-r-[2px] border-[#E5E7EB]"
                         />
 
                         <div className="flex flex-col justify-start items-start w-full gap-[3px] flex-grow pl-2">
-                          <p className="w-full text-start text-white font-inter text-[13px] font-bold leading-[150%] border-b border-[#E5E7EB]">
+                          <p className="w-full text-start text-white font-inter text-[13px] font-bold leading-[150%] border-b border-[#E5E7EB] text_ellipsis">
                             {item.name}
                           </p>
                           <p className="text-white font-roboto text-[8px] font-normal leading-none">

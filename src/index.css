@@ -78,13 +78,11 @@
     font-family: "Inter", sans-serif !important;
   }
 
-  /* .card_service {
-    width: 75px;
-    height: 94px;
-    border-radius: 10px;
-    background: #6b7280;
-    border: 2px solid #fff;
-    box-shadow: 3px 3px 2px 0px rgba(0, 0, 0, 0.05),
-      1px 1px 2px 0px rgba(0, 0, 0, 0.09), 0px 0px 1px 0px rgba(0, 0, 0, 0.1);
-  } */
+  .text_ellipsis {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden !important; 
+    white-space: nowrap !important;
+    text-overflow: ellipsis !important;
+  }
 }
