@@ -18,11 +18,11 @@ export const Signin = () => {
                     <input
                         type="email"
                         name="email"
-                        value={formik.values.email}
-                        onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
-                        className="w-full h-[48px] px-[10px] flex-shrink-0 rounded-[5px] border border-[#D8D6DE]"
+                        value={formik.values.email}
                         placeholder="Digite aqui..."
+                        onChange={formik.handleChange}
+                        className="w-full h-[48px] px-[10px] flex-shrink-0 rounded-[5px] border border-[#D8D6DE]"
                     />
                     {formik.touched.email && formik.errors.email ? (
                         <div className="text-red-500 text-sm">{formik.errors.email}</div>

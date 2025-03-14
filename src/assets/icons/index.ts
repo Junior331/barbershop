@@ -1,37 +1,41 @@
 import pole from "./pole.svg";
-import pole_left from "./pole_left.svg";
-import pole_right from "./pole_right.svg";
-import social_apple from "./social_apple.svg";
-import social_google from "./social_google.svg";
-import fallback from "../images/placeholder.svg";
-import social_facebook from "./social_facebook.svg";
-
 import home from "./home.svg";
 import wallet from "./wallet.svg";
 import profile from "./profile.svg";
 import calendar from "./calendar.svg";
+import pole_left from "./pole_left.svg";
+import star_solid from "./star_solid.svg";
+import pole_right from "./pole_right.svg";
 import home_active from "./home_active.svg";
+import social_apple from "./social_apple.svg";
+import social_google from "./social_google.svg";
 import wallet_active from "./wallet_active.svg";
+import fallback from "../images/placeholder.svg";
 import profile_active from "./profile_active.svg";
+import clock_outlined from "./clock_outlined.svg";
+import social_facebook from "./social_facebook.svg";
 import calendar_active from "./calendar_active.svg";
+import location_outlined from "./location_outlined.svg";
 
 export const icons = {
   pole,
-  fallback,
-  pole_left,
-  pole_right,
-  social_apple,
-  social_google,
-  social_facebook,
-
   home,
   wallet,
   profile,
+  fallback,
   calendar,
+  pole_left,
+  star_solid,
+  pole_right,
   home_active,
+  social_apple,
   wallet_active,
+  social_google,
+  clock_outlined,
   profile_active,
   calendar_active,
+  social_facebook,
+  location_outlined,
 };
 
 type IIcons = keyof typeof icons;
