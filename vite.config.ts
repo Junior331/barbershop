@@ -12,9 +12,9 @@ export default defineConfig({
       manifest: {
         name: 'Barbershop',
         short_name: 'Barbershop',
-        description: 'Agende seu corte em poucos clicks',
-        theme_color: '#F7F8FD',
+        theme_color: '#6B7280',
         background_color: '#F7F8FD',
+        description: 'Agende seu corte em poucos clicks',
         icons: [  
             {
               src: '/app_icon_ia.png',
