@@ -10,17 +10,17 @@ export const Home = () => {
   return (
     <Layout>
       <div className="flex flex-col pt-[27px] px-3 pr-1 justify-start items-start h-screen w-full">
-        <h2
-          className="font-[300]
-          flex flex-col
- text-[#283046] max-w-[145px] inter text-[32px] leading-[36px]"
-        >
-          Hi,
-          <span className="font-bold">Junior</span>
-        </h2>
+        {/* Header */}
+        <div className="w-full mb-6">
+          <h2 className="font-[300] flex flex-col text-[#283046] max-w-[145px] inter text-[32px] leading-[36px]">
+            Hi,
+            <span className="font-bold">Junior</span>
+          </h2>
+        </div>
 
+        {/* Content with Scroll */}
         <div className="flex flex-1 flex-col w-full h-full items-start justify-start overflow-y-auto">
-          <div className="flex flex-col items-center w-full mt-5 pr-2">
+          <div className="flex flex-col items-center w-full pr-2">
             <div className="flex items-center justify-between w-full gap-1">
               <label className="text-[#000] inter text-base font-bold leading-[150%]">
                 Promotions of week
@@ -196,47 +196,26 @@ export const Home = () => {
             </div>
           </div>
 
-            <motion.button
-              className="fixed bottom-24 right-2 flex items-center justify-center border border-white px-6 py-3 font-medium text-white rounded-lg shadow-lg bg-gradient-to-r bg-[#6b7280] focus:outline-none focus:ring-2 focus:ring-offset-2 cursor-pointer"
-              initial={{ boxShadow: "0 0 0 0 rgba(156,163,175, 0.7)" }}
-              animate={{
-                boxShadow: [
-                  "0 0 0 0 rgba(156,163,175, 0.7)",
-                  "0 0 0 10px rgba(156,163,175, 0)",
-                  "0 0 0 0 rgba(156,163,175, 0)",
-                ],
-              }}
-              transition={{
-                duration: 2,
-                ease: "easeOut",
-                repeat: Infinity,
-                repeatType: "loop",
-              }}
-            >
-              Agendar
-              <span className="absolute top-0 left-0 w-full h-full rounded-lg opacity-0 hover:opacity-20 bg-white transition-opacity duration-300"></span>
-            </motion.button>
-
-          {/* <motion.button
-            className="fixed bottom-24 right-2 flex items-center justify-center border border-white px-6 py-3 font-medium text-white rounded-lg shadow-lg bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
-            initial={{ boxShadow: "0 0 0 0 rgba(99, 102, 241, 0.7)" }}
+          <motion.button
+            className="fixed bottom-24 right-2 flex items-center justify-center border border-white px-6 py-3 font-medium text-white rounded-lg shadow-lg bg-gradient-to-r bg-[#6b7280] focus:outline-none focus:ring-2 focus:ring-offset-2 cursor-pointer"
+            initial={{ boxShadow: "0 0 0 0 rgba(156,163,175, 0.7)" }}
             animate={{
               boxShadow: [
-                "0 0 0 0 rgba(99, 102, 241, 0.7)",
-                "0 0 0 10px rgba(99, 102, 241, 0)",
-                "0 0 0 0 rgba(99, 102, 241, 0)",
+                "0 0 0 0 rgba(156,163,175, 0.7)",
+                "0 0 0 10px rgba(156,163,175, 0)",
+                "0 0 0 0 rgba(156,163,175, 0)",
               ],
             }}
             transition={{
               duration: 2,
+              ease: "easeOut",
               repeat: Infinity,
               repeatType: "loop",
-              ease: "easeOut",
             }}
           >
             Agendar
             <span className="absolute top-0 left-0 w-full h-full rounded-lg opacity-0 hover:opacity-20 bg-white transition-opacity duration-300"></span>
-          </motion.button> */}
+          </motion.button>
         </div>
       </div>
     </Layout>

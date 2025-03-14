@@ -11,8 +11,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       manifest: {
         name: 'Barbershop',
+        theme_color: '#ffffff',
         short_name: 'Barbershop',
-        theme_color: '#6B7280',
         background_color: '#F7F8FD',
         description: 'Agende seu corte em poucos clicks',
         icons: [  
