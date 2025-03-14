@@ -9,7 +9,7 @@ export const Layout = ({ children }: IProps) => (
       src={getIcons("pole_right")}
       className="fixed top-[15px] right-[-25px]"
     />
-    <main className="flex flex-1 justify-center items-start w-full h-full overflow-hidden">
+    <main className="flex flex-1 justify-center items-start w-full h-full overflow-hidden relative z-10">
       {children}
     </main>
     <img
