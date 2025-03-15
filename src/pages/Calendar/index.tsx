@@ -3,10 +3,9 @@ import { isBefore } from "date-fns";
 
 import { mocks } from "@/services/mocks";
 import { getIcons } from "@/assets/icons";
-import { formatDateTime, formatter, getCurrentDate } from "@/utils/utils";
 import { Layout } from "@/components/templates";
-import { Card, Header } from "@/components/organisms";
-import SwipeableCard from "./SwipeableCard";
+import { Card, Header, SwipeableCard } from "@/components/organisms";
+import { formatDateTime, formatter, getCurrentDate } from "@/utils/utils";
 
 export const Calendar = () => {
   const { dayOfWeek, formattedDate } = getCurrentDate();
@@ -17,7 +16,6 @@ export const Calendar = () => {
         const serviceDate = new Date(service.date);
         const currentDate = new Date();
 
-        // Zerar as horas para comparar apenas a data
         serviceDate.setHours(0, 0, 0, 0);
         currentDate.setHours(0, 0, 0, 0);
 
@@ -55,61 +53,11 @@ export const Calendar = () => {
           </div>
 
           <div className="flex flex-1 flex-col gap-2.5 w-full h-full items-start justify-start overflow-y-auto pr-2">
-            {/* {processedServices
+            {processedServices
               .filter((item) => !item.isCompleted)
               .map((item) => (
-                <div
-                  key={item.id}
-                  className="btn w-full h-auto bg-transparent border-0 shadow-none p-0"
-                >
-                  <Card
-                    style={{
-                      padding: 11.5,
-                      paddingLeft: 2,
-                      minWidth: "100%",
-                      minHeight: "initial",
-                    }}
-                  >
-                    <div className="flex items-center w-full h-full">
-                      <img
-                        src={item.icon}
-                        alt={`Service ${item.name}`}
-                        className="w-[87px] h-[87px]"
-                      />
-                      <div className="flex flex-col justify-start items-start w-full gap-2 flex-grow pl-2">
-                        <p className="text-white font-inter text-[13px] font-bold leading-[150%]">
-                          {item.name}
-                        </p>
-                        <p className="text-white inter text-[8px] font-[300] leading-none">
-                          <strong className="font-bold text-[11px]">Price: </strong>
-                          {formatter({
-                            type: "pt-BR",
-                            currency: "BRL",
-                            style: "currency",
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          }).format(item.price || 0)}{" "}
-                        </p>
-                        <p className="text-white inter text-[8px] font-[300] leading-none">
-                          <strong className="font-bold text-[11px]">Time: </strong>
-                          {item.time} minutes
-                        </p>
-                        <p className="text-white inter text-[8px] font-[300] leading-none">
-                          <strong className="font-bold text-[11px]">Date: </strong>
-                          {formatDateTime(item.date, "date")} at{" "}
-                          {formatDateTime(item.date, "time")}
-                        </p>
-                        <p className="text-white inter text-[8px] font-[300] leading-none">
-                          <strong className="font-bold text-[11px]">Barber: </strong>
-                          {item.barber}
-                        </p>
-                      </div>
-                    </div>
-                  </Card>
-                </div>
-              ))} */}
-
-              <SwipeableCard />
+                <SwipeableCard item={item} />
+              ))}
 
             <div className="flex gap-0.5 justify-center items-center w-full min-h-10 overflow-hidden">
               {dotsArray.map((_, index) => (
@@ -157,7 +105,9 @@ export const Calendar = () => {
                           {item.name}
                         </p>
                         <p className="text-white inter text-[8px] font-[300] leading-none">
-                          <strong className="font-bold text-[11px]">Price: </strong>
+                          <strong className="font-bold text-[11px]">
+                            Price:{" "}
+                          </strong>
                           {formatter({
                             type: "pt-BR",
                             currency: "BRL",
@@ -167,16 +117,22 @@ export const Calendar = () => {
                           }).format(item.price || 0)}{" "}
                         </p>
                         <p className="text-white inter text-[8px] font-[300] leading-none">
-                          <strong className="font-bold text-[11px]">Time: </strong>
+                          <strong className="font-bold text-[11px]">
+                            Time:{" "}
+                          </strong>
                           {item.time} minutes
                         </p>
                         <p className="text-white inter text-[8px] font-[300] leading-none">
-                          <strong className="font-bold text-[11px]">Date: </strong>
+                          <strong className="font-bold text-[11px]">
+                            Date:{" "}
+                          </strong>
                           {formatDateTime(item.date, "date")} at{" "}
                           {formatDateTime(item.date, "time")}
                         </p>
                         <p className="text-white inter text-[8px] font-[300] leading-none">
-                          <strong className="font-bold text-[11px]">Barber: </strong>
+                          <strong className="font-bold text-[11px]">
+                            Barber:{" "}
+                          </strong>
                           {item.barber}
                         </p>
                       </div>

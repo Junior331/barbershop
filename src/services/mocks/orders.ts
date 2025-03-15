@@ -29,7 +29,7 @@ export const orders: service[] = [
     id: 2,
     time: 20,
     price: 20,
-    date: generateRandomDate("2025-03-12"), // Data aleatória
+    date: generateRandomDate("2025-03-20"), // Data aleatória
     status: "pending",
     name: "Beard",
     barber: "Breno Tavares",

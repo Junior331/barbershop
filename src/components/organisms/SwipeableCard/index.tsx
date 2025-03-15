@@ -1,40 +1,25 @@
 import { useState } from "react";
-import { motion, useMotionValue, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
+
+import useSwipe from "./useSwipe";
+import { IProps } from "./@types";
+import { getIcons } from "@/assets/icons";
+import useCardActions from "./useCardActions";
 import { Card } from "@/components/organisms";
 import { getServices } from "@/assets/services";
 import { formatDateTime, formatter } from "@/utils/utils";
-import { generateRandomDate } from "@/services/mocks/orders";
-import { getIcons } from "@/assets/icons";
 
-const SwipeableCard = () => {
+export const SwipeableCard = ({ item }: IProps) => {
   const [isSwipedLeft, setIsSwipedLeft] = useState(false);
   const [isSwipedRight, setIsSwipedRight] = useState(false);
 
-  const x = useMotionValue(0);
-  const opacityLeft = useTransform(x, [-70, 0], [1, 0]);
-  const opacityRight = useTransform(x, [0, 70], [0, 1]);
-
-  const handleDragEnd = () => {
-    if (x.get() < -70) {
-      setIsSwipedLeft(true);
-      setIsSwipedRight(false);
-    } else if (x.get() > 70) {
-      setIsSwipedRight(true);
-      setIsSwipedLeft(false);
-    } else {
-      setIsSwipedLeft(false);
-      setIsSwipedRight(false);
-    }
-    x.set(0);
-  };
-
-  const handleLeftAction = () => {
-    alert("Editar agendamento!");
-  };
-
-  const handleRightAction = () => {
-    alert("Excluir agendamento!");
-  };
+  const { handleLeftAction, handleRightAction } = useCardActions();
+  const { x, opacityLeft, opacityRight, handleDrag, handleDragEnd } = useSwipe({
+    onLeftAction: handleLeftAction,
+    onRightAction: handleRightAction,
+    setIsSwipedLeft,
+    setIsSwipedRight,
+  });
 
   return (
     <div
@@ -45,12 +30,11 @@ const SwipeableCard = () => {
         minHeight: "min-content",
       }}
     >
-      {/* Ícone de Edição (esquerda) */}
       <motion.div
         className="card_edit"
         style={{
           left: 7,
-          zIndex: isSwipedRight ? 2 : 1, // z-index dinâmico
+          zIndex: isSwipedRight ? 2 : 1,
           top: "50%",
           display: "flex",
           paddingLeft: 20,
@@ -59,19 +43,19 @@ const SwipeableCard = () => {
           opacity: opacityRight,
           transform: "translateY(-50%)",
         }}
-        onClick={handleLeftAction} // Ação de edição
+        onClick={handleLeftAction}
       >
         <img src={getIcons("edit")} alt="Editar" />
       </motion.div>
 
-      {/* Card principal */}
       <motion.div
         style={{
           x,
           position: "relative",
-          zIndex: 3, // z-index maior que os ícones de ação
+          zIndex: 3,
         }}
         drag="x"
+        onDrag={handleDrag}
         onDragEnd={handleDragEnd}
         dragConstraints={{ left: -70, right: 70 }}
       >
@@ -92,7 +76,7 @@ const SwipeableCard = () => {
               />
               <div className="flex flex-col justify-start items-start w-full gap-2 flex-grow pl-2">
                 <p className="text-white font-inter text-[13px] font-bold leading-[150%]">
-                  Beard & hair
+                  {item.name}
                 </p>
                 <p className="text-white inter text-[8px] font-[300] leading-none">
                   <strong className="font-bold text-[11px]">Price: </strong>
@@ -102,23 +86,20 @@ const SwipeableCard = () => {
                     style: "currency",
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
-                  }).format(40)}{" "}
+                  }).format(item.price || 0)}{" "}
                 </p>
                 <p className="text-white inter text-[8px] font-[300] leading-none">
                   <strong className="font-bold text-[11px]">Time: </strong>
-                  40 minutes
+                  {item.time} minutes
                 </p>
                 <p className="text-white inter text-[8px] font-[300] leading-none">
                   <strong className="font-bold text-[11px]">Date: </strong>
-                  {formatDateTime(
-                    generateRandomDate("2025-03-16"),
-                    "date"
-                  )} at{" "}
-                  {formatDateTime(generateRandomDate("2025-03-16"), "time")}
+                  {formatDateTime(item.date, "date")} at{" "}
+                  {formatDateTime(item.date, "time")}
                 </p>
                 <p className="text-white inter text-[8px] font-[300] leading-none">
                   <strong className="font-bold text-[11px]">Barber: </strong>
-                  Breno Tavares
+                  {item.barber}
                 </p>
               </div>
             </div>
@@ -126,12 +107,11 @@ const SwipeableCard = () => {
         </div>
       </motion.div>
 
-      {/* Ícone de Exclusão (direita) */}
       <motion.div
         className="card_delete"
         style={{
           right: 7,
-          zIndex: isSwipedLeft ? 2 : 1, // z-index dinâmico
+          zIndex: isSwipedLeft ? 2 : 1,
           top: "50%",
           display: "flex",
           paddingRight: 20,
@@ -141,12 +121,10 @@ const SwipeableCard = () => {
           justifyContent: "flex-end",
           transform: "translateY(-50%)",
         }}
-        onClick={handleRightAction} // Ação de exclusão
+        onClick={handleRightAction}
       >
         <img src={getIcons("trash")} alt="Excluir" />
       </motion.div>
     </div>
   );
 };
-
-export default SwipeableCard;
