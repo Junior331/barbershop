@@ -29,7 +29,7 @@
 
 ![Account](https://github.com/user-attachments/assets/9e3a8b56-8d5d-4973-aab3-f021690d71ba)
 ![Profile](https://github.com/user-attachments/assets/ec2350b0-7ccd-4118-b3b4-6f8ca015b502)
-![Paymants](https://github.com/user-attachments/assets/18361f72-38fe-455b-be91-9d0d618297af)
+![Payments](https://github.com/user-attachments/assets/18361f72-38fe-455b-be91-9d0d618297af)
 
 ## Principais Tecnologias utilizadas
 

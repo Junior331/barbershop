@@ -120,7 +120,7 @@ export const Calendar = () => {
               ))}
               <div className="w-[136px] h-[29px] flex-shrink-0 rounded-[25px] bg-white shadow-[0px_4px_4px_0px_rgba(50,183,104,0.15)] flex justify-center items-center mx-1.5">
                 <h2 className="text-black font-roboto text-[16px] font-medium leading-none">
-                  Finished.
+                  Finished
                 </h2>
               </div>
               {dotsArray.map((_, index) => (
