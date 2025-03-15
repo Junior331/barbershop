@@ -15,7 +15,7 @@ export const Layout = ({ children }: IProps) => (
       className="fixed bottom-[100px] left-[-5px]"
     />
     <main
-      className="flex flex-1 justify-center items-start w-full h-full overflow-hidden relative z-10 pb-[75px]"
+      className="flex flex-1 justify-center items-start w-full h-full overflow-hidden relative z-10 pb-[50px]"
     >
       {children}
     </main>

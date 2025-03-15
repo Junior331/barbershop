@@ -81,8 +81,57 @@
   .text_ellipsis {
     width: 100%;
     max-width: 100%;
-    overflow: hidden !important; 
+    overflow: hidden !important;
     white-space: nowrap !important;
     text-overflow: ellipsis !important;
+  }
+
+  .card-container {
+    width: 100%;
+    padding: 0 0 15px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .card {
+    transition: transform 0.3s ease;
+    width: 100%;
+  }
+
+  .card_edit {
+    width: 100%;
+    height: 122.5px;
+    border-radius: 10px;
+    background-color: #146EFB;
+    border: 2px solid #fff !important;
+    filter: drop-shadow(0px 2px 4px rgba(112, 121, 116, 0.3));
+  }
+
+  .card_delete {
+    width: 100%;
+    height: 122.5px;
+    stroke: #fff;
+    border-radius: 10px;
+    background-color: #e83f5b;
+    border: 2px solid #fff !important;
+    filter: drop-shadow(0px 2px 4px rgba(112, 121, 116, 0.3));
+  }
+
+  .card.reveal {
+    transform: translateX(-80px); /* Ajuste o valor conforme necessário */
+  }
+
+  .action-button {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: 80px; /* Largura do botão que será revelado */
+    background-color: #ff4444; /* Cor de fundo do botão */
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
   }
 }

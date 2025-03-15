@@ -1,5 +1,7 @@
 import pole from "./pole.svg";
 import home from "./home.svg";
+import edit from "./edit.svg";
+import trash from "./trash.svg";
 import wallet from "./wallet.svg";
 import profile from "./profile.svg";
 import calendar from "./calendar.svg";
@@ -22,6 +24,8 @@ import calendar_solid_white from "./calendar_solid_white.svg";
 export const icons = {
   pole,
   home,
+  edit,
+  trash,
   wallet,
   profile,
   fallback,

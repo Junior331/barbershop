@@ -6,6 +6,7 @@ import { getIcons } from "@/assets/icons";
 import { formatDateTime, formatter, getCurrentDate } from "@/utils/utils";
 import { Layout } from "@/components/templates";
 import { Card, Header } from "@/components/organisms";
+import SwipeableCard from "./SwipeableCard";
 
 export const Calendar = () => {
   const { dayOfWeek, formattedDate } = getCurrentDate();
@@ -54,7 +55,7 @@ export const Calendar = () => {
           </div>
 
           <div className="flex flex-1 flex-col gap-2.5 w-full h-full items-start justify-start overflow-y-auto pr-2">
-            {processedServices
+            {/* {processedServices
               .filter((item) => !item.isCompleted)
               .map((item) => (
                 <div
@@ -106,7 +107,9 @@ export const Calendar = () => {
                     </div>
                   </Card>
                 </div>
-              ))}
+              ))} */}
+
+              <SwipeableCard />
 
             <div className="flex gap-0.5 justify-center items-center w-full min-h-10 overflow-hidden">
               {dotsArray.map((_, index) => (

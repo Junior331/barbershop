@@ -2,7 +2,7 @@ import { service } from "@/utils/types";
 import { getServices } from "@/assets/services";
 
 // Função para gerar uma data aleatória no formato ISO
-const generateRandomDate = (dateString: string): string => {
+export const generateRandomDate = (dateString: string): string => {
   const date = new Date(dateString);
   // Gera horas, minutos, segundos e milissegundos aleatórios
   const hours = Math.floor(Math.random() * 24); // 0-23
@@ -18,7 +18,7 @@ export const orders: service[] = [
     id: 1,
     time: 40,
     price: 40,
-    date: generateRandomDate("2025-03-15"), // Data aleatória
+    date: generateRandomDate("2025-03-16"), // Data aleatória
     status: "pending",
     name: "Beard & hair",
     barber: "Breno Tavares",
