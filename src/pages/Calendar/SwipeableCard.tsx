@@ -29,11 +29,11 @@ const SwipeableCard = () => {
   };
 
   const handleLeftAction = () => {
-    alert("Ação da esquerda executada!");
+    alert("Editar agendamento!");
   };
 
   const handleRightAction = () => {
-    alert("Ação da direita executada!");
+    alert("Excluir agendamento!");
   };
 
   return (
@@ -45,11 +45,12 @@ const SwipeableCard = () => {
         minHeight: "min-content",
       }}
     >
+      {/* Ícone de Edição (esquerda) */}
       <motion.div
         className="card_edit"
         style={{
           left: 7,
-          zIndex: 4,
+          zIndex: isSwipedRight ? 2 : 1, // z-index dinâmico
           top: "50%",
           display: "flex",
           paddingLeft: 20,
@@ -58,16 +59,17 @@ const SwipeableCard = () => {
           opacity: opacityRight,
           transform: "translateY(-50%)",
         }}
-        onClick={() => handleLeftAction()}
+        onClick={handleLeftAction} // Ação de edição
       >
-        <img src={getIcons("edit")} alt="" />
+        <img src={getIcons("edit")} alt="Editar" />
       </motion.div>
 
+      {/* Card principal */}
       <motion.div
         style={{
           x,
           position: "relative",
-          zIndex: 10,
+          zIndex: 3, // z-index maior que os ícones de ação
         }}
         drag="x"
         onDragEnd={handleDragEnd}
@@ -85,7 +87,7 @@ const SwipeableCard = () => {
             <div className="flex items-center w-full h-full">
               <img
                 src={getServices("beard_hair")}
-                alt={`Service`}
+                alt="Serviço"
                 className="w-[87px] h-[87px]"
               />
               <div className="flex flex-col justify-start items-start w-full gap-2 flex-grow pl-2">
@@ -124,11 +126,12 @@ const SwipeableCard = () => {
         </div>
       </motion.div>
 
+      {/* Ícone de Exclusão (direita) */}
       <motion.div
         className="card_delete"
         style={{
           right: 7,
-          zIndex: 4,
+          zIndex: isSwipedLeft ? 2 : 1, // z-index dinâmico
           top: "50%",
           display: "flex",
           paddingRight: 20,
@@ -138,9 +141,9 @@ const SwipeableCard = () => {
           justifyContent: "flex-end",
           transform: "translateY(-50%)",
         }}
-        onClick={() => handleRightAction()}
+        onClick={handleRightAction} // Ação de exclusão
       >
-        <img src={getIcons("trash")} alt="" />
+        <img src={getIcons("trash")} alt="Excluir" />
       </motion.div>
     </div>
   );
