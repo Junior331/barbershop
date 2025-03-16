@@ -74,3 +74,26 @@ export const formatDateTime = (dateString: string, type: "date" | "time") => {
     hour12: false,
   });
 };
+
+// export const maskPhone = (value: string) =>
+//   value.replace(/(\d{2})(\d{5})(\d{4})/g, "($1) $2-$3");
+
+export const maskPhone = (value: string) =>
+  value
+    .replace(/\D/g, '')
+    .replace(/(\d{2})(\d)/, '($1) $2')
+    .replace(/(\d{5})(\d)/, '$1-$2')
+    .slice(0, 15);
+
+export const maskBirthday = (value: string) =>
+  value
+    .replace(/\D/g, '')
+    .replace(/(\d{2})(\d)/, '$1/$2')
+    .replace(/(\d{2})(\d)/, '$1/$2')
+    .slice(0, 10);
+
+export const maskZipCode = (value: string) =>
+  value
+    .replace(/\D/g, '')
+    .replace(/(\d{5})(\d)/, '$1-$2')
+    .slice(0, 9);

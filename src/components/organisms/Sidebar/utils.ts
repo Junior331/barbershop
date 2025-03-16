@@ -24,8 +24,8 @@ export const routes = [
   },
   {
     id: 4,
-    name: "Profile",
-    path: "/profile",
+    name: "Account",
+    path: "/account",
     icon: getIcons("profile"),
     icon_active: getIcons("profile_active"),
   },

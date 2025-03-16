@@ -52,7 +52,7 @@ export const Calendar = () => {
             </div>
           </div>
 
-          <div className="flex flex-1 flex-col gap-2.5 w-full h-full items-start justify-start overflow-y-auto pr-2">
+          <div className="flex flex-1 flex-col gap-2.5 w-full h-full items-start justify-start overflow-y-auto pr-2 pb-[50px]">
             {processedServices
               .filter((item) => !item.isCompleted)
               .map((item) => (
