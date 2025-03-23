@@ -72,10 +72,24 @@
     background-color: var(--text) !important;
   }
 
+  .custom_before_service:checked::before {
+    background-color: #ffff !important;
+  }
+
+  .custom_hover_btn {
+    background-color: #f6f3f4 !important;
+  }
+
   .inter {
     font-weight: 400;
     font-style: normal;
     font-family: "Inter", sans-serif !important;
+  }
+
+  .dm_sans {
+    font-weight: 400;
+    font-style: normal;
+    font-family: "DM Sans", sans-serif;
   }
 
   .text_ellipsis {
@@ -118,7 +132,7 @@
   }
 
   .card.reveal {
-    transform: translateX(-80px); /* Ajuste o valor conforme necessário */
+    transform: translateX(-80px);
   }
 
   .action-button {
@@ -126,13 +140,21 @@
     right: 0;
     top: 0;
     height: 100%;
-    width: 80px; /* Largura do botão que será revelado */
-    background-color: #ff4444; /* Cor de fundo do botão */
+    width: 80px;
+    background-color: #ff4444;
     color: white;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
+  }
+
+  .custom_input_radio:checked::before {
+    background-color: #6E6B7B !important;
+  }
+  .custom_input_radio:checked {
+    border-color: #6E6B7B !important;
+    background-color: transparent !important;
   }
 
   .toggle:checked {

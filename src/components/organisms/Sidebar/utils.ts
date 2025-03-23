@@ -17,8 +17,8 @@ export const routes = [
   },
   {
     id: 3,
-    name: "Calendar",
-    path: "/calendar",
+    name: "My Bookings",
+    path: "/mybookings",
     icon: getIcons("calendar"),
     icon_active: getIcons("calendar_active"),
   },

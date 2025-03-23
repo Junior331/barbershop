@@ -47,11 +47,11 @@ export const Wallet = () => {
                 />
 
                 <div className="mt-auto">
-                  <p className="flex w-[48.442px] h-[13px] flex-col justify-center flex-shrink-0 text-[#181D27] font-inter text-[9px] font-extralight leading-[19.5px]">
+                  <p className="flex w-[48.442px] h-[13px] flex-col justify-center flex-shrink-0 text-[#181D27] inter text-[9px] font-extralight leading-[19.5px]">
                     Payment
                   </p>
 
-                  <p className="flex w-[64.913px] h-[13px] flex-col justify-center flex-shrink-0 text-[#181D27] font-inter text-[10px] font-medium leading-[19.5px]">
+                  <p className="flex w-[64.913px] h-[13px] flex-col justify-center flex-shrink-0 text-[#181D27] inter text-[10px] font-medium leading-[19.5px]">
                     Apple pay
                   </p>
                 </div>
@@ -65,11 +65,11 @@ export const Wallet = () => {
                 />
 
                 <div className="mt-auto">
-                  <p className="flex w-[48.442px] h-[13px] flex-col justify-center flex-shrink-0 text-[#181D27] font-inter text-[9px] font-extralight leading-[19.5px]">
+                  <p className="flex w-[48.442px] h-[13px] flex-col justify-center flex-shrink-0 text-[#181D27] inter text-[9px] font-extralight leading-[19.5px]">
                     Visa
                   </p>
 
-                  <p className="flex w-[64.913px] h-[13px] flex-col justify-center flex-shrink-0 text-[#181D27] font-inter text-[10px] font-medium leading-[19.5px]">
+                  <p className="flex w-[64.913px] h-[13px] flex-col justify-center flex-shrink-0 text-[#181D27] inter text-[10px] font-medium leading-[19.5px]">
                     **** 3708
                   </p>
                 </div>
@@ -83,11 +83,11 @@ export const Wallet = () => {
                 />
 
                 <div className="mt-auto">
-                  <p className="flex w-[48.442px] h-[13px] flex-col justify-center flex-shrink-0 text-[#181D27] font-inter text-[9px] font-extralight leading-[19.5px]">
+                  <p className="flex w-[48.442px] h-[13px] flex-col justify-center flex-shrink-0 text-[#181D27] inter text-[9px] font-extralight leading-[19.5px]">
                   Register
                   </p>
 
-                  <p className="flex w-[64.913px] h-[13px] flex-col justify-center flex-shrink-0 text-[#181D27] font-inter text-[10px] font-medium leading-[19.5px]">
+                  <p className="flex w-[64.913px] h-[13px] flex-col justify-center flex-shrink-0 text-[#181D27] inter text-[10px] font-medium leading-[19.5px]">
                   new card
                   </p>
                 </div>

@@ -18,7 +18,7 @@ export const orders: service[] = [
     id: 1,
     time: 40,
     price: 40,
-    date: generateRandomDate("2025-03-16"), // Data aleatória
+    date: generateRandomDate("2025-03-16"),
     status: "pending",
     name: "Beard & hair",
     barber: "Breno Tavares",
@@ -29,7 +29,7 @@ export const orders: service[] = [
     id: 2,
     time: 20,
     price: 20,
-    date: generateRandomDate("2025-03-20"), // Data aleatória
+    date: generateRandomDate("2025-03-20"),
     status: "pending",
     name: "Beard",
     barber: "Breno Tavares",
@@ -40,7 +40,7 @@ export const orders: service[] = [
     id: 3,
     time: 25,
     price: 25,
-    date: generateRandomDate("2025-03-12"), // Data aleatória
+    date: generateRandomDate("2025-03-12"),
     status: "completed",
     name: "Hair",
     barber: "Breno Tavares",
@@ -51,7 +51,7 @@ export const orders: service[] = [
     id: 4,
     time: 28,
     price: 28,
-    date: generateRandomDate("2025-03-12"), // Data aleatória
+    date: generateRandomDate("2025-03-12"),
     status: "completed",
     name: "Scissor Cut",
     barber: "Jaja",
@@ -62,7 +62,7 @@ export const orders: service[] = [
     id: 5,
     time: 35,
     price: 35,
-    date: generateRandomDate("2025-03-12"), // Data aleatória
+    date: generateRandomDate("2025-03-12"),
     status: "completed",
     name: "Reflex",
     barber: "Breno Tavares",
@@ -73,7 +73,7 @@ export const orders: service[] = [
     id: 6,
     time: 40,
     price: 40,
-    date: generateRandomDate("2025-03-12"), // Data aleatória
+    date: generateRandomDate("2025-03-12"),
     status: "completed",
     name: "Pigmentation",
     barber: "Angelo Lima",
@@ -84,7 +84,7 @@ export const orders: service[] = [
     id: 7,
     time: 40,
     price: 40,
-    date: generateRandomDate("2025-03-12"), // Data aleatória
+    date: generateRandomDate("2025-03-12"),
     status: "completed",
     name: "Kids' cuts",
     barber: "Joao Pedro",
@@ -95,7 +95,7 @@ export const orders: service[] = [
     id: 8,
     time: 8,
     price: 8,
-    date: generateRandomDate("2025-03-12"), // Data aleatória
+    date: generateRandomDate("2025-03-12"),
     status: "completed",
     name: "Hair cuts",
     barber: "Danyel Coelho",
@@ -106,7 +106,7 @@ export const orders: service[] = [
     id: 9,
     time: 8,
     price: 8,
-    date: generateRandomDate("2025-03-12"), // Data aleatória
+    date: generateRandomDate("2025-03-12"),
     status: "completed",
     name: "Eyebrow",
     barber: "Breno Tavares",

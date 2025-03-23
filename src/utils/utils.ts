@@ -43,24 +43,6 @@ export const convertSecondsToDays = (seconds: number): number => {
   return Math.floor(seconds / secondsInADay);
 };
 
-export const getCurrentDate = (): {
-  dayOfWeek: string;
-  formattedDate: string;
-} => {
-  const date = new Date();
-
-  const dayOfWeek = new Intl.DateTimeFormat("pt-BR", {
-    weekday: "long",
-  }).format(date);
-
-  const formattedDate = new Intl.DateTimeFormat("pt-BR", {
-    day: "2-digit",
-    month: "long",
-  }).format(date);
-
-  return { dayOfWeek, formattedDate };
-};
-
 export const formatDateTime = (dateString: string, type: "date" | "time") => {
   const date = new Date(dateString);
 
@@ -80,20 +62,74 @@ export const formatDateTime = (dateString: string, type: "date" | "time") => {
 
 export const maskPhone = (value: string) =>
   value
-    .replace(/\D/g, '')
-    .replace(/(\d{2})(\d)/, '($1) $2')
-    .replace(/(\d{5})(\d)/, '$1-$2')
+    .replace(/\D/g, "")
+    .replace(/(\d{2})(\d)/, "($1) $2")
+    .replace(/(\d{5})(\d)/, "$1-$2")
     .slice(0, 15);
 
 export const maskBirthday = (value: string) =>
   value
-    .replace(/\D/g, '')
-    .replace(/(\d{2})(\d)/, '$1/$2')
-    .replace(/(\d{2})(\d)/, '$1/$2')
+    .replace(/\D/g, "")
+    .replace(/(\d{2})(\d)/, "$1/$2")
+    .replace(/(\d{2})(\d)/, "$1/$2")
     .slice(0, 10);
 
 export const maskZipCode = (value: string) =>
   value
-    .replace(/\D/g, '')
-    .replace(/(\d{5})(\d)/, '$1-$2')
+    .replace(/\D/g, "")
+    .replace(/(\d{5})(\d)/, "$1-$2")
     .slice(0, 9);
+
+export const getCurrentDate = (): {
+  dayOfWeek: string;
+  formattedDate: string;
+} => {
+  const date = new Date();
+
+  const rawDayOfWeek = new Intl.DateTimeFormat("pt-BR", {
+    weekday: "long",
+  }).format(date);
+
+  const rawFormattedDate = new Intl.DateTimeFormat("pt-BR", {
+    day: "2-digit",
+    month: "long",
+  }).format(date);
+
+  const dayOfWeek =
+    rawDayOfWeek.charAt(0).toUpperCase() + rawDayOfWeek.slice(1);
+
+  // Capitalizar mês
+  const formattedDate = rawFormattedDate.replace(
+    /(\d{2}) de (\w+)/,
+    (_, day, month) =>
+      `${day} ${month.charAt(0).toUpperCase() + month.slice(1)}`
+  );
+
+  return { dayOfWeek, formattedDate };
+};
+
+export const formatCustomDateTime = (isoString: string): string => {
+  const date = new Date(isoString);
+  
+  const formattedDate = date.toLocaleDateString('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  });
+
+  const formattedTime = date.toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true
+  });
+
+  return `${formattedDate} as ${formattedTime}`;
+};
+
+export const formatPercentage = (value: number): string => {
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'percent',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 1
+  }).format(value);
+};

@@ -75,7 +75,7 @@ export const SwipeableCard = ({ item }: IProps) => {
                 className="w-[87px] h-[87px]"
               />
               <div className="flex flex-col justify-start items-start w-full gap-2 flex-grow pl-2">
-                <p className="text-white font-inter text-[13px] font-bold leading-[150%]">
+                <p className="text-white inter text-[13px] font-bold leading-[150%]">
                   {item.name}
                 </p>
                 <p className="text-white inter text-[8px] font-[300] leading-none">

@@ -66,7 +66,7 @@ export const Profile = () => {
               />
 
               <div className="flex flex-col justify-start items-start w-full flex-grow pl-2">
-                <p className="text-[#5E5873] font-inter text-2xl font-medium leading-[150%]">
+                <p className="text-[#5E5873] inter text-2xl font-medium leading-[150%]">
                   Jaja teste
                 </p>
                 <p className="text-[#5E5873] inter text-base font-light leading-none">

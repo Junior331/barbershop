@@ -43,6 +43,7 @@ export type randomMessage = {
   title: string;
   message: string;
 };
+
 export type service = {
   id: number;
   date: string;
@@ -54,3 +55,50 @@ export type service = {
   location: string;
   status: "completed" | "pending";
 };
+
+export interface ServiceSummary {
+  id: number;
+  time: number;
+  name: string;
+  icon: string;
+  price: number;
+}
+
+export interface Order {
+  id: string;
+  total: number;
+  discount: number;
+  subTotal: number;
+  paymentFee: number;
+  date: string | null;
+  services: ServiceSummary[];
+  status: "pending" | "confirmed" | "canceled";
+  paymentMethod: "pix" | "credit_card" | "debit_card" | string;
+}
+
+export interface CurrentOrder {
+  id: string;
+  total: number;
+  discount: number;
+  subTotal: number;
+  paymentFee: number;
+  date: string | null;
+  paymentMethod: string;
+  services: ServiceSummary[];
+  status: 'pending' | 'confirmed' | 'canceled';
+}
+
+export interface OrderActions {
+  addOrder: (order: Order) => void;
+  setDiscount: (discount: number) => void;
+  setDate: (dateTime: string | null) => void;
+  setPaymentMethod: (method: string) => void;
+  toggleService: (service: ServiceSummary) => void;
+  updateOrderStatus: (orderId: string, status: Order['status']) => void;
+}
+
+export interface OrderStore {
+  orders: Order[];
+  actions: OrderActions;
+  currentOrder: CurrentOrder;
+}

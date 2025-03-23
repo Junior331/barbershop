@@ -1,145 +1,191 @@
-import { useMemo } from "react";
-import { isBefore } from "date-fns";
-
-import { mocks } from "@/services/mocks";
+import { timeSlots } from "./utiils";
 import { getIcons } from "@/assets/icons";
+import { useCalendar } from "./useCalendar";
 import { Layout } from "@/components/templates";
-import { Card, Header, SwipeableCard } from "@/components/organisms";
-import { formatDateTime, formatter, getCurrentDate } from "@/utils/utils";
+import { Header } from "@/components/organisms";
+import { useEffect } from "react";
 
 export const Calendar = () => {
-  const { dayOfWeek, formattedDate } = getCurrentDate();
+  const {
+    days,
+    order,
+    navigate,
+    dayOfWeek,
+    monthNames,
+    daysOfWeek,
+    isSelected,
+    formatTime,
+    currentDate,
+    selectedTime,
+    formattedDate,
+    handleDayClick,
+    isCurrentMonth,
+    setCurrentDate,
+    handlePrevMonth,
+    handleNextMonth,
+    isDateSelectable,
+    handleTimeSelection,
+  } = useCalendar();
 
-  const processedServices = useMemo(
-    () =>
-      mocks.orders.map((service) => {
-        const serviceDate = new Date(service.date);
-        const currentDate = new Date();
+  useEffect(() => {
+    if (order.date) {
+      const storedDate = new Date(order.date);
+      setCurrentDate(new Date(
+        storedDate.getFullYear(),
+        storedDate.getMonth(),
+        1
+      ));
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [order.date]);
 
-        serviceDate.setHours(0, 0, 0, 0);
-        currentDate.setHours(0, 0, 0, 0);
-
-        const isCompleted =
-          service.status === "completed" || isBefore(serviceDate, currentDate);
-
-        console.log("Service Date:", serviceDate.toISOString());
-        console.log("Current Date:", currentDate.toISOString());
-        console.log("Is Completed:", isCompleted);
-
-        return { ...service, isCompleted };
-      }),
-    []
-  );
-
-  const dotsArray = Array.from({ length: 20 });
 
   return (
     <Layout>
       <div className="flex flex-col justify-start items-center h-full w-full">
-        <Header title={"My bookings"} backPath={"/home"} />
-        <div className="flex flex-col justify-start items-center h-full w-full p-4 pr-2 pt-2">
-          <div className="flex w-full gap-3 mb-4">
-            <div className="w-[71px] h-[71px] flex justify-center items-center rounded-[71px] flex-shrink-0 bg-[#6B7280] border-2 border-white filter drop-shadow-[0px_2px_4px_rgba(112,121,116,0.30)]">
-              <img src={getIcons("calendar_solid_white")} alt="Icon calendar" />
-            </div>
-            <div className="flex flex-col justify-center">
-              <p className="text-black font-inter text-[12px] font-medium leading-normal">
+        <Header title={"Calendar"} backPath={"/services"} />
+
+        <div className="flex h-full flex-col w-full justify-start items-start gap-5">
+          <div className="flex items-center w-full h-auto px-4">
+            <img
+              alt="Image avatar"
+              src={getIcons("calendar_solid_white")}
+              className="w-[71px] h-[71px] p-2.5 bg-[#6B7280] flex-shrink-0 rounded-[70px] border-2 border-white object-cover filter drop-shadow-[0_2px_4px_rgba(112,121,116,0.30)]"
+            />
+            <div className="flex flex-col justify-start items-start w-full flex-grow pl-2 gap-1">
+              <p className="flex-shrink-0 text-black inter text-[12px] font-medium leading-none">
                 {dayOfWeek}
               </p>
-              <h2 className="text-black font-inter text-[20px] font-bold leading-normal">
+              <h2 className="flex-shrink-0 text-black inter text-[20px] font-bold tracking-[1px] leading-none">
                 {formattedDate}
               </h2>
             </div>
           </div>
 
-          <div className="flex flex-1 flex-col gap-2.5 w-full h-full items-start justify-start overflow-y-auto pr-2 pb-[50px]">
-            {processedServices
-              .filter((item) => !item.isCompleted)
-              .map((item) => (
-                <SwipeableCard item={item} />
-              ))}
+          <div className="flex flex-col w-full bg-white shadow-sm p-4 pt-9 rounded-[40px_40px_0px_0px] overflow-auto h-[calc(100vh-220px)]">
+            <div className="w-full">
+              <div className="flex items-center justify-between mb-4">
+                <button
+                  onClick={handlePrevMonth}
+                  className="btn btn-circle btn-sm btn-ghost border-none hover:!bg-gray-100 active:!bg-gray-200 focus:!bg-gray-100 !shadow-none transition-all p-2.5"
+                >
+                  <img
+                    src={getIcons("arrow_line_left")}
+                    alt="Previous month"
+                    className="w-5 h-5 object-contain pointer-events-none"
+                  />
+                </button>
 
-            <div className="flex gap-0.5 justify-center items-center w-full min-h-10 overflow-hidden">
-              {dotsArray.map((_, index) => (
-                <div
-                  key={`left-${index}`}
-                  className="min-w-1 min-h-1 rounded bg-[#000]"
-                ></div>
-              ))}
-              <div className="w-[136px] h-[29px] flex-shrink-0 rounded-[25px] bg-white shadow-[0px_4px_4px_0px_rgba(50,183,104,0.15)] flex justify-center items-center mx-1.5">
-                <h2 className="text-black font-roboto text-[16px] font-medium leading-none">
-                  Finished
-                </h2>
+                <h3 className="text-lg font-semibold">
+                  {monthNames[currentDate.getMonth()]}{" "}
+                  {currentDate.getFullYear()}
+                </h3>
+
+                <button
+                  onClick={handleNextMonth}
+                  className="btn btn-circle btn-sm btn-ghost border-none hover:!bg-gray-100 active:!bg-gray-200 focus:!bg-gray-100 !shadow-none transition-all p-2.5"
+                >
+                  <img
+                    src={getIcons("arrow_line_right")}
+                    alt="Next month"
+                    className="w-5 h-5 object-contain pointer-events-none"
+                  />
+                </button>
               </div>
-              {dotsArray.map((_, index) => (
-                <div
-                  key={`right-${index}`}
-                  className="min-w-1 min-h-1 rounded bg-[#000]"
-                ></div>
-              ))}
+
+              <div className="grid grid-cols-7 gap-1 mb-2">
+                {daysOfWeek.map((day) => (
+                  <div
+                    key={day}
+                    className="text-center text-sm font-medium text-gray-500"
+                  >
+                    {day}
+                  </div>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-7 gap-1">
+                {days.map((day, index) => {
+                  const today = new Date();
+                  const isToday =
+                    isCurrentMonth &&
+                    day === today.getDate() &&
+                    currentDate.getMonth() === today.getMonth();
+
+                  const isValidDay = day && isDateSelectable(day);
+
+                  return (
+                    <div
+                      key={index}
+                      onClick={() => isValidDay && handleDayClick(day)}
+                      className={`h-12 flex items-center justify-center text-sm transition-all
+                ${day ? "cursor-pointer" : "opacity-0"}
+                ${isToday ? "bg-blue-500 text-white rounded-[10px]" : ""}
+                ${
+                  isSelected(day as number)
+                    ? "w-[48px] !bg-[#6B7280] text-white rounded-[10px]"
+                    : ""
+                }
+                ${
+                  isValidDay
+                    ? "hover:bg-gray-100"
+                    : "cursor-not-allowed opacity-50"
+                }`}
+                    >
+                      {day}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
 
-            {processedServices
-              .filter((item) => item.isCompleted)
-              .map((item) => (
-                <div
-                  key={item.id}
-                  className="btn w-full h-auto bg-transparent border-0 shadow-none p-0 filter blur-[0.75px]"
-                >
-                  <Card
-                    style={{
-                      padding: 11.5,
-                      paddingLeft: 2,
-                      minWidth: "100%",
-                      minHeight: "initial",
-                    }}
+            <h2 className="text-black inter text-[24px] font-medium leading-normal tracking-[1.2px] m-[25px_0px]">
+              Timetables
+            </h2>
+
+            <div className="w-full grid grid-cols-3 gap-3">
+              {timeSlots.map((item) => {
+                const isSelected = selectedTime === item.time;
+
+                return (
+                  <div
+                    key={item.id}
+                    className="w-full cursor-pointer"
+                    onClick={() => handleTimeSelection(item.time)}
                   >
-                    <div className="flex items-center w-full h-full">
-                      <img
-                        src={item.icon}
-                        alt={`Service ${item.name}`}
-                        className="w-[87px] h-[87px]"
-                      />
-                      <div className="flex flex-col justify-start items-start w-full gap-2 flex-grow pl-2">
-                        <p className="text-white font-inter text-[13px] font-bold leading-[150%]">
-                          {item.name}
-                        </p>
-                        <p className="text-white inter text-[8px] font-[300] leading-none">
-                          <strong className="font-bold text-[11px]">
-                            Price:{" "}
-                          </strong>
-                          {formatter({
-                            type: "pt-BR",
-                            currency: "BRL",
-                            style: "currency",
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          }).format(item.price || 0)}{" "}
-                        </p>
-                        <p className="text-white inter text-[8px] font-[300] leading-none">
-                          <strong className="font-bold text-[11px]">
-                            Time:{" "}
-                          </strong>
-                          {item.time} minutes
-                        </p>
-                        <p className="text-white inter text-[8px] font-[300] leading-none">
-                          <strong className="font-bold text-[11px]">
-                            Date:{" "}
-                          </strong>
-                          {formatDateTime(item.date, "date")} at{" "}
-                          {formatDateTime(item.date, "time")}
-                        </p>
-                        <p className="text-white inter text-[8px] font-[300] leading-none">
-                          <strong className="font-bold text-[11px]">
-                            Barber:{" "}
-                          </strong>
-                          {item.barber}
-                        </p>
-                      </div>
+                    <div
+                      className={`
+          w-full h-[33.568px] flex-shrink-0 rounded-[21px]
+          flex items-center justify-center transition-colors
+          ${
+            isSelected
+              ? "bg-[#ECEFF1]"
+              : "bg-[#6B7280] filter drop-shadow-[0px_4px_4px_rgba(32,32,32,0.15)]"
+          }
+        `}
+                    >
+                      <p
+                        className={`
+            text-[10px] inter font-medium leading-none
+            ${isSelected ? "text-[rgba(107,114,128,0.2)]" : "text-white"}
+          `}
+                      >
+                        {formatTime(item.time)}{" "}
+                      </p>
                     </div>
-                  </Card>
-                </div>
-              ))}
+                  </div>
+                );
+              })}
+            </div>
+
+            <button
+              type="button"
+              disabled={!order.date}
+              onClick={() => navigate("/confirm")}
+              className="btn w-full max-w-full border-none bg-[#6B7280] disabled:!bg-[#e5e5e5] rounded text-[14px] text-[#FFF] py-[10px] font-[500] tracking-[0.4px] mt-10"
+            >
+              Confirm
+            </button>
           </div>
         </div>
       </div>

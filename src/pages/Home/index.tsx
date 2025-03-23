@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 import { formatter } from "@/utils/utils";
 import { getIcons } from "@/assets/icons";
@@ -7,6 +8,8 @@ import { Layout } from "@/components/templates";
 import { barbers, orders, promotionsWeek } from "./utils";
 
 export const Home = () => {
+  const navigate = useNavigate();
+
   return (
     <Layout>
       <div className="flex flex-col pt-[27px] px-3 pr-1 justify-start items-start h-screen w-full">
@@ -41,7 +44,7 @@ export const Home = () => {
                       className="w-[45px] h-[45px] mx-auto"
                     />
                     <div className="flex-1 flex flex-col justify-end w-full h-full">
-                      <p className="text-white font-inter text-[9px] font-bold leading-none">
+                      <p className="text-white inter text-[9px] font-bold leading-none">
                         {formatter({
                           type: "pt-BR",
                           currency: "BRL",
@@ -50,7 +53,7 @@ export const Home = () => {
                           maximumFractionDigits: 2,
                         }).format(item.price || 0)}
                       </p>
-                      <p className="text-white font-inter text-[9px] font-bold leading-none truncate max-w-[80px]">
+                      <p className="text-white inter text-[9px] font-bold leading-none truncate max-w-[80px]">
                         {item.name}
                       </p>
                     </div>
@@ -92,20 +95,20 @@ export const Home = () => {
                         />
 
                         <div className="flex flex-col justify-start items-start w-full gap-[3px] flex-grow pl-2">
-                          <p className="text-white font-inter text-[13px] font-bold leading-[150%] border-b border-[#E5E7EB]">
+                          <p className="text-white inter text-[13px] font-bold leading-[150%] border-b border-[#E5E7EB]">
                             {item.name}
                           </p>
                           <p className="text-white font-roboto text-[8px] font-normal leading-none">
                             {item.barber}
                           </p>
-                          <p className="flex items-center gap-[1.5px] text-white font-inter text-[6.5px] font-normal leading-0">
+                          <p className="flex items-center gap-[1.5px] text-white inter text-[6.5px] font-normal leading-0">
                             <img
                               alt="Icon location"
                               src={getIcons("location_outlined")}
                             />
                             {item.location}
                           </p>
-                          <p className="flex items-center gap-[2.5px] text-white font-inter text-[6.5px] font-normal leading-0">
+                          <p className="flex items-center gap-[2.5px] text-white inter text-[6.5px] font-normal leading-0">
                             <img
                               alt="Icon location"
                               src={getIcons("clock_outlined")}
@@ -158,13 +161,13 @@ export const Home = () => {
                         />
 
                         <div className="flex flex-col justify-start items-start w-full gap-[3px] flex-grow pl-2">
-                          <p className="w-full text-start text-white font-inter text-[13px] font-bold leading-[150%] border-b border-[#E5E7EB] text_ellipsis">
+                          <p className="w-full text-start text-white inter text-[13px] font-bold leading-[150%] border-b border-[#E5E7EB] text_ellipsis">
                             {item.name}
                           </p>
                           <p className="text-white font-roboto text-[8px] font-normal leading-none">
                             {item.type}
                           </p>
-                          <p className="flex items-center gap-[1.5px] text-white font-inter text-[6.5px] font-normal leading-0">
+                          <p className="flex items-center gap-[1.5px] text-white inter text-[6.5px] font-normal leading-0">
                             <img
                               alt="Icon location"
                               src={getIcons("location_outlined")}
@@ -177,11 +180,11 @@ export const Home = () => {
                               src={getIcons("star_solid")}
                               className="relative top-[-1px]"
                             />
-                            <p className="flex items-center gap-[2.5px] text-white font-inter text-[6.5px] font-normal leading-0">
+                            <p className="flex items-center gap-[2.5px] text-white inter text-[6.5px] font-normal leading-0">
                               {item.rating}
                             </p>
                             <div className="h-[7px] w-[0.5px] bg-white" />
-                            <p className="flex items-center gap-[2.5px] text-white font-inter text-[6.5px] font-normal leading-0">
+                            <p className="flex items-center gap-[2.5px] text-white inter text-[6.5px] font-normal leading-0">
                               {item.cuts} Cuts
                             </p>
                           </div>
@@ -210,6 +213,7 @@ export const Home = () => {
               repeat: Infinity,
               repeatType: "loop",
             }}
+            onClick={() => navigate("/services")}
           >
             Agendar
             <span className="absolute top-0 left-0 w-full h-full rounded-lg opacity-0 hover:opacity-20 bg-white transition-opacity duration-300"></span>

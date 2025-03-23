@@ -59,7 +59,7 @@ export const Account = () => {
                   className="size-[69px] rounded-[70px] border-3 object-cover border-white shadow-[0_0_14px_rgba(0,0,0,0.14)]"
                 />
                 <div className="flex flex-col justify-start items-start w-full flex-grow pl-2">
-                  <p className="text-white font-inter text-[14px] font-medium leading-[150%]">
+                  <p className="text-white inter text-[14px] font-medium leading-[150%]">
                     Jaja teste
                   </p>
                   <p className="text-white inter text-[11px] font-light leading-none">
