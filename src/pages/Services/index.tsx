@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { formatter } from "@/utils/utils";
@@ -15,10 +14,6 @@ export const Services = () => {
 
   const isServiceSelected = (id: number): boolean =>
     selectedServices.some((service) => service.id === id);
-
-  useEffect(() => {
-    console.log("selectedServices ::", selectedServices);
-  }, [selectedServices]);
 
   return (
     <Layout>

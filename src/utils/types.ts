@@ -46,11 +46,24 @@ export type randomMessage = {
 
 export type service = {
   id: number;
+  date: string;
   name: string;
   time: number;
   icon: string;
   price: number;
+  barber: string;
+  location: string;
+  status: "completed" | "pending";
 };
+
+export interface ServiceSummary {
+  id: number;
+  time: number;
+  name: string;
+  icon: string;
+  price: number;
+  barber: string;
+}
 
 export interface Order {
   id: string;

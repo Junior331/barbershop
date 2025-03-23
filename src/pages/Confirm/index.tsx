@@ -30,8 +30,12 @@ export const Confirm = () => {
       time: 0,
       name: "",
       icon: "",
+      date: "",
       price: 0,
+      barber: "",
+      location: "",
       id: serviceId,
+      status: "pending"
     });
   };
 
@@ -114,7 +118,7 @@ export const Confirm = () => {
                   />
                   <div className="flex flex-col justify-start items-start w-full flex-grow pl-2 gap-1">
                     <p className="flex flex-col justify-center flex-shrink-0 text-[#6B7280] dm_sans text-[8px] font-light ">
-                      {/* {service.barber} */}
+                      {service.barber}
                     </p>
                     <h2 className="flex flex-col justify-center flex-shrink-0 text-[#494949] dm_sans text-[13px] font-medium ">
                       {service.name}
