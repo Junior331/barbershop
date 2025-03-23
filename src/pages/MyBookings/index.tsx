@@ -84,7 +84,7 @@ export const MyBookings = () => {
               .map((item) => (
                 <div
                   key={item.id}
-                  className="btn w-full h-auto bg-transparent border-0 shadow-none p-0 filter blur-[0.75px]"
+                  className="btn w-full h-auto bg-transparent border-0 shadow-none p-0 filter"
                 >
                   <Card
                     style={{

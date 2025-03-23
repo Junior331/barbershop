@@ -13,6 +13,7 @@ export const useOrderStore = create<OrderStore>((set) => ({
     id: "",
     total: 0,
     date: null,
+    barber: '',
     subTotal: 0,
     discount: 0,
     services: [],
@@ -28,6 +29,7 @@ export const useOrderStore = create<OrderStore>((set) => ({
         currentOrder: {
           id: "",
           total: 0,
+          barber: '',
           date: null,
           discount: 0,
           subTotal: 0,

@@ -27,11 +27,15 @@ export const Confirm = () => {
 
   const handleDelete = (serviceId: number) => {
     toggleService({
-      id: serviceId,
-      price: 0,
       time: 0,
       name: "",
       icon: "",
+      date: "",
+      price: 0,
+      barber: "",
+      location: "",
+      id: serviceId,
+      status: "pending"
     });
   };
 
@@ -51,7 +55,6 @@ export const Confirm = () => {
   const handleFinalConfirm = async () => {
     setLoading(true);
     try {
-      // Simulação de request com 50% de chance de sucesso
       await new Promise((resolve, reject) => {
         setTimeout(() => {
           if (Math.random() > 0.5) {
@@ -114,10 +117,10 @@ export const Confirm = () => {
                     className="object-scale-down w-[71px] h-[71px] p-1.5 bg-[#6B7280] flex-shrink-0 rounded-[70px] border-2 border-white filter drop-shadow-[0_2px_4px_rgba(112,121,116,0.30)]"
                   />
                   <div className="flex flex-col justify-start items-start w-full flex-grow pl-2 gap-1">
-                    <p className="w-[44px] h-[7px] flex flex-col justify-center flex-shrink-0 text-[#6B7280] dm_sans text-[8px] font-light leading-[16px]">
-                      {service.name}
+                    <p className="flex flex-col justify-center flex-shrink-0 text-[#6B7280] dm_sans text-[8px] font-light ">
+                      {service.barber}
                     </p>
-                    <h2 className="w-[79px] h-[13px] flex flex-col justify-center flex-shrink-0 text-[#494949] dm_sans text-[13px] font-medium leading-[19.5px]">
+                    <h2 className="flex flex-col justify-center flex-shrink-0 text-[#494949] dm_sans text-[13px] font-medium ">
                       {service.name}
                     </h2>
 

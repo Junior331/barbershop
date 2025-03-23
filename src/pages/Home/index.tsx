@@ -23,28 +23,28 @@ export const Home = () => {
         <div className="flex flex-1 flex-col w-full h-full items-start justify-start overflow-y-auto pb-20">
           <div className="flex flex-col items-center w-full pr-2">
             <div className="flex items-center justify-between w-full gap-1">
-              <label className="text-[#000] inter text-base font-bold leading-[150%]">
+              <label className="text-[#000] inter textarea-lg font-bold leading-[150%]">
                 Promotions of week
               </label>
-              <button
-                type="button"
-                className="btn p-0 m-0 btn-link border-none !no-underline text-[#000] font-[500] text-[15px] inter"
-              >
-                see all
-              </button>
             </div>
 
             <div className="flex items-center justify-start w-full overflow-auto max-w-full gap-[10px] pb-[10px]">
               {promotionsWeek.map((item) => {
                 return (
-                  <Card>
+                  <Card
+                    style={{
+                      minWidth: 110,
+                      minHeight: 120,
+                      paddingLeft: 8,
+                    }}
+                  >
                     <img
                       src={item.icon}
                       alt={`Service ${item.name}`}
-                      className="w-[45px] h-[45px] mx-auto"
+                      className="w-[calc(100%-25px)] h-[calc(100%-25px)] mx-auto"
                     />
                     <div className="flex-1 flex flex-col justify-end w-full h-full">
-                      <p className="text-white inter text-[9px] font-bold leading-none">
+                      <p className="text-white inter text-[14px] font-bold leading-none">
                         {formatter({
                           type: "pt-BR",
                           currency: "BRL",
@@ -53,7 +53,7 @@ export const Home = () => {
                           maximumFractionDigits: 2,
                         }).format(item.price || 0)}
                       </p>
-                      <p className="text-white inter text-[9px] font-bold leading-none truncate max-w-[80px]">
+                      <p className="text-white inter text-[14px] font-bold leading-none truncate max-w-[80px]">
                         {item.name}
                       </p>
                     </div>
@@ -65,12 +65,13 @@ export const Home = () => {
 
           <div className="flex flex-col items-center w-full mt-5 pr-2">
             <div className="flex items-center justify-between w-full gap-1">
-              <label className="text-[#000] inter text-base font-bold leading-[150%]">
+              <label className="text-[#000] inter textarea-lg font-bold leading-[150%]">
                 Your orders
               </label>
               <button
                 type="button"
-                className="btn p-0 m-0 btn-link border-none !no-underline text-[#000] font-[500] text-[15px] inter"
+                onClick={() => navigate('/myBookings')}
+                className="btn p-0 m-0 btn-link border-none !no-underline text-[#000] font-[500] text-[14px] inter"
               >
                 see all
               </button>
@@ -79,10 +80,10 @@ export const Home = () => {
             <div className="flex items-center justify-start w-full overflow-auto max-w-full gap-[10px] pb-[10px]">
               {orders.map((item) => {
                 return (
-                  <div className="btn w-[203px] h-auto bg-transparent border-0 shadow-none p-0">
+                  <div className="btn w-[250px] h-auto bg-transparent border-0 shadow-none p-0">
                     <Card
                       style={{
-                        minWidth: 203,
+                        minWidth: 250,
                         paddingLeft: 2,
                         minHeight: "initial",
                       }}
@@ -95,22 +96,24 @@ export const Home = () => {
                         />
 
                         <div className="flex flex-col justify-start items-start w-full gap-[3px] flex-grow pl-2">
-                          <p className="text-white inter text-[13px] font-bold leading-[150%] border-b border-[#E5E7EB]">
+                          <p className="text-white inter text-base font-bold leading-[150%] border-b border-[#E5E7EB]">
                             {item.name}
                           </p>
-                          <p className="text-white font-roboto text-[8px] font-normal leading-none">
+                          <p className="text-white font-roboto text-[12px] font-normal leading-none">
                             {item.barber}
                           </p>
-                          <p className="flex items-center gap-[1.5px] text-white inter text-[6.5px] font-normal leading-0">
+                          <p className="flex items-center gap-[1.5px] text-white inter text-[12px] font-normal">
                             <img
                               alt="Icon location"
+                              className="size-4"
                               src={getIcons("location_outlined")}
                             />
                             {item.location}
                           </p>
-                          <p className="flex items-center gap-[2.5px] text-white inter text-[6.5px] font-normal leading-0">
+                          <p className="flex items-center gap-[2.5px] text-white inter text-[12px] font-normal">
                             <img
-                              alt="Icon location"
+                              alt="Icon clock"
+                              className="size-4"
                               src={getIcons("clock_outlined")}
                             />
                             <div className="h-[7px] w-[1.5px] bg-white" />
@@ -127,18 +130,12 @@ export const Home = () => {
 
           <div className="flex flex-col items-center w-full mt-5">
             <div className="flex items-center justify-between w-full gap-1">
-              <label className="text-[#000] inter text-base font-bold leading-[150%]">
+              <label className="text-[#000] inter textarea-lg font-bold leading-[150%]">
                 Barbers
               </label>
-              <button
-                type="button"
-                className="btn p-0 m-0 btn-link border-none !no-underline text-[#000] font-[500] text-[15px] inter pr-2"
-              >
-                see all
-              </button>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-[5px] w-full overflow-auto max-w-full pb-[10px] 5 pr-1">
+            <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-[5px] w-full overflow-auto max-w-full pb-[10px] 5 pr-1">
               {barbers.map((item) => {
                 return (
                   <div
@@ -150,41 +147,41 @@ export const Home = () => {
                         padding: 0,
                         minWidth: "100%",
                         overflow: "hidden",
-                        minHeight: "initial",
                       }}
                     >
-                      <div className="flex items-center w-full h-full pr-[5px]">
+                      <div className="flex items-center w-full h-full pr-[5px] min-h-24">
                         <img
                           src={item.image}
                           alt={`Barber ${item.name}`}
-                          className="min-w-[66px] min-h-[70px] max-w-[66px] max-h-[70px] object-cover border-r-[2px] border-[#E5E7EB]"
+                          className="min-w-[95px] min-h-[95px] max-w-[95px] max-h-[95px] object-cover border-r-[2px] border-[#E5E7EB]"
                         />
 
-                        <div className="flex flex-col justify-start items-start w-full gap-[3px] flex-grow pl-2">
-                          <p className="w-full text-start text-white inter text-[13px] font-bold leading-[150%] border-b border-[#E5E7EB] text_ellipsis">
+                        <div className="flex flex-col justify-start items-start w-full gap-[5px] flex-grow pl-2">
+                          <p className="w-full text-start text-white inter text-base font-bold leading-[150%] border-b border-[#E5E7EB] text_ellipsis">
                             {item.name}
                           </p>
-                          <p className="text-white font-roboto text-[8px] font-normal leading-none">
+                          <p className="text-white font-roboto text-[12px] font-normal leading-none">
                             {item.type}
                           </p>
-                          <p className="flex items-center gap-[1.5px] text-white inter text-[6.5px] font-normal leading-0">
+                          <p className="flex items-center gap-[1.5px] text-white inter text-[12px] font-normal">
                             <img
                               alt="Icon location"
                               src={getIcons("location_outlined")}
+                              className="size-4"
                             />
                             {item.location}
                           </p>
                           <div className="flex items-center gap-[3px]">
                             <img
-                              alt="Icon location"
+                              alt="Icon star"
                               src={getIcons("star_solid")}
-                              className="relative top-[-1px]"
+                              className="size-4 relative top-[-1px]"
                             />
-                            <p className="flex items-center gap-[2.5px] text-white inter text-[6.5px] font-normal leading-0">
+                            <p className="flex items-center gap-[2.5px] text-white inter text-[12px] font-normal">
                               {item.rating}
                             </p>
                             <div className="h-[7px] w-[0.5px] bg-white" />
-                            <p className="flex items-center gap-[2.5px] text-white inter text-[6.5px] font-normal leading-0">
+                            <p className="flex items-center gap-[2.5px] text-white inter text-[12px] font-normal">
                               {item.cuts} Cuts
                             </p>
                           </div>

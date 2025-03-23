@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { formatter } from "@/utils/utils";
@@ -15,6 +16,10 @@ export const Services = () => {
   const isServiceSelected = (id: number): boolean =>
     selectedServices.some((service) => service.id === id);
 
+  useEffect(() => {
+    console.log("selectedServices ::", selectedServices);
+  }, [selectedServices]);
+
   return (
     <Layout>
       <div className="flex flex-col justify-start items-center h-full w-full">
@@ -28,11 +33,11 @@ export const Services = () => {
               return (
                 <div
                   key={item.id}
-                  className="btn w-full h-auto bg-transparent border-0 shadow-none p-0  min-h-24 min-w-20"
-                  onClick={() => toggleService(item)}
                   role="button"
                   tabIndex={0}
+                  onClick={() => toggleService(item)}
                   onKeyDown={(e) => e.key === "Enter" && toggleService(item)}
+                  className="btn w-full h-auto bg-transparent border-0 shadow-none p-0  min-h-24 min-w-20"
                 >
                   <Card
                     style={{

@@ -18,7 +18,7 @@ export const orders: service[] = [
     id: 1,
     time: 40,
     price: 40,
-    date: generateRandomDate("2025-03-16"),
+    date: generateRandomDate("2025-03-28"),
     status: "pending",
     name: "Beard & hair",
     barber: "Breno Tavares",

@@ -46,23 +46,11 @@ export type randomMessage = {
 
 export type service = {
   id: number;
-  date: string;
   name: string;
   time: number;
   icon: string;
   price: number;
-  barber: string;
-  location: string;
-  status: "completed" | "pending";
 };
-
-export interface ServiceSummary {
-  id: number;
-  time: number;
-  name: string;
-  icon: string;
-  price: number;
-}
 
 export interface Order {
   id: string;
@@ -71,7 +59,7 @@ export interface Order {
   subTotal: number;
   paymentFee: number;
   date: string | null;
-  services: ServiceSummary[];
+  services: service[];
   status: "pending" | "confirmed" | "canceled";
   paymentMethod: "pix" | "credit_card" | "debit_card" | string;
 }
@@ -82,18 +70,18 @@ export interface CurrentOrder {
   discount: number;
   subTotal: number;
   paymentFee: number;
+  services: service[];
   date: string | null;
   paymentMethod: string;
-  services: ServiceSummary[];
   status: 'pending' | 'confirmed' | 'canceled';
 }
 
 export interface OrderActions {
   addOrder: (order: Order) => void;
   setDiscount: (discount: number) => void;
+  toggleService: (service: service) => void;
   setDate: (dateTime: string | null) => void;
   setPaymentMethod: (method: string) => void;
-  toggleService: (service: ServiceSummary) => void;
   updateOrderStatus: (orderId: string, status: Order['status']) => void;
 }
 
