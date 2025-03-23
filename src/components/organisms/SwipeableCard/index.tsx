@@ -22,7 +22,6 @@ export const SwipeableCard = ({ item }: IProps) => {
     setIsSwipedRight,
   });
 
-  // Calcular o tempo total dos serviços
   const totalTime = item.services.reduce(
     (sum, service) => sum + service.time,
     0
@@ -41,13 +40,14 @@ export const SwipeableCard = ({ item }: IProps) => {
         className="card_edit"
         style={{
           left: 7,
-          zIndex: isSwipedRight ? 2 : 1,
           top: "50%",
+          height:"100%",
           display: "flex",
           paddingLeft: 20,
           alignItems: "center",
           position: "absolute",
           opacity: opacityRight,
+          zIndex: isSwipedRight ? 2 : 1,
           transform: "translateY(-50%)",
         }}
         onClick={handleLeftAction}
@@ -129,14 +129,15 @@ export const SwipeableCard = ({ item }: IProps) => {
         className="card_delete"
         style={{
           right: 7,
-          zIndex: isSwipedLeft ? 2 : 1,
           top: "50%",
+          height:"100%",
           display: "flex",
           paddingRight: 20,
           alignItems: "center",
           position: "absolute",
           opacity: opacityLeft,
           justifyContent: "flex-end",
+          zIndex: isSwipedLeft ? 2 : 1,
           transform: "translateY(-50%)",
         }}
         onClick={handleRightAction}
