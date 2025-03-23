@@ -1,37 +1,35 @@
 import { useMemo } from "react";
 import { isBefore } from "date-fns";
 
-import { mocks } from "@/services/mocks";
 import { getIcons } from "@/assets/icons";
 import { Layout } from "@/components/templates";
+import { useOrderStore } from "@/store/useOrderStore";
 import { Card, Header, SwipeableCard } from "@/components/organisms";
 import { formatDateTime, formatter, getCurrentDate } from "@/utils/utils";
 
 export const MyBookings = () => {
   const { dayOfWeek, formattedDate } = getCurrentDate();
+  const orders = useOrderStore((state) => state.orders);
 
-  const processedServices = useMemo(
+  const processedOrders = useMemo(
     () =>
-      mocks.orders.map((service) => {
-        const serviceDate = new Date(service.date);
+      orders.map((order) => {
+        const serviceDate = new Date(order.date || "");
         const currentDate = new Date();
 
         serviceDate.setHours(0, 0, 0, 0);
         currentDate.setHours(0, 0, 0, 0);
 
-        const isCompleted =
-          service.status === "completed" || isBefore(serviceDate, currentDate);
+        const isCompleted = isBefore(serviceDate, currentDate);
 
-        console.log("Service Date:", serviceDate.toISOString());
-        console.log("Current Date:", currentDate.toISOString());
-        console.log("Is Completed:", isCompleted);
-
-        return { ...service, isCompleted };
+        return { ...order, isCompleted };
       }),
-    []
+    [orders]
   );
 
   const dotsArray = Array.from({ length: 20 });
+
+  console.log("processedOrders ÇÇ", processedOrders);
 
   return (
     <Layout>
@@ -53,10 +51,10 @@ export const MyBookings = () => {
           </div>
 
           <div className="flex flex-1 flex-col gap-2.5 w-full h-full items-start justify-start overflow-y-auto pr-2 pb-[50px]">
-            {processedServices
-              .filter((item) => !item.isCompleted)
-              .map((item) => (
-                <SwipeableCard item={item} />
+            {processedOrders
+              .filter((order) => !order.isCompleted)
+              .map((order) => (
+                <SwipeableCard key={order.id} item={order} />
               ))}
 
             <div className="flex gap-0.5 justify-center items-center w-full min-h-10 overflow-hidden">
@@ -79,11 +77,11 @@ export const MyBookings = () => {
               ))}
             </div>
 
-            {processedServices
-              .filter((item) => item.isCompleted)
-              .map((item) => (
+            {processedOrders
+              .filter((order) => order.isCompleted)
+              .map((order) => (
                 <div
-                  key={item.id}
+                  key={order.id}
                   className="btn w-full h-auto bg-transparent border-0 shadow-none p-0 filter"
                 >
                   <Card
@@ -95,45 +93,44 @@ export const MyBookings = () => {
                     }}
                   >
                     <div className="flex items-center w-full h-full">
+                      {/* Mostre a primeira imagem do serviço ou uma padrão */}
                       <img
-                        src={item.icon}
-                        alt={`Service ${item.name}`}
+                        src={order.services[0]?.icon || getIcons("fallback")}
+                        alt={`Service ${order.services[0]?.name}`}
                         className="w-[87px] h-[87px]"
                       />
                       <div className="flex flex-col justify-start items-start w-full gap-2 flex-grow pl-2">
                         <p className="text-white inter text-[13px] font-bold leading-[150%]">
-                          {item.name}
+                          {order.services.map((s) => s.name).join(", ")}
                         </p>
                         <p className="text-white inter text-[8px] font-[300] leading-none">
                           <strong className="font-bold text-[11px]">
-                            Price:{" "}
+                            Total:{" "}
                           </strong>
                           {formatter({
                             type: "pt-BR",
                             currency: "BRL",
                             style: "currency",
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          }).format(item.price || 0)}{" "}
-                        </p>
-                        <p className="text-white inter text-[8px] font-[300] leading-none">
-                          <strong className="font-bold text-[11px]">
-                            Time:{" "}
-                          </strong>
-                          {item.time} minutes
+                          }).format(order.total)}
                         </p>
                         <p className="text-white inter text-[8px] font-[300] leading-none">
                           <strong className="font-bold text-[11px]">
                             Date:{" "}
                           </strong>
-                          {formatDateTime(item.date, "date")} at{" "}
-                          {formatDateTime(item.date, "time")}
+                          {formatDateTime(order.date || "", "date")} at{" "}
+                          {formatDateTime(order.date || "", "time")}
                         </p>
                         <p className="text-white inter text-[8px] font-[300] leading-none">
                           <strong className="font-bold text-[11px]">
                             Barber:{" "}
                           </strong>
-                          {item.barber}
+                          {order.barber}
+                        </p>
+                        <p className="text-white inter text-[8px] font-[300] leading-none">
+                          <strong className="font-bold text-[11px]">
+                            Status:{" "}
+                          </strong>
+                          {order.status}
                         </p>
                       </div>
                     </div>

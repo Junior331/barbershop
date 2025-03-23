@@ -44,26 +44,14 @@ export type randomMessage = {
   message: string;
 };
 
-export type service = {
+export type Service = {
   id: number;
-  date: string;
   name: string;
   time: number;
   icon: string;
   price: number;
-  barber: string;
-  location: string;
-  status: "completed" | "pending";
+  checked?: boolean;
 };
-
-export interface ServiceSummary {
-  id: number;
-  time: number;
-  name: string;
-  icon: string;
-  price: number;
-  barber: string;
-}
 
 export interface Order {
   id: string;
@@ -72,30 +60,25 @@ export interface Order {
   subTotal: number;
   paymentFee: number;
   date: string | null;
-  services: service[];
+  barber: string;
+  services: Service[];
   status: "pending" | "confirmed" | "canceled";
   paymentMethod: "pix" | "credit_card" | "debit_card" | string;
+  location: string;
 }
 
-export interface CurrentOrder {
+export interface CurrentOrder extends Omit<Order, "id" | "status"> {
   id: string;
-  total: number;
-  discount: number;
-  subTotal: number;
-  paymentFee: number;
-  services: service[];
-  date: string | null;
-  paymentMethod: string;
-  status: 'pending' | 'confirmed' | 'canceled';
+  status: "pending" | "confirmed" | "canceled";
 }
 
 export interface OrderActions {
   addOrder: (order: Order) => void;
   setDiscount: (discount: number) => void;
-  toggleService: (service: service) => void;
+  toggleService: (service: Service) => void;
   setDate: (dateTime: string | null) => void;
   setPaymentMethod: (method: string) => void;
-  updateOrderStatus: (orderId: string, status: Order['status']) => void;
+  updateOrderStatus: (orderId: string, status: Order["status"]) => void;
 }
 
 export interface OrderStore {

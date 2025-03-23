@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-import { OrderStore } from "@/utils/types";
+import { OrderStore, Service } from "@/utils/types";
 
 const calculatePaymentFee = (method: string, amount: number): number => {
   if (method === "pix") return amount * 0.01;
@@ -17,9 +17,11 @@ export const useOrderStore = create<OrderStore>((set) => ({
     subTotal: 0,
     discount: 0,
     services: [],
+    location: '',
     paymentFee: 0,
     status: "pending",
     paymentMethod: "",
+
   },
   orders: [],
   actions: {
@@ -27,6 +29,7 @@ export const useOrderStore = create<OrderStore>((set) => ({
       set((state) => ({
         orders: [...state.orders, order],
         currentOrder: {
+          ...state.currentOrder,
           id: "",
           total: 0,
           barber: '',
@@ -37,6 +40,7 @@ export const useOrderStore = create<OrderStore>((set) => ({
           paymentFee: 0,
           paymentMethod: "",
           status: "pending",
+          location: state.currentOrder.location,
         },
       })),
 
@@ -51,7 +55,7 @@ export const useOrderStore = create<OrderStore>((set) => ({
       set((state) => ({
         currentOrder: { ...state.currentOrder, date },
       })),
-    toggleService: (service) =>
+    toggleService: (service: Service) =>
       set((state) => {
         const exists = state.currentOrder.services.some(
           (s) => s.id === service.id

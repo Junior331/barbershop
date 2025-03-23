@@ -27,9 +27,9 @@ export const Services = () => {
 
               return (
                 <div
+                  tabIndex={0}
                   key={item.id}
                   role="button"
-                  tabIndex={0}
                   onClick={() => toggleService(item)}
                   onKeyDown={(e) => e.key === "Enter" && toggleService(item)}
                   className="btn w-full h-auto bg-transparent border-0 shadow-none p-0  min-h-24 min-w-20"

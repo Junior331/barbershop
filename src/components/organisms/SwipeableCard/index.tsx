@@ -8,6 +8,7 @@ import useCardActions from "./useCardActions";
 import { Card } from "@/components/organisms";
 import { getServices } from "@/assets/services";
 import { formatDateTime, formatter } from "@/utils/utils";
+import { Service } from "@/utils/types";
 
 export const SwipeableCard = ({ item }: IProps) => {
   const [isSwipedLeft, setIsSwipedLeft] = useState(false);
@@ -76,7 +77,7 @@ export const SwipeableCard = ({ item }: IProps) => {
               />
               <div className="flex flex-col justify-start items-start w-full gap-2 flex-grow pl-2">
                 <p className="text-white inter text-[13px] font-bold leading-[150%]">
-                  {item.name}
+                  {item.services.map((service: Service) => service.name).join(", ")}
                 </p>
                 <p className="text-white inter text-[8px] font-[300] leading-none">
                   <strong className="font-bold text-[11px]">Price: </strong>

@@ -1,10 +1,11 @@
 import { getServices } from "@/assets/services";
+import { Service } from "@/utils/types";
 
-export const services = [
+export const services: Service[] = [
   {
     id: 1,
-    price: 40,
     time: 40,
+    price: 40,
     checked: true,
     name: "Beard & hair",
     icon: getServices("beard_hair"),
