@@ -8,12 +8,12 @@ import useCardActions from "./useCardActions";
 import { Card } from "@/components/organisms";
 import { getServices } from "@/assets/services";
 import { formatDateTime, formatter } from "@/utils/utils";
-import { Service } from "@/utils/types";
 
 export const SwipeableCard = ({ item }: IProps) => {
   const [isSwipedLeft, setIsSwipedLeft] = useState(false);
   const [isSwipedRight, setIsSwipedRight] = useState(false);
 
+  // Atualize o hook para receber o ID do pedido
   const { handleLeftAction, handleRightAction } = useCardActions();
   const { x, opacityLeft, opacityRight, handleDrag, handleDragEnd } = useSwipe({
     onLeftAction: handleLeftAction,
@@ -21,6 +21,12 @@ export const SwipeableCard = ({ item }: IProps) => {
     setIsSwipedLeft,
     setIsSwipedRight,
   });
+
+  // Calcular o tempo total dos serviços
+  const totalTime = item.services.reduce(
+    (sum, service) => sum + service.time,
+    0
+  );
 
   return (
     <div
@@ -71,36 +77,47 @@ export const SwipeableCard = ({ item }: IProps) => {
           >
             <div className="flex items-center w-full h-full">
               <img
-                src={getServices("beard_hair")}
+                src={item.services[0]?.icon || getServices("fallback")}
                 alt="Serviço"
                 className="w-[87px] h-[87px]"
               />
               <div className="flex flex-col justify-start items-start w-full gap-2 flex-grow pl-2">
                 <p className="text-white inter text-[13px] font-bold leading-[150%]">
-                  {item.services.map((service: Service) => service.name).join(", ")}
+                  {item.services.map((service) => service.name).join(", ")}
                 </p>
+
                 <p className="text-white inter text-[8px] font-[300] leading-none">
-                  <strong className="font-bold text-[11px]">Price: </strong>
+                  <strong className="font-bold text-[11px]">Total: </strong>
                   {formatter({
                     type: "pt-BR",
                     currency: "BRL",
                     style: "currency",
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
-                  }).format(item.price || 0)}{" "}
+                  }).format(item.total)}
                 </p>
+
                 <p className="text-white inter text-[8px] font-[300] leading-none">
-                  <strong className="font-bold text-[11px]">Time: </strong>
-                  {item.time} minutes
+                  <strong className="font-bold text-[11px]">
+                    Tempo Total:{" "}
+                  </strong>
+                  {totalTime} minutos
                 </p>
+
                 <p className="text-white inter text-[8px] font-[300] leading-none">
-                  <strong className="font-bold text-[11px]">Date: </strong>
-                  {formatDateTime(item.date, "date")} at{" "}
-                  {formatDateTime(item.date, "time")}
+                  <strong className="font-bold text-[11px]">Data: </strong>
+                  {formatDateTime(item.date || "", "date")} às{" "}
+                  {formatDateTime(item.date || "", "time")}
                 </p>
+
                 <p className="text-white inter text-[8px] font-[300] leading-none">
-                  <strong className="font-bold text-[11px]">Barber: </strong>
+                  <strong className="font-bold text-[11px]">Barbeiro: </strong>
                   {item.barber}
+                </p>
+
+                <p className="text-white inter text-[8px] font-[300] leading-none">
+                  <strong className="font-bold text-[11px]">Status: </strong>
+                  {item.status}
                 </p>
               </div>
             </div>

@@ -1,4 +1,4 @@
-import { service } from "@/utils/types";
+import { Order } from "@/utils/types";
 
 export interface IUseSwipeProps {
   onLeftAction: () => void;
@@ -7,5 +7,5 @@ export interface IUseSwipeProps {
   setIsSwipedRight: (value: boolean) => void;
 }
 export interface IProps {
-  item: service;
+  item: Order;
 }
