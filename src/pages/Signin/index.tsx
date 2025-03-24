@@ -27,7 +27,7 @@ export const Signin = () => {
             value={formik.values.email}
             placeholder="Digite aqui..."
             onChange={formik.handleChange}
-            className="w-full h-[48px] px-[10px] flex-shrink-0 rounded-[5px] border border-[#D8D6DE]"
+            className="w-full h-[48px] px-[10px]  rounded-[5px] border border-[#D8D6DE]"
           />
           {formik.touched.email && formik.errors.email ? (
             <div className="text-red-500 text-sm">{formik.errors.email}</div>
@@ -46,7 +46,7 @@ export const Signin = () => {
               Forgot Password?
             </button>
           </div>
-          <div className="flex items-center justify-between w-full h-[48px] px-[10px] flex-shrink-0 rounded-[5px] border border-[#D8D6DE]">
+          <div className="flex items-center justify-between w-full h-[48px] px-[10px]  rounded-[5px] border border-[#D8D6DE]">
             <input
               name="password"
               onBlur={formik.handleBlur}
@@ -108,13 +108,13 @@ export const Signin = () => {
       </div>
 
       <div className="flex gap-4 justify-center">
-        <div className="btn flex size-20 p-4 justify-center items-center gap-4 flex-shrink-0 rounded-full border border-[rgba(227,227,227,0.8)] bg-white shadow-sm">
+        <div className="btn flex size-20 p-4 justify-center items-center gap-4  rounded-full border border-[rgba(227,227,227,0.8)] bg-white shadow-sm">
           <img src={getIcons("social_facebook")} alt="Facebook" />
         </div>
-        <div className="btn flex size-20 p-4 justify-center items-center gap-4 flex-shrink-0 rounded-full border border-[rgba(227,227,227,0.8)] bg-white shadow-sm">
+        <div className="btn flex size-20 p-4 justify-center items-center gap-4  rounded-full border border-[rgba(227,227,227,0.8)] bg-white shadow-sm">
           <img src={getIcons("social_google")} alt="Google" />
         </div>
-        <div className="btn flex size-20 p-4 justify-center items-center gap-4 flex-shrink-0 rounded-full border border-[rgba(227,227,227,0.8)] bg-white shadow-sm">
+        <div className="btn flex size-20 p-4 justify-center items-center gap-4  rounded-full border border-[rgba(227,227,227,0.8)] bg-white shadow-sm">
           <img src={getIcons("social_apple")} alt="Apple" />
         </div>
       </div>

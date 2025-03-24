@@ -53,6 +53,17 @@ export type Service = {
   checked?: boolean;
 };
 
+export type BarberType = {
+  id: number,
+  cuts: number,
+  type: string,
+  name: string,
+  image: string,
+  rating: number,
+  location: string,
+  checked?: boolean;
+};
+
 export interface Order {
   id: string;
   total: number;
@@ -60,7 +71,7 @@ export interface Order {
   subTotal: number;
   paymentFee: number;
   date: string | null;
-  barber: string;
+  barber: BarberType;
   services: Service[];
   status: "pending" | "confirmed" | "canceled";
   paymentMethod: "pix" | "credit_card" | "debit_card" | string;
@@ -74,6 +85,7 @@ export interface CurrentOrder extends Omit<Order, "id" | "status"> {
 
 export interface OrderActions {
   addOrder: (order: Order) => void;
+  setBarber: (barber: BarberType) => void;
   setDiscount: (discount: number) => void;
   toggleService: (service: Service) => void;
   setDate: (dateTime: string | null) => void;

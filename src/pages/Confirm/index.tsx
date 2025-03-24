@@ -17,7 +17,7 @@ import { Loading } from "@/components/elements";
 
 export const Confirm = () => {
   const navigate = useNavigate();
-  const { services, } = useOrder();
+  const { services } = useOrder();
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [selectedMethod, setSelectedMethod] = useState<string>("");
@@ -70,7 +70,7 @@ export const Confirm = () => {
 
       addOrder(newOrder);
       navigate("/mybookings");
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Error:", error.message);
       alert(`Error: ${error.message}`);
@@ -105,50 +105,41 @@ export const Confirm = () => {
               >
                 <div
                   key={service.id}
-                  className="flex py-2.5 px-3.5 justify-between items-center self-stretch rounded-md bg-white shadow-lg"
+                  className="flex flex-col py-2.5 px-3.5 justify-between items-center self-stretch rounded-md bg-white shadow-lg relative"
                 >
-                  <img
-                    alt="Image avatar"
-                    src={service.icon}
-                    className="object-scale-down w-[71px] h-[71px] p-1.5 bg-[#6B7280] flex-shrink-0 rounded-[70px] border-2 border-white filter drop-shadow-[0_2px_4px_rgba(112,121,116,0.30)]"
-                  />
-                  <div className="flex flex-col justify-start items-start w-full flex-grow pl-2 gap-1">
-                    <p className="flex flex-col justify-center flex-shrink-0 text-[#6B7280] dm_sans text-[8px] font-light ">
-                      {currentOrder.barber}
+                  <div className="size-32 p-5 bg-[#6B7280] rounded-[70px] border-2 border-white filter drop-shadow-[0_2px_4px_rgba(112,121,116,0.30)]">
+                    <img
+                      alt="Image avatar"
+                      src={service.icon}
+                      className="size-full "
+                    />
+                  </div>
+                  <div className="flex flex-col justify-start items-start w-full flex-grow pl-2 gap-3">
+                    <p className="text-[#6B7280] dm_sans text-base font-light ">
+                      {currentOrder.barber.name}
                     </p>
-                    <h2 className="flex flex-col justify-center flex-shrink-0 text-[#494949] dm_sans text-[13px] font-medium ">
+                    <h2 className="text-[#494949] dm_sans textarea-lg font-medium leading-normal">
                       {service.name}
                     </h2>
 
-                    <p className="flex items-center gap-[1.5px] text-[#6B7280] dm_sans text-[8px]">
+                    <p className="flex items-center gap-[1.5px] text-[#6B7280] dm_sans text-base">
                       <img
                         alt="Icon location"
+                        className="size-5"
                         src={getIcons("location_outlined_green")}
                       />
                       Barbearia faz milagres
                     </p>
-                    <p className="flex items-center gap-1.5 text-[#6B7280] dm_sans text-[8px]">
+                    <p className="flex items-center gap-1 text-[#6B7280] dm_sans text-base">
                       <img
-                        alt="Icon location"
+                        alt="Icon calendar"
+                        className="size-5"
                         src={getIcons("calendar_tick")}
                       />
-                      <div className="h-[6px] w-[0.5px] bg-[#6B7280] rounded-3xl" />
+                      <div className="h-3 w-[0.5px] bg-[#6B7280] rounded-3xl" />
                       {formatCustomDateTime(currentOrder.date || "")}
                     </p>
-                  </div>
-
-                  <div className="flex flex-col w-fit min-w-[41px] min-h-[51px] items-end h-full justify-between">
-                    <button
-                      onClick={() => handleDelete(service.id)}
-                      className="cursor-pointer"
-                    >
-                      <img
-                        className="size-3.5"
-                        alt="Delete icon"
-                        src={getIcons("trash_red")}
-                      />
-                    </button>
-                    <h2 className="self-stretch text-[#494949] font-dm-sans text-[9px] not-italic font-medium leading-[19.5px]">
+                    <h2 className="self-stretch text-[#494949] dm_sans text-base not-italic dm_sansfont-medium leading-[19.5px]">
                       {formatter({
                         type: "pt-BR",
                         currency: "BRL",
@@ -158,6 +149,17 @@ export const Confirm = () => {
                       }).format(service.price || 0)}{" "}
                     </h2>
                   </div>
+
+                  <button
+                    className="cursor-pointer absolute top-4 right-4"
+                    onClick={() => handleDelete(service.id)}
+                  >
+                    <img
+                      alt="Delete icon"
+                      className="size-8"
+                      src={getIcons("trash_red")}
+                    />
+                  </button>
                 </div>
               </motion.div>
             ))}

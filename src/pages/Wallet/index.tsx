@@ -10,7 +10,7 @@ export const Wallet = () => {
 
         <div className="flex flex-col w-full justify-center items-start gap-5 px-4">
           <div className="flex w-full p-[10px_15px] flex-col items-start gap-[25px] rounded-[5px] bg-white shadow-[0px_4px_44px_0px_rgba(0,0,0,0.06)]">
-            <h2 className="flex w-fit h-auto flex-col justify-center flex-shrink-0 text-[#181D27] text-[13px] font-medium leading-[19.5px]">
+            <h2 className="flex w-fit h-auto flex-col justify-center  text-[#181D27] text-[13px] font-medium leading-[19.5px]">
               Balance
             </h2>
 
@@ -26,7 +26,7 @@ export const Wallet = () => {
 
           <div className="flex w-full p-[10px_15px] flex-col items-start gap-[8px] rounded-[5px] bg-white shadow-[0px_4px_44px_0px_rgba(0,0,0,0.06)]">
             <div className="flex items-center justify-between w-full gap-1">
-              <h2 className="flex w-fit h-auto flex-col justify-center flex-shrink-0 text-[#181D27] text-[13px] font-medium leading-[19.5px]">
+              <h2 className="flex w-fit h-auto flex-col justify-center  text-[#181D27] text-[13px] font-medium leading-[19.5px]">
                 Payment methods
               </h2>
 
@@ -39,7 +39,7 @@ export const Wallet = () => {
             </div>
 
             <div className="flex items-center w-full gap-1.5">
-              <div className="flex w-full flex-1 h-[94px] flex-shrink-0 rounded-[10px] border-[0.5px] border-[#EAEAEA] bg-white p-2">
+              <div className="flex w-full flex-1 h-[94px]  rounded-[10px] border-[0.5px] border-[#EAEAEA] bg-white p-2">
                 <img
                   alt="Ícone"
                   className="w-6 h-6 absolute"
@@ -47,17 +47,17 @@ export const Wallet = () => {
                 />
 
                 <div className="mt-auto">
-                  <p className="flex w-[48.442px] h-[13px] flex-col justify-center flex-shrink-0 text-[#181D27] inter text-[9px] font-extralight leading-[19.5px]">
+                  <p className="flex w-[48.442px] h-[13px] flex-col justify-center  text-[#181D27] inter text-[9px] font-extralight leading-[19.5px]">
                     Payment
                   </p>
 
-                  <p className="flex w-[64.913px] h-[13px] flex-col justify-center flex-shrink-0 text-[#181D27] inter text-[10px] font-medium leading-[19.5px]">
+                  <p className="flex w-[64.913px] h-[13px] flex-col justify-center  text-[#181D27] inter text-[10px] font-medium leading-[19.5px]">
                     Apple pay
                   </p>
                 </div>
               </div>
 
-              <div className="flex w-full flex-1 h-[94px] flex-shrink-0 rounded-[10px] border-[0.5px] border-[#EAEAEA] bg-white p-2">
+              <div className="flex w-full flex-1 h-[94px]  rounded-[10px] border-[0.5px] border-[#EAEAEA] bg-white p-2">
                 <img
                   alt="Ícone"
                   className="w-6 h-6 absolute"
@@ -65,17 +65,17 @@ export const Wallet = () => {
                 />
 
                 <div className="mt-auto">
-                  <p className="flex w-[48.442px] h-[13px] flex-col justify-center flex-shrink-0 text-[#181D27] inter text-[9px] font-extralight leading-[19.5px]">
+                  <p className="flex w-[48.442px] h-[13px] flex-col justify-center  text-[#181D27] inter text-[9px] font-extralight leading-[19.5px]">
                     Visa
                   </p>
 
-                  <p className="flex w-[64.913px] h-[13px] flex-col justify-center flex-shrink-0 text-[#181D27] inter text-[10px] font-medium leading-[19.5px]">
+                  <p className="flex w-[64.913px] h-[13px] flex-col justify-center  text-[#181D27] inter text-[10px] font-medium leading-[19.5px]">
                     **** 3708
                   </p>
                 </div>
               </div>
 
-              <div className="flex w-full flex-1 h-[94px] flex-shrink-0 rounded-[10px] border-[0.5px] border-[#EAEAEA] bg-white p-2">
+              <div className="flex w-full flex-1 h-[94px]  rounded-[10px] border-[0.5px] border-[#EAEAEA] bg-white p-2">
                 <img
                   alt="Ícone"
                   className="w-6 h-6 absolute"
@@ -83,11 +83,11 @@ export const Wallet = () => {
                 />
 
                 <div className="mt-auto">
-                  <p className="flex w-[48.442px] h-[13px] flex-col justify-center flex-shrink-0 text-[#181D27] inter text-[9px] font-extralight leading-[19.5px]">
+                  <p className="flex w-[48.442px] h-[13px] flex-col justify-center  text-[#181D27] inter text-[9px] font-extralight leading-[19.5px]">
                   Register
                   </p>
 
-                  <p className="flex w-[64.913px] h-[13px] flex-col justify-center flex-shrink-0 text-[#181D27] inter text-[10px] font-medium leading-[19.5px]">
+                  <p className="flex w-[64.913px] h-[13px] flex-col justify-center  text-[#181D27] inter text-[10px] font-medium leading-[19.5px]">
                   new card
                   </p>
                 </div>
@@ -97,7 +97,7 @@ export const Wallet = () => {
 
           <div className="flex w-full p-[10px_15px] flex-col items-start gap-[25px] rounded-[5px] bg-white shadow-[0px_4px_44px_0px_rgba(0,0,0,0.06)]">
             <div className="flex items-center justify-between w-full gap-1">
-              <h2 className="flex w-fit h-auto flex-col justify-center flex-shrink-0 text-[#181D27] text-[13px] font-medium leading-[19.5px]">
+              <h2 className="flex w-fit h-auto flex-col justify-center  text-[#181D27] text-[13px] font-medium leading-[19.5px]">
                 Recent transactions
               </h2>
 

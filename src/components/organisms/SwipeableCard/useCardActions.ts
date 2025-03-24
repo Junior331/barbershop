@@ -1,6 +1,10 @@
+import { useNavigate } from "react-router-dom";
+
 const useCardActions = () => {
-  const handleLeftAction = () => {
-    alert("Editar agendamento!");
+  const navigate = useNavigate();
+
+  const handleLeftAction = (id: string) => {
+    navigate(`/editorder/${id}`)
   };
 
   const handleRightAction = () => {

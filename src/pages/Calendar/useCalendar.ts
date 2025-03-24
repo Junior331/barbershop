@@ -139,8 +139,9 @@ export const useCalendar = () => {
 
   const handleTimeSelection = (time: string) => {
     setSelectedTime(time);
-    if (order.date) {
-      const day = new Date(order.date).getDate();
+    
+    if (selectedDate) {
+      const day = selectedDate.getDate();
       setDate(combineDateTime(day, time));
     }
   };

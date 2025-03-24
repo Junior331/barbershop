@@ -13,15 +13,22 @@ export const useOrderStore = create<OrderStore>((set) => ({
     id: "",
     total: 0,
     date: null,
-    barber: '',
+    barber: {
+      id: 0,
+      cuts: 0,
+      type: "",
+      name: "",
+      image: "",
+      rating: 0,
+      location: "",
+    },
     subTotal: 0,
     discount: 0,
     services: [],
-    location: '',
+    location: "",
     paymentFee: 0,
     status: "pending",
     paymentMethod: "",
-
   },
   orders: [],
   actions: {
@@ -32,7 +39,15 @@ export const useOrderStore = create<OrderStore>((set) => ({
           ...state.currentOrder,
           id: "",
           total: 0,
-          barber: '',
+          barber: {
+            id: 0,
+            cuts: 0,
+            type: "",
+            name: "",
+            image: "",
+            rating: 0,
+            location: "",
+          },
           date: null,
           discount: 0,
           subTotal: 0,
@@ -115,6 +130,14 @@ export const useOrderStore = create<OrderStore>((set) => ({
           },
         };
       }),
+
+    setBarber: (barber) =>
+      set((state) => ({
+        currentOrder: {
+          ...state.currentOrder,
+          barber: barber,
+        },
+      })),
   },
 }));
 

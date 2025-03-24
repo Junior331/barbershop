@@ -91,7 +91,7 @@ export const Profile = () => {
                 value={formik.values.name}
                 placeholder="Digite aqui..."
                 onChange={formik.handleChange}
-                className="w-full h-[48px] px-[10px] flex-shrink-0 rounded-[5px] border border-[#D8D6DE] bg-[#f7f8fd]"
+                className="w-full h-[48px] px-[10px]  rounded-[5px] border border-[#D8D6DE] bg-[#f7f8fd]"
               />
               {formik.touched.name && formik.errors.name ? (
                 <div className="text-red-500 text-sm">{formik.errors.name}</div>
@@ -108,7 +108,7 @@ export const Profile = () => {
                 value={formik.values.email}
                 placeholder="Digite aqui..."
                 onChange={formik.handleChange}
-                className="w-full h-[48px] px-[10px] flex-shrink-0 rounded-[5px] border border-[#D8D6DE] bg-[#f7f8fd]"
+                className="w-full h-[48px] px-[10px]  rounded-[5px] border border-[#D8D6DE] bg-[#f7f8fd]"
               />
               {formik.touched.email && formik.errors.email ? (
                 <div className="text-red-500 text-sm">
@@ -127,7 +127,7 @@ export const Profile = () => {
                 placeholder="Digite aqui..."
                 onChange={formik.handleChange}
                 value={maskPhone(formik.values.phone)}
-                className="w-full h-[48px] px-[10px] flex-shrink-0 rounded-[5px] border border-[#D8D6DE] bg-[#f7f8fd]"
+                className="w-full h-[48px] px-[10px]  rounded-[5px] border border-[#D8D6DE] bg-[#f7f8fd]"
               />
               {formik.touched.phone && formik.errors.phone ? (
                 <div className="text-red-500 text-sm">
@@ -146,7 +146,7 @@ export const Profile = () => {
                 placeholder="Digite aqui..."
                 onChange={formik.handleChange}
                 value={maskBirthday(formik.values.birthday)}
-                className="w-full h-[48px] px-[10px] flex-shrink-0 rounded-[5px] border border-[#D8D6DE] bg-[#f7f8fd]"
+                className="w-full h-[48px] px-[10px]  rounded-[5px] border border-[#D8D6DE] bg-[#f7f8fd]"
               />
               {formik.touched.birthday && formik.errors.birthday ? (
                 <div className="text-red-500 text-sm">
@@ -165,7 +165,7 @@ export const Profile = () => {
                 placeholder="Digite aqui..."
                 onChange={formik.handleChange}
                 value={maskZipCode(formik.values.zip_code)}
-                className="w-full h-[48px] px-[10px] flex-shrink-0 rounded-[5px] border border-[#D8D6DE] bg-[#f7f8fd]"
+                className="w-full h-[48px] px-[10px]  rounded-[5px] border border-[#D8D6DE] bg-[#f7f8fd]"
               />
               {formik.touched.zip_code && formik.errors.zip_code ? (
                 <div className="text-red-500 text-sm">
@@ -184,7 +184,7 @@ export const Profile = () => {
                 value={formik.values.address}
                 placeholder="Digite aqui..."
                 onChange={formik.handleChange}
-                className="w-full h-[48px] px-[10px] flex-shrink-0 rounded-[5px] border border-[#D8D6DE] bg-[#f7f8fd]"
+                className="w-full h-[48px] px-[10px]  rounded-[5px] border border-[#D8D6DE] bg-[#f7f8fd]"
               />
               {formik.touched.address && formik.errors.address ? (
                 <div className="text-red-500 text-sm">
@@ -204,7 +204,7 @@ export const Profile = () => {
                 value={formik.values.state}
                 placeholder="Digite aqui..."
                 onChange={formik.handleChange}
-                className="w-full h-[48px] px-[10px] flex-shrink-0 rounded-[5px] border border-[#D8D6DE] bg-[#f7f8fd]"
+                className="w-full h-[48px] px-[10px]  rounded-[5px] border border-[#D8D6DE] bg-[#f7f8fd]"
               />
               {formik.touched.state && formik.errors.state ? (
                 <div className="text-red-500 text-sm">
@@ -223,7 +223,7 @@ export const Profile = () => {
                 value={formik.values.country}
                 placeholder="Digite aqui..."
                 onChange={formik.handleChange}
-                className="w-full h-[48px] px-[10px] flex-shrink-0 rounded-[5px] border border-[#D8D6DE] bg-[#f7f8fd]"
+                className="w-full h-[48px] px-[10px]  rounded-[5px] border border-[#D8D6DE] bg-[#f7f8fd]"
               />
               {formik.touched.country && formik.errors.country ? (
                 <div className="text-red-500 text-sm">

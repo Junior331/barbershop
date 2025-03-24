@@ -4,10 +4,10 @@ import { motion } from "framer-motion";
 import useSwipe from "./useSwipe";
 import { IProps } from "./@types";
 import { getIcons } from "@/assets/icons";
-import useCardActions from "./useCardActions";
 import { Card } from "@/components/organisms";
+import useCardActions from "./useCardActions";
+import { formatDateTime } from "@/utils/utils";
 import { getServices } from "@/assets/services";
-import { formatDateTime, formatter } from "@/utils/utils";
 
 export const SwipeableCard = ({ item }: IProps) => {
   const [isSwipedLeft, setIsSwipedLeft] = useState(false);
@@ -16,16 +16,16 @@ export const SwipeableCard = ({ item }: IProps) => {
   // Atualize o hook para receber o ID do pedido
   const { handleLeftAction, handleRightAction } = useCardActions();
   const { x, opacityLeft, opacityRight, handleDrag, handleDragEnd } = useSwipe({
-    onLeftAction: handleLeftAction,
+    onLeftAction: () => handleLeftAction(item.id),
     onRightAction: handleRightAction,
     setIsSwipedLeft,
     setIsSwipedRight,
   });
 
-  const totalTime = item.services.reduce(
-    (sum, service) => sum + service.time,
-    0
-  );
+  // const totalTime = item.services.reduce(
+  //   (sum, service) => sum + service.time,
+  //   0
+  // );
 
   return (
     <div
@@ -41,7 +41,7 @@ export const SwipeableCard = ({ item }: IProps) => {
         style={{
           left: 7,
           top: "50%",
-          height:"100%",
+          height: "100%",
           display: "flex",
           paddingLeft: 20,
           alignItems: "center",
@@ -50,7 +50,7 @@ export const SwipeableCard = ({ item }: IProps) => {
           zIndex: isSwipedRight ? 2 : 1,
           transform: "translateY(-50%)",
         }}
-        onClick={handleLeftAction}
+        onClick={() => handleLeftAction(item.id)}
       >
         <img src={getIcons("edit")} alt="Editar" />
       </motion.div>
@@ -82,42 +82,18 @@ export const SwipeableCard = ({ item }: IProps) => {
                 className="w-[87px] h-[87px]"
               />
               <div className="flex flex-col justify-start items-start w-full gap-2 flex-grow pl-2">
-                <p className="text-white inter text-[13px] font-bold leading-[150%]">
+                <p className="text-white inter textarea-lg font-bold leading-[150%] truncate max-w-[calc(100vw-140px)]">
                   {item.services.map((service) => service.name).join(", ")}
                 </p>
 
-                <p className="text-white inter text-[8px] font-[300] leading-none">
-                  <strong className="font-bold text-[11px]">Total: </strong>
-                  {formatter({
-                    type: "pt-BR",
-                    currency: "BRL",
-                    style: "currency",
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  }).format(item.total)}
-                </p>
-
-                <p className="text-white inter text-[8px] font-[300] leading-none">
-                  <strong className="font-bold text-[11px]">
-                    Tempo Total:{" "}
-                  </strong>
-                  {totalTime} minutos
-                </p>
-
-                <p className="text-white inter text-[8px] font-[300] leading-none">
-                  <strong className="font-bold text-[11px]">Data: </strong>
-                  {formatDateTime(item.date || "", "date")} às{" "}
+                <p className="text-white inter textarea-lg font-[300] leading-none">
+                  <strong className="font-bold textarea-lg">Hora: </strong>
                   {formatDateTime(item.date || "", "time")}
                 </p>
-
-                <p className="text-white inter text-[8px] font-[300] leading-none">
-                  <strong className="font-bold text-[11px]">Barbeiro: </strong>
-                  {item.barber}
-                </p>
-
-                <p className="text-white inter text-[8px] font-[300] leading-none">
-                  <strong className="font-bold text-[11px]">Status: </strong>
-                  {item.status}
+                
+                <p className="text-white inter textarea-lg font-[300] leading-none">
+                  <strong className="font-bold textarea-lg">Dia: </strong>
+                  {formatDateTime(item.date || "", "date")}
                 </p>
               </div>
             </div>
@@ -130,7 +106,7 @@ export const SwipeableCard = ({ item }: IProps) => {
         style={{
           right: 7,
           top: "50%",
-          height:"100%",
+          height: "100%",
           display: "flex",
           paddingRight: 20,
           alignItems: "center",

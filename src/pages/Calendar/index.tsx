@@ -30,15 +30,12 @@ export const Calendar = () => {
   useEffect(() => {
     if (order.date) {
       const storedDate = new Date(order.date);
-      setCurrentDate(new Date(
-        storedDate.getFullYear(),
-        storedDate.getMonth(),
-        1
-      ));
+      setCurrentDate(
+        new Date(storedDate.getFullYear(), storedDate.getMonth(), 1)
+      );
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [order.date]);
-
 
   return (
     <Layout>
@@ -50,13 +47,13 @@ export const Calendar = () => {
             <img
               alt="Image avatar"
               src={getIcons("calendar_solid_white")}
-              className="w-[71px] h-[71px] p-2.5 bg-[#6B7280] flex-shrink-0 rounded-[70px] border-2 border-white object-cover filter drop-shadow-[0_2px_4px_rgba(112,121,116,0.30)]"
+              className="w-[71px] h-[71px] p-2.5 bg-[#6B7280]  rounded-[70px] border-2 border-white object-cover filter drop-shadow-[0_2px_4px_rgba(112,121,116,0.30)]"
             />
             <div className="flex flex-col justify-start items-start w-full flex-grow pl-2 gap-1">
-              <p className="flex-shrink-0 text-black inter text-[12px] font-medium leading-none">
+              <p className=" text-black inter textarea-md font-medium leading-none">
                 {dayOfWeek}
               </p>
-              <h2 className="flex-shrink-0 text-black inter text-[20px] font-bold tracking-[1px] leading-none">
+              <h2 className=" text-black inter text-2xl font-bold tracking-[1px] leading-none">
                 {formattedDate}
               </h2>
             </div>
@@ -70,13 +67,13 @@ export const Calendar = () => {
                   className="btn btn-circle btn-sm btn-ghost border-none hover:!bg-gray-100 active:!bg-gray-200 focus:!bg-gray-100 !shadow-none transition-all p-2.5"
                 >
                   <img
-                    src={getIcons("arrow_line_left")}
                     alt="Previous month"
+                    src={getIcons("arrow_line_left")}
                     className="w-5 h-5 object-contain pointer-events-none"
                   />
                 </button>
 
-                <h3 className="text-lg font-semibold">
+                <h3 className="text-lg font-semibold text-[#000]">
                   {monthNames[currentDate.getMonth()]}{" "}
                   {currentDate.getFullYear()}
                 </h3>
@@ -86,8 +83,8 @@ export const Calendar = () => {
                   className="btn btn-circle btn-sm btn-ghost border-none hover:!bg-gray-100 active:!bg-gray-200 focus:!bg-gray-100 !shadow-none transition-all p-2.5"
                 >
                   <img
-                    src={getIcons("arrow_line_right")}
                     alt="Next month"
+                    src={getIcons("arrow_line_right")}
                     className="w-5 h-5 object-contain pointer-events-none"
                   />
                 </button>
@@ -97,7 +94,7 @@ export const Calendar = () => {
                 {daysOfWeek.map((day) => (
                   <div
                     key={day}
-                    className="text-center text-sm font-medium text-gray-500"
+                    className="text-center text-sm font-medium text-[#000]"
                   >
                     {day}
                   </div>
@@ -118,7 +115,7 @@ export const Calendar = () => {
                     <div
                       key={index}
                       onClick={() => isValidDay && handleDayClick(day)}
-                      className={`h-12 flex items-center justify-center text-sm transition-all
+                      className={`h-12 flex items-center justify-center text-sm transition-all text-[#000]
                 ${day ? "cursor-pointer" : "opacity-0"}
                 ${isToday ? "bg-blue-500 text-white rounded-[10px]" : ""}
                 ${
@@ -140,7 +137,7 @@ export const Calendar = () => {
             </div>
 
             <h2 className="text-black inter text-[24px] font-medium leading-normal tracking-[1.2px] m-[25px_0px]">
-              Timetables
+              Horários
             </h2>
 
             <div className="w-full grid grid-cols-3 gap-3">
@@ -155,7 +152,7 @@ export const Calendar = () => {
                   >
                     <div
                       className={`
-          w-full h-[33.568px] flex-shrink-0 rounded-[21px]
+          w-full h-[33.568px] rounded-[21px]
           flex items-center justify-center transition-colors
           ${
             isSelected
@@ -166,7 +163,7 @@ export const Calendar = () => {
                     >
                       <p
                         className={`
-            text-[10px] inter font-medium leading-none
+            textarea-md inter font-medium leading-none
             ${isSelected ? "text-[rgba(107,114,128,0.2)]" : "text-white"}
           `}
                       >

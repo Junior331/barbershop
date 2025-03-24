@@ -7,7 +7,7 @@ export const services: Service[] = [
     time: 40,
     price: 40,
     checked: true,
-    name: "Beard & hair",
+    name: "Barba e Cabelo",
     icon: getServices("beard_hair"),
   },
   {
@@ -15,7 +15,7 @@ export const services: Service[] = [
     time: 40,
     price: 35,
     checked: false,
-    name: "Beard",
+    name: "Barba",
     icon: getServices("beard"),
   },
   {
@@ -23,7 +23,7 @@ export const services: Service[] = [
     time: 40,
     price: 25,
     checked: false,
-    name: "Hair",
+    name: "Corte com Máquina",
     icon: getServices("electric_razor_cut"),
   },
   {
@@ -31,7 +31,7 @@ export const services: Service[] = [
     time: 40,
     price: 28,
     checked: false,
-    name: "Scissor Cut",
+    name: "Corte com Tesoura",
     icon: getServices("scissor_cut"),
   },
   {
@@ -39,7 +39,7 @@ export const services: Service[] = [
     time: 40,
     price: 35,
     checked: false,
-    name: "Reflex",
+    name: "Reflexo",
     icon: getServices("reflex"),
   },
   {
@@ -47,7 +47,7 @@ export const services: Service[] = [
     time: 40,
     price: 40,
     checked: false,
-    name: "Pigmentation",
+    name: "Pigmentação",
     icon: getServices("pigmentation"),
   },
   {
@@ -55,7 +55,7 @@ export const services: Service[] = [
     time: 40,
     price: 40,
     checked: false,
-    name: "Kids' cuts",
+    name: "Cortes Infantis",
     icon: getServices("kids_cuts"),
   },
   {
@@ -63,7 +63,7 @@ export const services: Service[] = [
     time: 40,
     price: 8,
     checked: false,
-    name: "Hair cuts",
+    name: "Cortes de Cabelo",
     icon: getServices("haircuts"),
   },
   {
@@ -71,7 +71,7 @@ export const services: Service[] = [
     time: 40,
     price: 8,
     checked: false,
-    name: "Eyebrow",
+    name: "Sobrancelha",
     icon: getServices("eyebrow"),
   },
 ];
