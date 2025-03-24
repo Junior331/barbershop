@@ -43,7 +43,7 @@ export const Home = () => {
                       alt={`Service ${item.name}`}
                       className="w-[calc(100%-25px)] h-[calc(100%-25px)] mx-auto"
                     />
-                    <div className="flex-1 flex flex-col justify-end w-full h-full">
+                    <div className="flex-1 flex flex-col justify-end w-full h-full gap-2 mt-2">
                       <p className="text-white inter text-[14px] font-bold leading-none">
                         {formatter({
                           type: "pt-BR",
@@ -70,7 +70,7 @@ export const Home = () => {
               </label>
               <button
                 type="button"
-                onClick={() => navigate('/myBookings')}
+                onClick={() => navigate("/myBookings")}
                 className="btn p-0 m-0 btn-link border-none !no-underline text-[#000] font-[500] text-[14px] inter"
               >
                 see all
@@ -80,10 +80,10 @@ export const Home = () => {
             <div className="flex items-center justify-start w-full overflow-auto max-w-full gap-[10px] pb-[10px]">
               {orders.map((item) => {
                 return (
-                  <div className="btn w-[250px] h-auto bg-transparent border-0 shadow-none p-0">
+                  <div className="btn w-[300px] h-auto bg-transparent border-0 shadow-none p-0">
                     <Card
                       style={{
-                        minWidth: 250,
+                        minWidth: 300,
                         paddingLeft: 2,
                         minHeight: "initial",
                       }}
@@ -92,31 +92,31 @@ export const Home = () => {
                         <img
                           src={item.icon}
                           alt={`Service ${item.name}`}
-                          className="w-[60px] h-[60px]"
+                          className="w-[90px] h-[90px]"
                         />
 
-                        <div className="flex flex-col justify-start items-start w-full gap-[3px] flex-grow pl-2">
-                          <p className="text-white inter text-base font-bold leading-[150%] border-b border-[#E5E7EB]">
+                        <div className="flex flex-col justify-start items-start w-full gap-[8px] flex-grow pl-2">
+                          <p className="w-full text-start text-white inter textarea-lg font-bold leading-[150%] border-b border-[#E5E7EB]">
                             {item.name}
                           </p>
-                          <p className="text-white font-roboto text-[12px] font-normal leading-none">
+                          <p className="text-white font-roboto textarea-md font-normal leading-none">
                             {item.barber}
                           </p>
-                          <p className="flex items-center gap-[1.5px] text-white inter text-[12px] font-normal">
+                          <p className="flex items-center gap-[1.5px] text-white inter textarea-md font-normal">
                             <img
-                              alt="Icon location"
                               className="size-4"
+                              alt="Icon location"
                               src={getIcons("location_outlined")}
                             />
                             {item.location}
                           </p>
-                          <p className="flex items-center gap-[2.5px] text-white inter text-[12px] font-normal">
+                          <p className="flex items-center gap-2 text-white inter textarea-md font-normal">
                             <img
                               alt="Icon clock"
                               className="size-4"
                               src={getIcons("clock_outlined")}
                             />
-                            <div className="h-[7px] w-[1.5px] bg-white" />
+                            <div className="h-3 w-[1.5px] bg-white" />
                             {item.time}min
                           </p>
                         </div>
@@ -135,7 +135,7 @@ export const Home = () => {
               </label>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-[5px] w-full overflow-auto max-w-full pb-[10px] 5 pr-1">
+            <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 w-full overflow-auto max-w-full pb-[10px] 5 pr-1">
               {barbers.map((item) => {
                 return (
                   <div
@@ -145,25 +145,26 @@ export const Home = () => {
                     <Card
                       style={{
                         padding: 0,
+                        minHeight: 130,
                         minWidth: "100%",
                         overflow: "hidden",
                       }}
                     >
-                      <div className="flex items-center w-full h-full pr-[5px] min-h-24">
+                      <div className="flex items-center w-full h-full pr-[5px] min-h-28">
                         <img
                           src={item.image}
                           alt={`Barber ${item.name}`}
-                          className="min-w-[95px] min-h-[95px] max-w-[95px] max-h-[95px] object-cover border-r-[2px] border-[#E5E7EB]"
+                          className="min-w-32 min-h-32 max-w-32 max-h-32 object-cover border-r-[2px] border-[#E5E7EB]"
                         />
 
-                        <div className="flex flex-col justify-start items-start w-full gap-[5px] flex-grow pl-2">
-                          <p className="w-full text-start text-white inter text-base font-bold leading-[150%] border-b border-[#E5E7EB] text_ellipsis">
+                        <div className="flex flex-col justify-start items-start w-full gap-2 flex-grow pl-2">
+                          <p className="w-full text-start text-white inter textarea-lg font-bold leading-[150%] border-b border-[#E5E7EB] text_ellipsis">
                             {item.name}
                           </p>
-                          <p className="text-white font-roboto text-[12px] font-normal leading-none">
+                          <p className="text-white font-roboto textarea-md font-normal leading-none">
                             {item.type}
                           </p>
-                          <p className="flex items-center gap-[1.5px] text-white inter text-[12px] font-normal">
+                          <p className="flex items-center gap-[1.5px] text-white inter textarea-md font-normal">
                             <img
                               alt="Icon location"
                               src={getIcons("location_outlined")}
@@ -177,11 +178,11 @@ export const Home = () => {
                               src={getIcons("star_solid")}
                               className="size-4 relative top-[-1px]"
                             />
-                            <p className="flex items-center gap-[2.5px] text-white inter text-[12px] font-normal">
+                            <p className="flex items-center gap-[2.5px] text-white inter textarea-md font-normal">
                               {item.rating}
                             </p>
                             <div className="h-[7px] w-[0.5px] bg-white" />
-                            <p className="flex items-center gap-[2.5px] text-white inter text-[12px] font-normal">
+                            <p className="flex items-center gap-[2.5px] text-white inter textarea-md font-normal">
                               {item.cuts} Cuts
                             </p>
                           </div>
@@ -213,7 +214,6 @@ export const Home = () => {
             onClick={() => navigate("/services")}
           >
             Agendar
-            <span className="absolute top-0 left-0 w-full h-full rounded-lg opacity-0 hover:opacity-20 bg-white transition-opacity duration-300"></span>
           </motion.button>
         </div>
       </div>

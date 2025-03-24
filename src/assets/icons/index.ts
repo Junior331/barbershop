@@ -4,6 +4,7 @@ import edit from "./edit.svg";
 import trash from "./trash.svg";
 import camera from "./camera.svg";
 import wallet from "./wallet.svg";
+import barber from "./barber.png";
 import profile from "./profile.svg";
 import calendar from "./calendar.svg";
 import card_add from "./card_add.svg";
@@ -17,6 +18,7 @@ import arrow_right from "./arrow_right.svg";
 import apple_solid from "./apple_solid.svg";
 import card_credit from "./card_credit.svg";
 import home_active from "./home_active.svg";
+import barber_apron from "./barber_apron.png";
 import social_apple from "./social_apple.svg";
 import calendar_tick from "./calendar_tick.svg";
 import social_google from "./social_google.svg";
@@ -24,6 +26,7 @@ import wallet_active from "./wallet_active.svg";
 import fallback from "../images/placeholder.svg";
 import profile_active from "./profile_active.svg";
 import clock_outlined from "./clock_outlined.svg";
+import electric_shaver from "./electric_shaver.png";
 import social_facebook from "./social_facebook.svg";
 import calendar_active from "./calendar_active.svg";
 import arrow_line_left from "./arrow_line_left.svg";
@@ -49,6 +52,7 @@ export const icons = {
   trash,
   camera,
   wallet,
+  barber,
   profile,
   fallback,
   calendar,
@@ -63,12 +67,14 @@ export const icons = {
   apple_solid,
   card_credit,
   home_active,
+  barber_apron,
   social_apple,
   wallet_active,
   calendar_tick,
   social_google,
   clock_outlined,
   profile_active,
+  electric_shaver,
   calendar_active,
   social_facebook,
   arrow_line_left,
