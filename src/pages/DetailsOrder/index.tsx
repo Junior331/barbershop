@@ -7,7 +7,7 @@ import { Header } from "@/components/organisms";
 import { formatCustomDateTime, formatter } from "@/utils/utils";
 import { useOrderActions, useOrderStore } from "@/store/useOrderStore";
 
-export const EditOrder = () => {
+export const DetailsOrder = () => {
   const { id } = useParams();
   const orders = useOrderStore((state) => state.orders);
   const { toggleService } = useOrderActions();

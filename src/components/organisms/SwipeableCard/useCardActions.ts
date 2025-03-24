@@ -4,7 +4,7 @@ const useCardActions = () => {
   const navigate = useNavigate();
 
   const handleLeftAction = (id: string) => {
-    navigate(`/editorder/${id}`)
+    navigate(`/detailsorder/${id}`)
   };
 
   const handleRightAction = () => {

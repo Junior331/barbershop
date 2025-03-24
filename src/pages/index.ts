@@ -7,8 +7,8 @@ import { Barbers } from "./Barbers";
 import { Account } from "./Account";
 import { Calendar } from "./Calendar";
 import { Services } from "./Services";
-import { EditOrder } from "./EditOrder";
 import { MyBookings } from "./MyBookings";
+import { DetailsOrder } from "./DetailsOrder";
 
 export {
   Home,
@@ -20,6 +20,6 @@ export {
   Account,
   Calendar,
   Services,
-  EditOrder,
   MyBookings,
+  DetailsOrder,
 };

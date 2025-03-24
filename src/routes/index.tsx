@@ -11,7 +11,7 @@ import {
   Profile,
   Calendar,
   Services,
-  EditOrder,
+  DetailsOrder,
   MyBookings,
 } from "@/pages";
 import { Loading } from "@/components/elements";
@@ -29,8 +29,8 @@ export const AppRoutes = () => {
         <Route path="/calendar" element={<Calendar />} />
         <Route path="/services" element={<Services />} />
         <Route path="/mybookings" element={<MyBookings />} />
-        <Route path="/editorder/:id" element={<EditOrder />} />
         <Route path="/account/profile" element={<Profile />} />
+        <Route path="/detailsorder/:id" element={<DetailsOrder />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Suspense>
