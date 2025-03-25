@@ -1,5 +1,4 @@
-import { Helmet } from "react-helmet";
-import { useState, Suspense } from "react";
+import { useState } from "react";
 
 import { getIcons, icons } from "@/assets/icons";
 import { getImage } from "@/assets/images";
@@ -7,18 +6,13 @@ import { useSignin } from "./useSignin";
 import { Loading } from "@/components/elements";
 const SocialIcon = ({ type }: { type: string }) => {
   return (
-    <Suspense
-      fallback={
-        <div className="size-20 animate-pulse bg-gray-200 rounded-full" />
-      }
-    >
+
       <div className="btn flex size-20 p-4 justify-center items-center gap-4 rounded-full border border-[rgba(227,227,227,0.8)] bg-white shadow-sm">
         <img
           loading="lazy"
           src={getIcons(`social_${type}` as keyof typeof icons)}
         />
       </div>
-    </Suspense>
   );
 };
 
@@ -28,10 +22,6 @@ export const Signin = () => {
 
   return (
     <div className="flex gap-5 flex-col justify-center items-center p-5 w-full h-full">
-      <Helmet>
-        <link rel="preload" href={getImage("logo")} as="image" />
-      </Helmet>
-
       <img
         width="256"
         height="256"
