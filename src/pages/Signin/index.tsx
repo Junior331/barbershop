@@ -1,8 +1,25 @@
+import { Helmet } from "react-helmet";
+import { useState, lazy, Suspense } from "react";
+
 import { getIcons } from "@/assets/icons";
 import { getImage } from "@/assets/images";
 import { useSignin } from "./useSignin";
 import { Loading } from "@/components/elements";
-import { useState } from "react";
+
+const SocialIcon = ({ type }: { type: string }) => {
+  const Icon = lazy(() => import(`@/assets/icons/social_${type}`));
+  return (
+    <Suspense
+      fallback={
+        <div className="size-20 animate-pulse bg-gray-200 rounded-full" />
+      }
+    >
+      <div className="btn flex size-20 p-4 justify-center items-center gap-4 rounded-full border border-[rgba(227,227,227,0.8)] bg-white shadow-sm">
+        <Icon />
+      </div>
+    </Suspense>
+  );
+};
 
 export const Signin = () => {
   const { formik, loading } = useSignin();
@@ -10,7 +27,19 @@ export const Signin = () => {
 
   return (
     <div className="flex gap-5 flex-col justify-center items-center p-5 w-full h-full">
-      <img className="size-64 object-cover" src={getImage("logo")} alt="Image logo" />
+      <Helmet>
+        <link rel="preload" href={getImage("logo")} as="image" />
+      </Helmet>
+
+      <img
+        width="256"
+        height="256"
+        loading="eager"
+        decoding="async"
+        src={getImage("logo")}
+        alt="Logo da Barbearia"
+        className="size-64 object-cover"
+      />
 
       <form
         onSubmit={formik.handleSubmit}
@@ -108,16 +137,11 @@ export const Signin = () => {
       </div>
 
       <div className="flex gap-4 justify-center">
-        <div className="btn flex size-20 p-4 justify-center items-center gap-4  rounded-full border border-[rgba(227,227,227,0.8)] bg-white shadow-sm">
-          <img src={getIcons("social_facebook")} alt="Facebook" />
-        </div>
-        <div className="btn flex size-20 p-4 justify-center items-center gap-4  rounded-full border border-[rgba(227,227,227,0.8)] bg-white shadow-sm">
-          <img src={getIcons("social_google")} alt="Google" />
-        </div>
-        <div className="btn flex size-20 p-4 justify-center items-center gap-4  rounded-full border border-[rgba(227,227,227,0.8)] bg-white shadow-sm">
-          <img src={getIcons("social_apple")} alt="Apple" />
-        </div>
+        <SocialIcon type="facebook" />
+        <SocialIcon type="google" />
+        <SocialIcon type="apple" />
       </div>
+
       {loading && <Loading />}
     </div>
   );

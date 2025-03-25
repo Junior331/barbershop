@@ -133,3 +133,4 @@ export const formatPercentage = (value: number): string => {
     maximumFractionDigits: 1
   }).format(value);
 };
+
