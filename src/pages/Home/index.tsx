@@ -23,7 +23,7 @@ export const Home = () => {
 
         <div className="flex flex-1 flex-col w-full h-full items-start justify-start overflow-y-auto pb-20 z-10">
           <div className="flex flex-col items-center w-full pr-2">
-            <div className="flex items-center justify-between w-full gap-1">
+            <div className="flex items-center justify-between w-full gap-1 my-4">
               <label className="text-[#000] inter textarea-lg font-bold leading-[150%]">
                 Promoções da semana
               </label>
@@ -42,7 +42,7 @@ export const Home = () => {
                     <img
                       src={item.icon}
                       alt={`Service ${item.name}`}
-                      className="w-[calc(100%-25px)] h-[calc(100%-25px)] mx-auto"
+                      className="w-[calc(100%-35px)] h-[calc(100%-35px)] mx-auto"
                     />
                     <div className="flex-1 flex flex-col justify-end w-full h-full gap-2 mt-2">
                       <p className="text-[#6b7280] inter text-[14px] font-bold leading-none">
@@ -65,7 +65,7 @@ export const Home = () => {
           </div>
 
           <div className="flex flex-col items-center w-full mt-5 pr-2">
-            <div className="flex items-center justify-between w-full gap-1">
+            <div className="flex items-center justify-between w-full gap-1 my-4">
               <label className="text-[#000] inter textarea-lg font-bold leading-[150%]">
                 Seus serviços
               </label>
@@ -130,7 +130,7 @@ export const Home = () => {
           </div>
 
           <div className="flex flex-col items-center w-full mt-5">
-            <div className="flex items-center justify-between w-full gap-1">
+            <div className="flex items-center justify-between w-full gap-1 my-4">
               <label className="text-[#000] inter textarea-lg font-bold leading-[150%]">
                 Barbeiros
               </label>
