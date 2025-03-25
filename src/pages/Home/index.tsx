@@ -15,7 +15,7 @@ export const Home = () => {
       <div className="bg-[#f7f8fde8] w-screen h-screen fixed top-[180px]" />
       <div className="flex flex-col pt-[27px] px-3 pr-1 justify-start items-start h-screen w-full">
         <div className="w-full mb-6">
-          <h2 className="font-[300] flex flex-col text-[#283046] max-w-[145px] inter text-[32px] leading-[36px]">
+          <h2 className="font-[300] flex flex-col text-[#283046] max-w-[145px] inter text-[26px] leading-[36px]">
             Olá,
             <span className="font-bold">Junior</span>
           </h2>

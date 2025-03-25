@@ -20,6 +20,7 @@ export const Sidebar = () => {
               >
                 <img
                   alt={`Icon ${item.name}`}
+                  className="size-7"
                   src={isActive ? item.icon_active : item.icon}
                 />
               </li>
