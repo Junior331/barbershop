@@ -10,7 +10,7 @@ export const Signin = () => {
 
   return (
     <div className="flex gap-5 flex-col justify-center items-center p-5 w-full h-full">
-      <img src={getImage("logo")} alt="Image logo" />
+      <img className="size-64 object-cover" src={getImage("logo")} alt="Image logo" />
 
       <form
         onSubmit={formik.handleSubmit}
