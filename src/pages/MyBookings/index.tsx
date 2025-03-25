@@ -31,22 +31,16 @@ export const MyBookings = () => {
   );
 
   const dotsArray = Array.from({ length: 20 });
-  console.log('processedOrders ::', processedOrders)
 
   return (
     <Layout>
       <div className="flex flex-col justify-start items-center h-full w-full">
-        <Header title={"My bookings"} backPath={"/home"} />
+        <Header title={"Minha Agenda"} backPath={"/home"} />
         <div className="flex flex-col justify-start items-center h-full w-full p-4 pr-2 pt-2">
           <div className="flex w-full gap-3 mb-4">
             <div className="w-[71px] h-[71px] flex justify-center items-center rounded-[71px]  bg-[#6B7280] border-2 border-white filter drop-shadow-[0px_2px_4px_rgba(112,121,116,0.30)]">
               <img src={getIcons("calendar_solid_white")} alt="Icon calendar" />
             </div>
-
-            {/* <div className="w-[71px] h-[71px] flex justify-center items-center rounded-[70px]  bg-[#FEFEFE] border-2 border-white shadow-[0px_1px_4px_0px_rgba(156,163,175,0.40)]">
-              <img src={getIcons("calendar_solid_green")} alt="Icon calendar" />
-            </div> */}
-            
             <div className="flex flex-col justify-center">
               <p className="text-black inter text-base font-medium leading-normal">
                 {dayOfWeek}
@@ -57,7 +51,7 @@ export const MyBookings = () => {
             </div>
           </div>
 
-          <div className="flex flex-1 flex-col gap-2.5 w-full h-full items-start justify-start overflow-y-auto pr-2 pb-[50px]">
+          <div className="flex flex-1 flex-col w-full h-full items-start justify-start overflow-y-auto pr-2 pb-[50px]">
             {processedOrders.length ? (
               <>
                 {processedOrders

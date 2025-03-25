@@ -29,7 +29,7 @@ export const SwipeableCard = ({ item }: IProps) => {
 
   return (
     <div
-      className="card-container"
+      className="card-container p-[10px_2px]"
       style={{
         overflow: "hidden",
         position: "relative",

@@ -12,15 +12,16 @@ export const Home = () => {
 
   return (
     <Layout>
+      <div className="bg-[#f7f8fde8] w-screen h-screen fixed top-[180px]" />
       <div className="flex flex-col pt-[27px] px-3 pr-1 justify-start items-start h-screen w-full">
         <div className="w-full mb-6">
           <h2 className="font-[300] flex flex-col text-[#283046] max-w-[145px] inter text-[32px] leading-[36px]">
-            Hi,
+            Olá,
             <span className="font-bold">Junior</span>
           </h2>
         </div>
 
-        <div className="flex flex-1 flex-col w-full h-full items-start justify-start overflow-y-auto pb-20">
+        <div className="flex flex-1 flex-col w-full h-full items-start justify-start overflow-y-auto pb-20 z-10">
           <div className="flex flex-col items-center w-full pr-2">
             <div className="flex items-center justify-between w-full gap-1">
               <label className="text-[#000] inter textarea-lg font-bold leading-[150%]">

@@ -41,7 +41,7 @@ export const Account = () => {
   return (
     <Layout>
       <div className="flex flex-col justify-start items-start h-full w-full">
-        <Header title={"Account"} backPath={"/home"} />
+        <Header title={"Perfil"} backPath={"/home"} />
         <div className="bg-[#f7f8fde8] w-screen h-screen fixed top-[180px]" />
 
         <div className="flex flex-col h-full w-full p-4 pt-2 overflow-y-auto z-10">
@@ -93,7 +93,7 @@ export const Account = () => {
               </div>
             ))}
           </div>
-          <h2 className="text-black my-4  inter text-[18px] tracking-[1.2px]">
+          <h2 className="text-black my-4 inter text-[18px] tracking-[1.2px]">
             Mais
           </h2>
 
