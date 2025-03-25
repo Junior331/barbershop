@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useSignin } from "./useSignin";
-import { getIcons, icons } from "@/assets/icons";
+import { getIcons } from "@/assets/icons";
 import { getImage } from "@/assets/images";
 import { Loading } from "@/components/elements";
 
@@ -108,19 +108,15 @@ export const Signin = () => {
       </div>
 
       <div className="flex gap-4 justify-center">
-        {["social_facebook", "social_google", "social_apple"].map(
-          (item, index) => (
-            <div
-              key={`${item}_${index}`}
-              className="btn flex size-20 p-4 justify-center items-center gap-4  rounded-full border border-[rgba(227,227,227,0.8)] bg-white shadow-sm"
-            >
-              <img
-                src={getIcons(item as keyof typeof icons)}
-                alt={`Icon ${item}`}
-              />
-            </div>
-          )
-        )}
+        <div className="btn flex size-20 p-4 justify-center items-center gap-4  rounded-full border border-[rgba(227,227,227,0.8)] bg-white shadow-sm">
+          <img src={getIcons("social_facebook")} alt="Facebook" />
+        </div>
+        <div className="btn flex size-20 p-4 justify-center items-center gap-4  rounded-full border border-[rgba(227,227,227,0.8)] bg-white shadow-sm">
+          <img src={getIcons("social_google")} alt="Google" />
+        </div>
+        <div className="btn flex size-20 p-4 justify-center items-center gap-4  rounded-full border border-[rgba(227,227,227,0.8)] bg-white shadow-sm">
+          <img src={getIcons("social_apple")} alt="Apple" />
+        </div>
       </div>
       {loading && <Loading />}
     </div>
