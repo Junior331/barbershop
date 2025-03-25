@@ -54,7 +54,7 @@ export const Home = () => {
                           maximumFractionDigits: 2,
                         }).format(item.price || 0)}
                       </p>
-                      <p className="text-[#6b7280] inter text-[14px] font-bold leading-none truncate max-w-[80px]">
+                      <p className="text-[#6b7280] w-full inter text-[14px] font-bold leading-none truncate max-w-[calc(100%-5px)]">
                         {item.name}
                       </p>
                     </div>
