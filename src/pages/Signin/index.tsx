@@ -1,8 +1,20 @@
 import { useState } from "react";
-import { getIcons } from "@/assets/icons";
-import { getImage } from "@/assets/images";
+
 import { useSignin } from "./useSignin";
+import { getImage } from "@/assets/images";
 import { Loading } from "@/components/elements";
+import { getIcons, icons } from "@/assets/icons";
+
+const SocialIcon = ({ type }: { type: string }) => {
+  return (
+    <div className="btn flex size-20 p-4 justify-center items-center gap-4 rounded-full border border-[rgba(227,227,227,0.8)] bg-white shadow-sm">
+      <img
+        loading="lazy"
+        src={getIcons(`social_${type}` as keyof typeof icons)}
+      />
+    </div>
+  );
+};
 
 export const Signin = () => {
   const { formik, loading } = useSignin();
@@ -108,15 +120,9 @@ export const Signin = () => {
       </div>
 
       <div className="flex gap-4 justify-center">
-        <div className="btn flex size-20 p-4 justify-center items-center gap-4  rounded-full border border-[rgba(227,227,227,0.8)] bg-white shadow-sm">
-          <img src={getIcons("social_facebook")} alt="Facebook" />
-        </div>
-        <div className="btn flex size-20 p-4 justify-center items-center gap-4  rounded-full border border-[rgba(227,227,227,0.8)] bg-white shadow-sm">
-          <img src={getIcons("social_google")} alt="Google" />
-        </div>
-        <div className="btn flex size-20 p-4 justify-center items-center gap-4  rounded-full border border-[rgba(227,227,227,0.8)] bg-white shadow-sm">
-          <img src={getIcons("social_apple")} alt="Apple" />
-        </div>
+        <SocialIcon type={"facebook"} />
+        <SocialIcon type={"google"} />
+        <SocialIcon type={"apple"} />
       </div>
       {loading && <Loading />}
     </div>
