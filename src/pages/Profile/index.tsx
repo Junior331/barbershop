@@ -35,8 +35,13 @@ export const Profile = () => {
       <div className="flex flex-col justify-start items-center h-full w-full">
         <Header title={"Profile"} backPath={"/account"} />
 
+
+        <div className="bg-[#f7f8fde8] w-screen h-screen fixed top-[180px]">
+
+        </div>
+
         {loading && <Loading />}
-        <div className="flex flex-col h-full w-full p-4 pt-2 gap-2.5 overflow-y-auto">
+        <div className="flex flex-col h-full w-full p-4 pt-2 gap-2.5 overflow-y-auto z-10">
           <div className="btn w-full h-auto bg-transparent border-0 shadow-none px-0 py-2.5 border-b-2 border-[#EBE9F1]">
             <div className="flex items-center w-full h-full">
               <div
@@ -91,7 +96,7 @@ export const Profile = () => {
                 value={formik.values.name}
                 placeholder="Digite aqui..."
                 onChange={formik.handleChange}
-                className="w-full h-[48px] px-[10px]  rounded-[5px] border border-[#D8D6DE] bg-[#f7f8fd]"
+                className="w-full h-[48px] px-[10px]  rounded-[5px] border border-[#D8D6DE] bg-[#f7f8fde8]"
               />
               {formik.touched.name && formik.errors.name ? (
                 <div className="text-red-500 text-sm">{formik.errors.name}</div>
@@ -108,7 +113,7 @@ export const Profile = () => {
                 value={formik.values.email}
                 placeholder="Digite aqui..."
                 onChange={formik.handleChange}
-                className="w-full h-[48px] px-[10px]  rounded-[5px] border border-[#D8D6DE] bg-[#f7f8fd]"
+                className="w-full h-[48px] px-[10px]  rounded-[5px] border border-[#D8D6DE] bg-[#f7f8fde8]"
               />
               {formik.touched.email && formik.errors.email ? (
                 <div className="text-red-500 text-sm">
@@ -127,7 +132,7 @@ export const Profile = () => {
                 placeholder="Digite aqui..."
                 onChange={formik.handleChange}
                 value={maskPhone(formik.values.phone)}
-                className="w-full h-[48px] px-[10px]  rounded-[5px] border border-[#D8D6DE] bg-[#f7f8fd]"
+                className="w-full h-[48px] px-[10px]  rounded-[5px] border border-[#D8D6DE] bg-[#f7f8fde8]"
               />
               {formik.touched.phone && formik.errors.phone ? (
                 <div className="text-red-500 text-sm">
@@ -146,7 +151,7 @@ export const Profile = () => {
                 placeholder="Digite aqui..."
                 onChange={formik.handleChange}
                 value={maskBirthday(formik.values.birthday)}
-                className="w-full h-[48px] px-[10px]  rounded-[5px] border border-[#D8D6DE] bg-[#f7f8fd]"
+                className="w-full h-[48px] px-[10px]  rounded-[5px] border border-[#D8D6DE] bg-[#f7f8fde8]"
               />
               {formik.touched.birthday && formik.errors.birthday ? (
                 <div className="text-red-500 text-sm">
@@ -165,7 +170,7 @@ export const Profile = () => {
                 placeholder="Digite aqui..."
                 onChange={formik.handleChange}
                 value={maskZipCode(formik.values.zip_code)}
-                className="w-full h-[48px] px-[10px]  rounded-[5px] border border-[#D8D6DE] bg-[#f7f8fd]"
+                className="w-full h-[48px] px-[10px]  rounded-[5px] border border-[#D8D6DE] bg-[#f7f8fde8]"
               />
               {formik.touched.zip_code && formik.errors.zip_code ? (
                 <div className="text-red-500 text-sm">
@@ -184,7 +189,7 @@ export const Profile = () => {
                 value={formik.values.address}
                 placeholder="Digite aqui..."
                 onChange={formik.handleChange}
-                className="w-full h-[48px] px-[10px]  rounded-[5px] border border-[#D8D6DE] bg-[#f7f8fd]"
+                className="w-full h-[48px] px-[10px]  rounded-[5px] border border-[#D8D6DE] bg-[#f7f8fde8]"
               />
               {formik.touched.address && formik.errors.address ? (
                 <div className="text-red-500 text-sm">
@@ -204,7 +209,7 @@ export const Profile = () => {
                 value={formik.values.state}
                 placeholder="Digite aqui..."
                 onChange={formik.handleChange}
-                className="w-full h-[48px] px-[10px]  rounded-[5px] border border-[#D8D6DE] bg-[#f7f8fd]"
+                className="w-full h-[48px] px-[10px]  rounded-[5px] border border-[#D8D6DE] bg-[#f7f8fde8]"
               />
               {formik.touched.state && formik.errors.state ? (
                 <div className="text-red-500 text-sm">
@@ -223,7 +228,7 @@ export const Profile = () => {
                 value={formik.values.country}
                 placeholder="Digite aqui..."
                 onChange={formik.handleChange}
-                className="w-full h-[48px] px-[10px]  rounded-[5px] border border-[#D8D6DE] bg-[#f7f8fd]"
+                className="w-full h-[48px] px-[10px]  rounded-[5px] border border-[#D8D6DE] bg-[#f7f8fde8]"
               />
               {formik.touched.country && formik.errors.country ? (
                 <div className="text-red-500 text-sm">
