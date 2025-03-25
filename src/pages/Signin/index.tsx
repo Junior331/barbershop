@@ -1,13 +1,11 @@
 import { Helmet } from "react-helmet";
-import { useState, lazy, Suspense } from "react";
+import { useState, Suspense } from "react";
 
-import { getIcons } from "@/assets/icons";
+import { getIcons, icons } from "@/assets/icons";
 import { getImage } from "@/assets/images";
 import { useSignin } from "./useSignin";
 import { Loading } from "@/components/elements";
-
 const SocialIcon = ({ type }: { type: string }) => {
-  const Icon = lazy(() => import(`@/assets/icons/social_${type}`));
   return (
     <Suspense
       fallback={
@@ -15,7 +13,10 @@ const SocialIcon = ({ type }: { type: string }) => {
       }
     >
       <div className="btn flex size-20 p-4 justify-center items-center gap-4 rounded-full border border-[rgba(227,227,227,0.8)] bg-white shadow-sm">
-        <Icon />
+        <img
+          loading="lazy"
+          src={getIcons(`social_${type}` as keyof typeof icons)}
+        />
       </div>
     </Suspense>
   );
