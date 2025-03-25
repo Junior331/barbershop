@@ -24,7 +24,7 @@ export const Home = () => {
           <div className="flex flex-col items-center w-full pr-2">
             <div className="flex items-center justify-between w-full gap-1">
               <label className="text-[#000] inter textarea-lg font-bold leading-[150%]">
-                Promotions of week
+                Promoções da semana
               </label>
             </div>
 
@@ -44,7 +44,7 @@ export const Home = () => {
                       className="w-[calc(100%-25px)] h-[calc(100%-25px)] mx-auto"
                     />
                     <div className="flex-1 flex flex-col justify-end w-full h-full gap-2 mt-2">
-                      <p className="text-white inter text-[14px] font-bold leading-none">
+                      <p className="text-[#6b7280] inter text-[14px] font-bold leading-none">
                         {formatter({
                           type: "pt-BR",
                           currency: "BRL",
@@ -53,7 +53,7 @@ export const Home = () => {
                           maximumFractionDigits: 2,
                         }).format(item.price || 0)}
                       </p>
-                      <p className="text-white inter text-[14px] font-bold leading-none truncate max-w-[80px]">
+                      <p className="text-[#6b7280] inter text-[14px] font-bold leading-none truncate max-w-[80px]">
                         {item.name}
                       </p>
                     </div>
@@ -66,14 +66,14 @@ export const Home = () => {
           <div className="flex flex-col items-center w-full mt-5 pr-2">
             <div className="flex items-center justify-between w-full gap-1">
               <label className="text-[#000] inter textarea-lg font-bold leading-[150%]">
-                Your orders
+                Seus serviços
               </label>
               <button
                 type="button"
                 onClick={() => navigate("/myBookings")}
                 className="btn p-0 m-0 btn-link border-none !no-underline text-[#000] font-[500] text-[14px] inter"
               >
-                see all
+                Ver mais
               </button>
             </div>
 
@@ -96,27 +96,27 @@ export const Home = () => {
                         />
 
                         <div className="flex flex-col justify-start items-start w-full gap-[8px] flex-grow pl-2">
-                          <p className="w-full text-start text-white inter textarea-lg font-bold leading-[150%] border-b border-[#E5E7EB]">
+                          <p className="w-full text-start text-[#6b7280] inter textarea-lg font-bold leading-[150%] border-b border-[#E5E7EB]">
                             {item.name}
                           </p>
-                          <p className="text-white font-roboto textarea-md font-normal leading-none">
+                          <p className="text-[#6b7280] font-roboto textarea-md font-normal leading-none">
                             {item.barber}
                           </p>
-                          <p className="flex items-center gap-[1.5px] text-white inter textarea-md font-normal">
+                          <p className="flex items-center gap-[1.5px] text-[#6b7280] inter textarea-md font-normal">
                             <img
                               className="size-4"
                               alt="Icon location"
-                              src={getIcons("location_outlined")}
+                              src={getIcons("location_outlined_green")}
                             />
                             {item.location}
                           </p>
-                          <p className="flex items-center gap-2 text-white inter textarea-md font-normal">
+                          <p className="flex items-center gap-2 text-[#6b7280] inter textarea-md font-normal">
                             <img
                               alt="Icon clock"
                               className="size-4"
-                              src={getIcons("clock_outlined")}
+                              src={getIcons("clock_outlined_green")}
                             />
-                            <div className="h-3 w-[1.5px] bg-white" />
+                            <div className="h-3 w-[1.5px] bg-[#6b7280]" />
                             {item.time}min
                           </p>
                         </div>
@@ -131,7 +131,7 @@ export const Home = () => {
           <div className="flex flex-col items-center w-full mt-5">
             <div className="flex items-center justify-between w-full gap-1">
               <label className="text-[#000] inter textarea-lg font-bold leading-[150%]">
-                Barbers
+                Barbeiros
               </label>
             </div>
 
@@ -154,20 +154,20 @@ export const Home = () => {
                         <img
                           src={item.image}
                           alt={`Barber ${item.name}`}
-                          className="min-w-32 min-h-32 max-w-32 max-h-32 object-cover border-r-[2px] border-[#E5E7EB]"
+                          className="min-w-32 min-h-32 max-w-32 max-h-32 object-cover"
                         />
 
                         <div className="flex flex-col justify-start items-start w-full gap-2 flex-grow pl-2">
-                          <p className="w-full text-start text-white inter textarea-lg font-bold leading-[150%] border-b border-[#E5E7EB] text_ellipsis">
+                          <p className="w-full text-start text-[#6b7280] inter textarea-lg font-bold leading-[150%] border-b border-[#9CA3AF] text_ellipsis">
                             {item.name}
                           </p>
-                          <p className="text-white font-roboto textarea-md font-normal leading-none">
+                          <p className="text-[#6b7280] font-roboto textarea-md font-normal leading-none">
                             {item.type}
                           </p>
-                          <p className="flex items-center gap-[1.5px] text-white inter textarea-md font-normal">
+                          <p className="flex items-center gap-[1.5px] text-[#6b7280] inter textarea-md font-normal">
                             <img
                               alt="Icon location"
-                              src={getIcons("location_outlined")}
+                              src={getIcons("location_outlined_green")}
                               className="size-4"
                             />
                             {item.location}
@@ -175,14 +175,14 @@ export const Home = () => {
                           <div className="flex items-center gap-[3px]">
                             <img
                               alt="Icon star"
-                              src={getIcons("star_solid")}
+                              src={getIcons("star_solid_green")}
                               className="size-4 relative top-[-1px]"
                             />
-                            <p className="flex items-center gap-[2.5px] text-white inter textarea-md font-normal">
+                            <p className="flex items-center gap-[2.5px] text-[#6b7280] inter textarea-md font-normal">
                               {item.rating}
                             </p>
-                            <div className="h-[7px] w-[0.5px] bg-white" />
-                            <p className="flex items-center gap-[2.5px] text-white inter textarea-md font-normal">
+                            <div className="h-[7px] w-[0.5px] bg-[#6b7280]" />
+                            <p className="flex items-center gap-[2.5px] text-[#6b7280] inter textarea-md font-normal">
                               {item.cuts} Cuts
                             </p>
                           </div>

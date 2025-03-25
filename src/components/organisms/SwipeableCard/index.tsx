@@ -31,8 +31,8 @@ export const SwipeableCard = ({ item }: IProps) => {
     <div
       className="card-container"
       style={{
-        position: "relative",
         overflow: "hidden",
+        position: "relative",
         minHeight: "min-content",
       }}
     >
@@ -41,7 +41,6 @@ export const SwipeableCard = ({ item }: IProps) => {
         style={{
           left: 7,
           top: "50%",
-          height: "100%",
           display: "flex",
           paddingLeft: 20,
           alignItems: "center",
@@ -58,15 +57,14 @@ export const SwipeableCard = ({ item }: IProps) => {
       <motion.div
         style={{
           x,
-          position: "relative",
           zIndex: 3,
+          position: "relative",
         }}
         drag="x"
         onDrag={handleDrag}
         onDragEnd={handleDragEnd}
         dragConstraints={{ left: -70, right: 70 }}
       >
-        <div className="btn w-full h-auto bg-transparent border-0 shadow-none p-0">
           <Card
             style={{
               padding: 11.5,
@@ -82,23 +80,22 @@ export const SwipeableCard = ({ item }: IProps) => {
                 className="w-[87px] h-[87px]"
               />
               <div className="flex flex-col justify-start items-start w-full gap-2 flex-grow pl-2">
-                <p className="text-white inter textarea-lg font-bold leading-[150%] truncate max-w-[calc(100vw-140px)]">
+                <p className="text-[#6B7280] inter textarea-lg font-bold leading-[150%] truncate max-w-[calc(100vw-140px)]">
                   {item.services.map((service) => service.name).join(", ")}
                 </p>
 
-                <p className="text-white inter textarea-lg font-[300] leading-none">
+                <p className="text-[#6B7280] inter textarea-lg font-[300] leading-none">
                   <strong className="font-bold textarea-lg">Hora: </strong>
                   {formatDateTime(item.date || "", "time")}
                 </p>
                 
-                <p className="text-white inter textarea-lg font-[300] leading-none">
+                <p className="text-[#6B7280] inter textarea-lg font-[300] leading-none">
                   <strong className="font-bold textarea-lg">Dia: </strong>
                   {formatDateTime(item.date || "", "date")}
                 </p>
               </div>
             </div>
           </Card>
-        </div>
       </motion.div>
 
       <motion.div
@@ -106,7 +103,6 @@ export const SwipeableCard = ({ item }: IProps) => {
         style={{
           right: 7,
           top: "50%",
-          height: "100%",
           display: "flex",
           paddingRight: 20,
           alignItems: "center",

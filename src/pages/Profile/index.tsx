@@ -34,11 +34,7 @@ export const Profile = () => {
     <Layout>
       <div className="flex flex-col justify-start items-center h-full w-full">
         <Header title={"Profile"} backPath={"/account"} />
-
-
-        <div className="bg-[#f7f8fde8] w-screen h-screen fixed top-[180px]">
-
-        </div>
+        <div className="bg-[#f7f8fde8] w-screen h-screen fixed top-[180px]" />
 
         {loading && <Loading />}
         <div className="flex flex-col h-full w-full p-4 pt-2 gap-2.5 overflow-y-auto z-10">

@@ -49,21 +49,21 @@ export const Services = () => {
                       />
 
                       <div className="flex flex-col justify-start items-start w-full h-auto gap-2 flex-grow pl-2">
-                        <p className="w-full text-start text-white inter textarea-lg font-bold text_ellipsis">
+                        <p className="w-full text-start text-[#6b7280] inter textarea-lg font-bold text_ellipsis">
                           {item.name}
                         </p>
 
-                        <p className="flex items-center gap-[5px] text-white font-[300] inter textarea-md leading-0">
+                        <p className="flex items-center gap-[5px] text-[#6b7280] font-[300] inter textarea-md leading-0">
                           <img
                             alt="Icon clock"
                             className="size-5"
-                            src={getIcons("clock_outlined")}
+                            src={getIcons("clock_outlined_green")}
                           />
-                          <div className="h-[15px] w-[0.5px] bg-white " />
+                          <div className="h-2.5 rounded-2xl w-[0.8px] bg-[#6b7280] " />
                           {item.time}min
                         </p>
 
-                        <p className="text-white inter textarea-md font-[300] leading-none">
+                        <p className="text-[#6b7280] inter textarea-md font-[300] leading-none">
                           {formatter({
                             type: "pt-BR",
                             currency: "BRL",
@@ -79,7 +79,7 @@ export const Services = () => {
                         type="checkbox"
                         name="rememberMe"
                         checked={checked}
-                        className="relative top-[7px] left-[-5px] self-stretch checkbox custom_before_service w-4 h-4 border border-[#fff] p-[3px] rounded-3xl !shadow-none"
+                        className="relative top-[7px] left-[-5px] self-stretch checkbox custom_before_service w-4 h-4 border border-[#6b7280] p-[3px] rounded-3xl !shadow-none"
                       />
                     </div>
                   </Card>

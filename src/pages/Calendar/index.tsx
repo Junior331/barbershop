@@ -120,7 +120,7 @@ export const Calendar = () => {
                 ${isToday ? "bg-blue-500 text-white rounded-[10px]" : ""}
                 ${
                   isSelected(day as number)
-                    ? "w-[48px] !bg-[#6B7280] text-white rounded-[10px]"
+                    ? "w-[48px] !bg-[#9CA3AF] text-white rounded-[10px]"
                     : ""
                 }
                 ${
@@ -157,14 +157,14 @@ export const Calendar = () => {
           ${
             isSelected
               ? "bg-[#ECEFF1]"
-              : "bg-[#6B7280] filter drop-shadow-[0px_4px_4px_rgba(32,32,32,0.15)]"
+              : "bg-[#FEFEFE] filter drop-shadow-[0px_2px_4px_0px_rgba(156,163,175,0.20)] border border-[#6B7280]"
           }
         `}
                     >
                       <p
                         className={`
             textarea-md inter font-medium leading-none
-            ${isSelected ? "text-[rgba(107,114,128,0.2)]" : "text-white"}
+            ${isSelected ? "text-[rgba(107,114,128,0.2)]" : "text-[#6B7280]"}
           `}
                       >
                         {formatTime(item.time)}{" "}

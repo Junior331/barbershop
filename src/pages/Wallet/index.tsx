@@ -1,40 +1,44 @@
 import { getIcons } from "@/assets/icons";
 import { Header } from "@/components/organisms";
 import { Layout } from "@/components/templates";
+import { formatter } from "@/utils/utils";
 
 export const Wallet = () => {
   return (
     <Layout>
       <div className="flex flex-col justify-start items-center h-full w-full">
-        <Header title={"Payments"} backPath={"/home"} />
+        <Header title={"Carteira"} backPath={"/home"} />
 
         <div className="flex flex-col w-full justify-center items-start gap-5 px-4">
           <div className="flex w-full p-[10px_15px] flex-col items-start gap-[25px] rounded-[5px] bg-white shadow-[0px_4px_44px_0px_rgba(0,0,0,0.06)]">
-            <h2 className="flex w-fit h-auto flex-col justify-center  text-[#181D27] text-[13px] font-medium leading-[19.5px]">
-              Balance
+            <h2 className="flex w-fit h-auto flex-col justify-center text-[#181D27] inter textarea-lg font-medium opacity-60">
+              Saldo disponível
             </h2>
 
             <div>
-              <p className="w-[169.177px] text-[#181D27] inter text-[11px] font-normal leading-[16px] opacity-60">
-                Available balance
-              </p>
-              <p className="w-[169.177px] text-[#ABABAB] inter text-[11px] font-normal leading-[16px] opacity-40">
-                R$ 1.800,00
+              <p className="w-[169.177px] text-[#000] inter textarea-lg font-normal opacity-80">
+                {formatter({
+                  type: "pt-BR",
+                  currency: "BRL",
+                  style: "currency",
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                }).format(1800)}{" "}
               </p>
             </div>
           </div>
 
-          <div className="flex w-full p-[10px_15px] flex-col items-start gap-[8px] rounded-[5px] bg-white shadow-[0px_4px_44px_0px_rgba(0,0,0,0.06)]">
+          <div className="flex w-full p-[10px_8px] flex-col items-start gap-[8px] rounded-[5px] bg-white shadow-[0px_4px_44px_0px_rgba(0,0,0,0.06)]">
             <div className="flex items-center justify-between w-full gap-1">
-              <h2 className="flex w-fit h-auto flex-col justify-center  text-[#181D27] text-[13px] font-medium leading-[19.5px]">
-                Payment methods
+              <h2 className="flex w-fit h-auto flex-col justify-center text-[#181D27] text-base font-medium">
+                Métodos de pagamento
               </h2>
 
               <button
                 type="button"
-                className="btn p-0 m-0 btn-link border-none !no-underline text-[#181D27] font-[500] text-[11px] inter"
+                className="btn p-0 m-0 btn-link border-none !no-underline text-[#181D27] font-[500] text-[12px] inter opacity-80"
               >
-                see all
+                Ver mais
               </button>
             </div>
 
@@ -47,11 +51,11 @@ export const Wallet = () => {
                 />
 
                 <div className="mt-auto">
-                  <p className="flex w-[48.442px] h-[13px] flex-col justify-center  text-[#181D27] inter text-[9px] font-extralight leading-[19.5px]">
+                  <p className="flex flex-col justify-center  text-[#181D27] inter textarea-sm font-extralight leading-[19.5px]">
                     Payment
                   </p>
 
-                  <p className="flex w-[64.913px] h-[13px] flex-col justify-center  text-[#181D27] inter text-[10px] font-medium leading-[19.5px]">
+                  <p className="flex flex-col justify-center  text-[#181D27] inter textarea-md font-medium ">
                     Apple pay
                   </p>
                 </div>
@@ -65,11 +69,11 @@ export const Wallet = () => {
                 />
 
                 <div className="mt-auto">
-                  <p className="flex w-[48.442px] h-[13px] flex-col justify-center  text-[#181D27] inter text-[9px] font-extralight leading-[19.5px]">
+                  <p className="flex flex-col justify-center  text-[#181D27] inter textarea-sm font-extralight leading-[19.5px]">
                     Visa
                   </p>
 
-                  <p className="flex w-[64.913px] h-[13px] flex-col justify-center  text-[#181D27] inter text-[10px] font-medium leading-[19.5px]">
+                  <p className="flex flex-col justify-center  text-[#181D27] inter textarea-md font-medium leading-[19.5px]">
                     **** 3708
                   </p>
                 </div>
@@ -83,12 +87,12 @@ export const Wallet = () => {
                 />
 
                 <div className="mt-auto">
-                  <p className="flex w-[48.442px] h-[13px] flex-col justify-center  text-[#181D27] inter text-[9px] font-extralight leading-[19.5px]">
-                  Register
+                  <p className="flex flex-col justify-center  text-[#181D27] inter textarea-sm font-extralight leading-[19.5px]">
+                    Register
                   </p>
 
-                  <p className="flex w-[64.913px] h-[13px] flex-col justify-center  text-[#181D27] inter text-[10px] font-medium leading-[19.5px]">
-                  new card
+                  <p className="flex flex-col justify-center  text-[#181D27] inter textarea-md font-medium leading-[19.5px]">
+                    new card
                   </p>
                 </div>
               </div>
@@ -97,15 +101,15 @@ export const Wallet = () => {
 
           <div className="flex w-full p-[10px_15px] flex-col items-start gap-[25px] rounded-[5px] bg-white shadow-[0px_4px_44px_0px_rgba(0,0,0,0.06)]">
             <div className="flex items-center justify-between w-full gap-1">
-              <h2 className="flex w-fit h-auto flex-col justify-center  text-[#181D27] text-[13px] font-medium leading-[19.5px]">
+              <h2 className="flex w-fit h-auto flex-col justify-center  text-[#181D27] text-base font-medium leading-[19.5px]">
                 Recent transactions
               </h2>
 
               <button
                 type="button"
-                className="btn p-0 m-0 btn-link border-none !no-underline text-[#181D27] font-[500] text-[11px] inter"
+                className="btn p-0 m-0 btn-link border-none !no-underline text-[#181D27] font-[500] text-[12px] inter opacity-80"
               >
-                see all
+                Ver mais
               </button>
             </div>
           </div>

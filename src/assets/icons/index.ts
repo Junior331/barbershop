@@ -31,10 +31,13 @@ import social_facebook from "./social_facebook.svg";
 import calendar_active from "./calendar_active.svg";
 import arrow_line_left from "./arrow_line_left.svg";
 import arrow_line_right from "./arrow_line_right.svg";
+import star_solid_green from "./star_solid_green.svg";
 import eye_slash_outline from "./eye_slash_outline.svg";
 import arrow_circle_left from "./arrow_circle_left.svg";
 import location_outlined from "./location_outlined.svg";
+import calendar_solid_green from "./calendar_solid_green.svg";
 import calendar_solid_white from "./calendar_solid_white.svg";
+import clock_outlined_green from "./clock_outlined_green.svg";
 import location_outlined_green from "./location_outlined_green.svg";
 
 import lock from "./lock.svg";
@@ -43,7 +46,6 @@ import logout from "./logout.svg";
 import shield_done from "./shield_done.svg";
 import notification from "./notification.svg";
 import profile_custom from "./profile_custom.svg";
-
 
 export const icons = {
   pole,
@@ -78,10 +80,13 @@ export const icons = {
   calendar_active,
   social_facebook,
   arrow_line_left,
+  star_solid_green,
   arrow_line_right,
   eye_slash_outline,
   arrow_circle_left,
   location_outlined,
+  clock_outlined_green,
+  calendar_solid_green,
   calendar_solid_white,
   location_outlined_green,
 

@@ -55,7 +55,7 @@ export const DetailsOrder = () => {
                   key={service.id}
                   className="flex flex-col py-2.5 px-3.5 justify-between items-center self-stretch rounded-md bg-white shadow-lg relative"
                 >
-                  <div className="size-32 p-5 bg-[#6B7280] rounded-[70px] border-2 border-white filter drop-shadow-[0_2px_4px_rgba(112,121,116,0.30)]">
+                  <div className="size-32 p-5 bg-[#FEFEFE] rounded-[70px] border-2 border-white shadow-[0px_1px_4px_0px_rgba(156,163,175,0.40)]">
                     <img
                       alt="Image avatar"
                       src={service.icon}

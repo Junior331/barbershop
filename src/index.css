@@ -73,7 +73,7 @@
   }
 
   .custom_before_service:checked::before {
-    background-color: #ffff !important;
+    background-color: #6b7280 !important;
   }
 
   .custom_hover_btn {
@@ -102,7 +102,7 @@
 
   .card-container {
     width: 100%;
-    padding: 0 0 15px;
+    padding: 8px 2px;
     overflow: hidden;
     position: relative;
   }
@@ -113,22 +113,18 @@
   }
 
   .card_edit {
-    width: 100%;
-    height: 122.5px;
+    width: 90%;
+    height: 110px;
     border-radius: 10px;
     background-color: #146efb;
     border: 2px solid #fff !important;
-    filter: drop-shadow(0px 2px 4px rgba(112, 121, 116, 0.3));
   }
 
   .card_delete {
-    width: 100%;
-    height: 122.5px;
-    stroke: #fff;
+    width: 90%;
+    height: 110px;
     border-radius: 10px;
     background-color: #e83f5b;
-    border: 2px solid #fff !important;
-    filter: drop-shadow(0px 2px 4px rgba(112, 121, 116, 0.3));
   }
 
   .card.reveal {

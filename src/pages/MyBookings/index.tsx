@@ -42,11 +42,16 @@ export const MyBookings = () => {
             <div className="w-[71px] h-[71px] flex justify-center items-center rounded-[71px]  bg-[#6B7280] border-2 border-white filter drop-shadow-[0px_2px_4px_rgba(112,121,116,0.30)]">
               <img src={getIcons("calendar_solid_white")} alt="Icon calendar" />
             </div>
+
+            {/* <div className="w-[71px] h-[71px] flex justify-center items-center rounded-[70px]  bg-[#FEFEFE] border-2 border-white shadow-[0px_1px_4px_0px_rgba(156,163,175,0.40)]">
+              <img src={getIcons("calendar_solid_green")} alt="Icon calendar" />
+            </div> */}
+            
             <div className="flex flex-col justify-center">
-              <p className="text-black inter text-[12px] font-medium leading-normal">
+              <p className="text-black inter text-base font-medium leading-normal">
                 {dayOfWeek}
               </p>
-              <h2 className="text-black inter text-[20px] font-bold leading-normal">
+              <h2 className="text-black inter textarea-xl font-bold leading-normal">
                 {formattedDate}
               </h2>
             </div>
@@ -109,10 +114,10 @@ export const MyBookings = () => {
                             className="w-[87px] h-[87px]"
                           />
                           <div className="flex flex-col justify-start items-start w-full gap-2 flex-grow pl-2">
-                            <p className="text-white inter text-[13px] font-bold leading-[150%] truncate max-w-[calc(100vw-32px)]">
+                            <p className="text-[#6B7280] inter text-[13px] font-bold leading-[150%] truncate max-w-[calc(100vw-32px)]">
                               {order.services.map((s) => s.name).join(", ")}
                             </p>
-                            <p className="text-white inter text-[8px] font-[300] leading-none">
+                            <p className="text-[#6B7280] inter text-[8px] font-[300] leading-none">
                               <strong className="font-bold text-[11px]">
                                 Total:{" "}
                               </strong>
@@ -122,20 +127,20 @@ export const MyBookings = () => {
                                 style: "currency",
                               }).format(order.total)}
                             </p>
-                            <p className="text-white inter text-[8px] font-[300] leading-none">
+                            <p className="text-[#6B7280] inter text-[8px] font-[300] leading-none">
                               <strong className="font-bold text-[11px]">
                                 Date:{" "}
                               </strong>
                               {formatDateTime(order.date || "", "date")} at{" "}
                               {formatDateTime(order.date || "", "time")}
                             </p>
-                            <p className="text-white inter text-[8px] font-[300] leading-none">
+                            <p className="text-[#6B7280] inter text-[8px] font-[300] leading-none">
                               <strong className="font-bold text-[11px]">
                                 Barber:{" "}
                               </strong>
                               {order.barber.name}
                             </p>
-                            <p className="text-white inter text-[8px] font-[300] leading-none">
+                            <p className="text-[#6B7280] inter text-[8px] font-[300] leading-none">
                               <strong className="font-bold text-[11px]">
                                 Status:{" "}
                               </strong>

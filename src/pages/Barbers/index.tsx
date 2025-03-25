@@ -53,31 +53,31 @@ export const Barbers = () => {
                       />
 
                       <div className="flex flex-col justify-start items-start w-full gap-2 flex-grow pl-2">
-                        <p className="w-full text-start text-white inter textarea-lg font-bold leading-[150%] border-b border-[#E5E7EB] text_ellipsis">
+                        <p className="w-full text-start text-[#6b7280] inter textarea-lg font-bold leading-[150%] border-b border-[#9CA3AF] text_ellipsis">
                           {item.name}
                         </p>
-                        <p className="text-white font-roboto textarea-md font-normal leading-none">
+                        <p className="text-[#6b7280] font-roboto textarea-md font-normal leading-none">
                           {item.type}
                         </p>
-                        <p className="flex items-center gap-[1.5px] text-white inter textarea-md font-normal">
+                        <p className="flex items-center gap-[1.5px] text-[#6b7280] inter textarea-md font-normal">
                           <img
                             alt="Icon location"
-                            src={getIcons("location_outlined")}
+                            src={getIcons("location_outlined_green")}
                             className="size-4"
                           />
                           {item.location}
                         </p>
-                        <div className="flex items-center gap-[3px]">
+                        <div className="flex items-center gap-1.5">
                           <img
                             alt="Icon star"
-                            src={getIcons("star_solid")}
+                            src={getIcons("star_solid_green")}
                             className="size-4 relative top-[-1px]"
                           />
-                          <p className="flex items-center gap-[2.5px] text-white inter textarea-md font-normal">
+                          <p className="flex items-center gap-[2.5px] text-[#6b7280] inter textarea-md font-normal">
                             {item.rating}
                           </p>
-                          <div className="h-[7px] w-[0.5px] bg-white" />
-                          <p className="flex items-center gap-[2.5px] text-white inter textarea-md font-normal">
+                          <div className="h-[7px] rounded-2xl w-[0.5px] bg-[#6b7280]" />
+                          <p className="flex items-center gap-[2.5px] text-[#6b7280] inter textarea-md font-normal">
                             {item.cuts} Cuts
                           </p>
                         </div>
@@ -88,7 +88,7 @@ export const Barbers = () => {
                         type="checkbox"
                         name="rememberMe"
                         checked={checked}
-                        className="self-stretch checkbox custom_before_service w-4 h-4 border border-[#fff] p-[3px] rounded-3xl !shadow-none absolute top-[12px] right-[8px]"
+                        className="self-stretch checkbox custom_before_service w-4 h-4 border border-[#6b7280] p-[3px] rounded-3xl !shadow-none absolute top-[12px] right-[8px]"
                       />
                     </div>
                   </Card>

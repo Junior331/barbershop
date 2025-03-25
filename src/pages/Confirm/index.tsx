@@ -107,7 +107,7 @@ export const Confirm = () => {
                   key={service.id}
                   className="flex flex-col py-2.5 px-3.5 justify-between items-center self-stretch rounded-md bg-white shadow-lg relative"
                 >
-                  <div className="size-32 p-5 bg-[#6B7280] rounded-[70px] border-2 border-white filter drop-shadow-[0_2px_4px_rgba(112,121,116,0.30)]">
+                  <div className="size-32 p-5 bg-[#FEFEFE] rounded-[70px] border-2 border-white shadow-[0px_1px_4px_0px_rgba(156,163,175,0.40)]">
                     <img
                       alt="Image avatar"
                       src={service.icon}
@@ -118,7 +118,7 @@ export const Confirm = () => {
                     <p className="text-[#6B7280] dm_sans text-base font-light ">
                       {currentOrder.barber.name}
                     </p>
-                    <h2 className="text-[#494949] dm_sans textarea-lg font-medium leading-normal">
+                    <h2 className="text-[#494949] dm_sans textarea-lg font-medium ">
                       {service.name}
                     </h2>
 
@@ -139,7 +139,7 @@ export const Confirm = () => {
                       <div className="h-3 w-[0.5px] bg-[#6B7280] rounded-3xl" />
                       {formatCustomDateTime(currentOrder.date || "")}
                     </p>
-                    <h2 className="self-stretch text-[#494949] dm_sans text-base not-italic dm_sansfont-medium leading-[19.5px]">
+                    <h2 className="self-stretch text-[#494949] dm_sans text-base not-italic dm_sansfont-medium ">
                       {formatter({
                         type: "pt-BR",
                         currency: "BRL",
@@ -165,15 +165,15 @@ export const Confirm = () => {
             ))}
           </AnimatePresence>
 
-          <h2 className="text-black inter text-[18px] font-medium leading-normal tracking-[1.2px]">
-            Summary of services
+          <h2 className="text-black inter text-[18px] font-medium tracking-[1.2px]">
+            Resumo dos serviços
           </h2>
-          <div className="flex flex-col gap-2.5 py-2.5 px-3.5 justify-between items-center self-stretch rounded-md bg-white shadow-lg">
+          <div className="flex flex-col gap-2 py-6 px-3.5 justify-between items-center self-stretch rounded-md bg-white shadow-lg">
             <div className="flex justify-between items-center w-full">
-              <p className="text-[#181D27] opacity-60 dm_sans text-[11px] font-normal leading-[16px]">
+              <p className="text-[#181D27] opacity-60 dm_sans text-base font-normal ">
                 SubTotal
               </p>
-              <h2 className="text-[#181D27] dm_sans text-[13px] font-medium leading-[19.5px]">
+              <h2 className="text-[#181D27] dm_sans textarea-lg font-medium ">
                 {formatter({
                   type: "pt-BR",
                   currency: "BRL",
@@ -184,32 +184,30 @@ export const Confirm = () => {
               </h2>
             </div>
             <div className="flex justify-between items-center w-full">
-              <p className="text-[#181D27] opacity-60 dm_sans text-[11px] font-normal leading-[16px]">
+              <p className="text-[#181D27] opacity-60 dm_sans text-base font-normal ">
                 Payment fee
               </p>
-              <p className="text-[#181D27] opacity-60 dm_sans text-[11px] font-normal leading-[16px]">
+              <p className="text-[#181D27] opacity-60 dm_sans text-base font-normal ">
                 {formatPercentage(currentOrder.paymentFee)}
               </p>
             </div>
             <div className="flex justify-between items-center w-full">
-              <p className="text-[#181D27] opacity-60 dm_sans text-[11px] font-normal leading-[16px]">
+              <p className="text-[#181D27] opacity-60 dm_sans text-base font-normal ">
                 Payment method
               </p>
 
-              <button
-                className="btn bg-transparent border-0 shadow-none p-0 "
+              <p
+                className="text-[#9938FC] dm_sans text-base font-normal tracking-wide"
                 onClick={() => setIsOpen((prev) => !prev)}
               >
-                <p className="text-[#9938FC] dm_sans text-[11px] font-normal leading-[16px]">
-                  Visa **** 3708
-                </p>
-              </button>
+                Visa **** 3708
+              </p>
             </div>
             <div className="flex justify-between items-center w-full">
-              <p className="text-[#181D27] opacity-60 dm_sans text-[11px] font-normal leading-[16px]">
+              <p className="text-[#181D27] opacity-60 dm_sans text-base font-normal ">
                 Promotion discount
               </p>
-              <p className="text-[#181D27] opacity-60 dm_sans text-[11px] font-normal leading-[16px]">
+              <p className="text-[#181D27] opacity-60 dm_sans text-base font-normal ">
                 {formatter({
                   type: "pt-BR",
                   currency: "BRL",
@@ -220,10 +218,10 @@ export const Confirm = () => {
               </p>
             </div>
             <div className="flex justify-between items-center w-full">
-              <h2 className="text-[#181D27] dm_sans text-[13px] font-medium leading-[19.5px]">
+              <h2 className="text-[#181D27] dm_sans textarea-lg font-medium ">
                 Total
               </h2>
-              <h2 className="text-[#181D27] dm_sans text-[13px] font-medium leading-[19.5px]">
+              <h2 className="text-[#181D27] dm_sans textarea-lg font-medium ">
                 {formatter({
                   type: "pt-BR",
                   currency: "BRL",
