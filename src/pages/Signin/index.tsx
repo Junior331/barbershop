@@ -1,20 +1,8 @@
 import { useState } from "react";
-
-import { getIcons, icons } from "@/assets/icons";
+import { getIcons } from "@/assets/icons";
 import { getImage } from "@/assets/images";
 import { useSignin } from "./useSignin";
 import { Loading } from "@/components/elements";
-const SocialIcon = ({ type }: { type: string }) => {
-  return (
-
-      <div className="btn flex size-20 p-4 justify-center items-center gap-4 rounded-full border border-[rgba(227,227,227,0.8)] bg-white shadow-sm">
-        <img
-          loading="lazy"
-          src={getIcons(`social_${type}` as keyof typeof icons)}
-        />
-      </div>
-  );
-};
 
 export const Signin = () => {
   const { formik, loading } = useSignin();
@@ -22,15 +10,7 @@ export const Signin = () => {
 
   return (
     <div className="flex gap-5 flex-col justify-center items-center p-5 w-full h-full">
-      <img
-        width="256"
-        height="256"
-        loading="eager"
-        decoding="async"
-        src={getImage("logo")}
-        alt="Logo da Barbearia"
-        className="size-64 object-cover"
-      />
+      <img width="258" height="258" src={getImage("logo")} alt="Image logo" />
 
       <form
         onSubmit={formik.handleSubmit}
@@ -128,11 +108,16 @@ export const Signin = () => {
       </div>
 
       <div className="flex gap-4 justify-center">
-        <SocialIcon type="facebook" />
-        <SocialIcon type="google" />
-        <SocialIcon type="apple" />
+        <div className="btn flex size-20 p-4 justify-center items-center gap-4  rounded-full border border-[rgba(227,227,227,0.8)] bg-white shadow-sm">
+          <img src={getIcons("social_facebook")} alt="Facebook" />
+        </div>
+        <div className="btn flex size-20 p-4 justify-center items-center gap-4  rounded-full border border-[rgba(227,227,227,0.8)] bg-white shadow-sm">
+          <img src={getIcons("social_google")} alt="Google" />
+        </div>
+        <div className="btn flex size-20 p-4 justify-center items-center gap-4  rounded-full border border-[rgba(227,227,227,0.8)] bg-white shadow-sm">
+          <img src={getIcons("social_apple")} alt="Apple" />
+        </div>
       </div>
-
       {loading && <Loading />}
     </div>
   );
