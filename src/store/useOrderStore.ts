@@ -14,7 +14,7 @@ export const useOrderStore = create<OrderStore>((set) => ({
     total: 0,
     date: null,
     barber: {
-      id: 0,
+      id: '',
       cuts: 0,
       type: "",
       name: "",
@@ -40,7 +40,7 @@ export const useOrderStore = create<OrderStore>((set) => ({
           id: "",
           total: 0,
           barber: {
-            id: 0,
+            id: '',
             cuts: 0,
             type: "",
             name: "",

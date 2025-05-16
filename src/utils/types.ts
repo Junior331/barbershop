@@ -53,15 +53,22 @@ export type Service = {
   checked?: boolean;
 };
 
+export type BarberSchedule = {
+  endTime: string;   // "18:00"
+  weekday: number; // 0 (domingo) a 6 (sábado)
+  startTime: string; // "08:00"
+};
+
 export type BarberType = {
-  id: number,
-  cuts: number,
-  type: string,
-  name: string,
-  image: string,
-  rating: number,
-  location: string,
+  id: string;
+  type: string;
+  cuts: number;
+  name: string;
+  image: string;
+  rating: number;
+  location: string;
   checked?: boolean;
+  schedule?: BarberSchedule[];
 };
 
 export interface Order {

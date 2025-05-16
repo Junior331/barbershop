@@ -1,6 +1,6 @@
 import { getImage } from "@/assets/images";
 import { getServices } from "@/assets/services";
-import { BarberType } from "@/utils/types";
+import { BarberSchedule, BarberType } from "@/utils/types";
 
 export const promotionsWeek = [
   {
@@ -134,59 +134,74 @@ export const orders = [
   },
 ];
 
+const defaultSchedule: BarberSchedule[] = [
+  { weekday: 1, startTime: "08:00", endTime: "18:00" }, // segunda
+  { weekday: 2, startTime: "08:00", endTime: "18:00" },
+  { weekday: 3, startTime: "08:00", endTime: "18:00" },
+  { weekday: 4, startTime: "08:00", endTime: "18:00" },
+  { weekday: 5, startTime: "08:00", endTime: "18:00" },
+  { weekday: 6, startTime: "08:00", endTime: "14:00" }, // sábado
+];
+
 export const barbers: BarberType[] = [
   {
-    id: 1,
+    id: "1",
     cuts: 1872,
     rating: 4.8,
     type: "Barbeiro",
     name: "Willian",
     image: getImage("willian"),
     location: "Barbearia faz milagres",
+    schedule: defaultSchedule,
   },
   {
-    id: 2,
+    id: "2",
     cuts: 1872,
     rating: 4.8,
     type: "Barbeiro",
     name: "Breno Tavares",
     image: getImage("breno_tavares"),
     location: "Barbearia faz milagres",
+    schedule: defaultSchedule,
   },
   {
-    id: 3,
+    id: "3",
     cuts: 1872,
     rating: 4.8,
     type: "Barbeiro",
     name: "Angelo lima",
     image: getImage("angelo_lima"),
     location: "Barbearia faz milagres",
+    schedule: defaultSchedule,
   },
   {
-    id: 4,
+    id: "4",
     cuts: 1872,
     rating: 4.8,
     type: "Barbeiro",
     name: "Danyel coelho",
     image: getImage("danyel_coelho"),
     location: "Barbearia faz milagres",
+    schedule: defaultSchedule,
   },
   {
-    id: 5,
+    id: "5",
     cuts: 1872,
     rating: 4.8,
     type: "Barbeiro",
     name: "Joao pedro",
     image: getImage("joao_pedro"),
     location: "Barbearia faz milagres",
+    schedule: defaultSchedule,
   },
   {
-    id: 6,
+    id: "6",
     cuts: 1872,
     rating: 4.8,
     type: "Barbeiro",
     name: "Jaja",
     image: getImage("Jaja"),
     location: "Barbearia faz milagres",
+    schedule: defaultSchedule,
   },
 ];

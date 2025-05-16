@@ -1,22 +1,22 @@
 import { useNavigate } from "react-router-dom";
-import { barbers } from "../Home/utils";
+
 import { getIcons } from "@/assets/icons";
 import { Layout } from "@/components/templates";
 import { Card, Header } from "@/components/organisms";
 import { useOrder, useOrderActions } from "@/store/useOrderStore";
-import { useEffect } from "react";
+import { useBarbers } from "@/hooks/useBarbers";
 
 export const Barbers = () => {
-  const order = useOrder();
   const { barber } = useOrder();
   const navigate = useNavigate();
   const { setBarber } = useOrderActions();
 
-  const isBarberSelected = (id: number): boolean => barber.id === id;
+  const isBarberSelected = (id: string): boolean => barber.id === id;
 
-  useEffect(() => {
-    console.log("order ::", order);
-  }, [order]);
+  const { barbers, loading, error } = useBarbers()
+
+  if (loading) return <div>Carregando...</div>
+  if (error) return <div>Erro: {error}</div>
 
   return (
     <Layout>
