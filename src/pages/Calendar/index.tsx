@@ -40,7 +40,7 @@ export const Calendar = () => {
   return (
     <Layout>
       <div className="flex flex-col justify-start items-center h-full w-full">
-        <Header title={"Calendar"} backPath={"/services"} />
+        <Header title={"Calendar"} backPath={"/barbers"} />
 
         <div className="flex h-full flex-col w-full justify-start items-start gap-5">
           <div className="flex items-center w-full h-auto px-4">

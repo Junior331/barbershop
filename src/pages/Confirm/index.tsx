@@ -52,13 +52,11 @@ export const Confirm = () => {
     setLoading(true);
     try {
       await new Promise((resolve, reject) => {
+        setTimeout(resolve, 5000);
+
         setTimeout(() => {
-          if (Math.random() > 0.5) {
-            resolve("Success");
-          } else {
-            reject(new Error("Payment processing failed"));
-          }
-        }, 2000);
+          reject(new Error("Payment processing failed."));
+        }, 5000);
       });
 
       const newOrder: Order = {
