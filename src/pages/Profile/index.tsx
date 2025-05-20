@@ -1,15 +1,18 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 
 import { getIcons } from "@/assets/icons";
 import { useProfile } from "./useProfile";
 import { getImage } from "@/assets/images";
+import { useAuth } from "@/context/AuthContext";
+import { Loading } from "@/components/elements";
 import { Layout } from "@/components/templates";
 import { Header } from "@/components/organisms";
 import { maskBirthday, maskPhone, maskZipCode } from "@/utils/utils";
-import { Loading } from "@/components/elements";
 
 export const Profile = () => {
   const { formik, loading } = useProfile();
+  const { user } = useAuth();
+
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -29,6 +32,23 @@ export const Profile = () => {
       reader.readAsDataURL(file);
     }
   };
+
+  useEffect(() => {
+    if (user) {
+      formik.setFieldValue("name", user.user_metadata.name);
+      formik.setFieldValue("email", user.user_metadata.email);
+      formik.setFieldValue("phone", user.phone);
+      // formik.setFieldValue("avatar", user.user_metadata.avatar);
+      // formik.setFieldValue("birthday", user.user_metadata.birthday);
+      // formik.setFieldValue("zip_code", user.user_metadata.zip_code);
+      // formik.setFieldValue("address", user.user_metadata.address);
+      // formik.setFieldValue("state", user.user_metadata.state);
+      // formik.setFieldValue("country", user.user_metadata.country);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
+
+  console.log(user)
 
   return (
     <Layout>

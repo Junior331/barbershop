@@ -1,8 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import { useFormik } from "formik";
+import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
+import { supabase } from "@/lib/supabase";
 import { schema } from "./schema";
 
 export const useSignin = () => {
@@ -16,19 +17,30 @@ export const useSignin = () => {
       rememberMe: false,
     },
     validationSchema: schema,
-    onSubmit: async () => {
+    onSubmit: async (values) => {
       setLoading(true);
-      try {
-        await new Promise((resolve, reject) => {
-          setTimeout(resolve, 5000);
 
-          setTimeout(() => {
-            reject(new Error("Something went wrong."));
-          }, 5000);
-        });
-        navigate("/home");
-      } catch (error: any) {
-        console.log("Error ::", error);
+      try {
+        const { error: supabaseError } = await supabase.auth.signInWithPassword(
+          {
+            email: values.email,
+            password: values.password,
+          }
+        );
+
+        if (supabaseError) {
+          throw new Error(supabaseError.message);
+        }
+
+        toast.success("Login realizado com sucesso!");
+        navigate("/");
+      } catch (error: unknown) {
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : "Erro ao fazer login. Verifique suas credenciais.";
+
+        toast.error(errorMessage);
       } finally {
         setLoading(false);
       }

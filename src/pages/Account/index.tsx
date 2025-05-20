@@ -1,47 +1,35 @@
 import { useNavigate } from "react-router-dom";
 
 import { getImage } from "@/assets/images";
-import { AccountHeaderProps } from "./@types";
 import { Layout } from "@/components/templates";
-import { accountItems, moreItems } from "./utils";
+import { AccountHeader } from "./AccountHeader";
 import { Card, Header } from "@/components/organisms";
-
-const AccountHeader = ({
-  imageSrc,
-  imageAlt,
-  title,
-  subtitle,
-  children,
-}: AccountHeaderProps) => {
-  return (
-    <div className="flex items-center gap-2 w-full">
-      <div className="min-w-10 min-h-10 rounded-full bg-[#F4F4F4] p-1.5">
-        <img src={imageSrc} alt={imageAlt} className="size-full" />
-      </div>
-      <div className="flex flex-col gap-1 flex-1">
-        {title && (
-          <h2 className="textarea-md font-medium text-[#181D27]">{title}</h2>
-        )}
-        {subtitle && <p className="text-[#ABABAB] textarea-sm">{subtitle}</p>}
-      </div>
-      <div className="w-fit">{children}</div>
-    </div>
-  );
-};
+import { getAccountItems, getMoreItems } from "./utils";
+import { useAuth } from "@/context/AuthContext";
+import { useEffect } from "react";
 
 export const Account = () => {
   const navigate = useNavigate();
+  const { user, setAuth } = useAuth();
+  const accountItems = getAccountItems({ setAuth, navigate });
+  const moreItems = getMoreItems();
 
-  const handleAction = (path?: string) => {
-    if (path) {
-      navigate(path);
+  const handleAction = (item: ReturnType<typeof getAccountItems>[0]) => {
+    if (item.handleAction) {
+      item.handleAction();
+    } else if (item.path) {
+      navigate(item.path);
     }
   };
+
+  useEffect(() => {
+    console.log(user);
+  }, [user]);
 
   return (
     <Layout>
       <div className="flex flex-col justify-start items-start h-full w-full">
-        <Header title={"Perfil"} backPath={"/home"} />
+        <Header title="Perfil" backPath="/" />
         <div className="bg-[#f7f8fde8] w-screen h-screen fixed top-[180px]" />
 
         <div className="flex flex-col h-full w-full p-4 pt-2 overflow-y-auto z-10">
@@ -62,21 +50,22 @@ export const Account = () => {
                 />
                 <div className="flex flex-col justify-start items-start w-full flex-grow pl-2 gap-2">
                   <p className="text-[#000] inter textarea-lg font-medium leading-[150%]">
-                    Jaja teste
+                    {user?.user_metadata.name}
                   </p>
                   <p className="text-[#000] inter textarea-md font-light leading-none">
-                    teste@gmail.com
+                    {user?.email}
                   </p>
                 </div>
               </div>
             </Card>
           </div>
+
           <div className="flex w-full p-2.5 flex-col items-start rounded-[5px] gap-[25px] bg-white shadow-[0px_4px_44px_0px_rgba(0,0,0,0.06)]">
             {accountItems.map((item) => (
               <div
                 key={item.id}
-                onClick={() => handleAction(item.path)}
-                className="w-full hover:bg-gray-50 transition-colors py-2 pl-2 rounded"
+                onClick={() => handleAction(item)}
+                className="w-full hover:bg-gray-50 transition-colors py-2 pl-2 rounded cursor-pointer"
               >
                 <AccountHeader
                   title={item.title}
@@ -93,6 +82,7 @@ export const Account = () => {
               </div>
             ))}
           </div>
+
           <h2 className="text-black my-4 inter text-[18px] tracking-[1.2px]">
             Mais
           </h2>
@@ -101,8 +91,8 @@ export const Account = () => {
             {moreItems.map((item) => (
               <div
                 key={item.id}
-                onClick={() => handleAction(item.path)}
-                className="w-full hover:bg-gray-50 transition-colors"
+                onClick={() => item.path && navigate(item.path)}
+                className="w-full hover:bg-gray-50 transition-colors py-2 pl-2 rounded cursor-pointer"
               >
                 <AccountHeader
                   title={item.title}

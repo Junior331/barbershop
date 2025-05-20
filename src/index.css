@@ -146,10 +146,10 @@
   }
 
   .custom_input_radio:checked::before {
-    background-color: #6E6B7B !important;
+    background-color: #6e6b7b !important;
   }
   .custom_input_radio:checked {
-    border-color: #6E6B7B !important;
+    border-color: #6e6b7b !important;
     background-color: transparent !important;
   }
 
@@ -161,5 +161,13 @@
   }
   .toggle:checked::before {
     background-color: #605dff !important;
+  }
+
+  .bg_login {
+    /* aspect-ratio: 957 / 957; */
+    background-size: cover;
+    background-position: bottom;
+    background-repeat: no-repeat;
+    background-image: url(./logo_all.jpeg);
   }
 }

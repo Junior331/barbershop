@@ -1,6 +1,7 @@
 import { Home } from "./Home";
 import { Signin } from "./Signin";
 import { Wallet } from "./Wallet";
+import { Signup } from "./Signup";
 import { Confirm } from "./Confirm";
 import { Profile } from "./Profile";
 import { Barbers } from "./Barbers";
@@ -14,6 +15,7 @@ export {
   Home,
   Signin,
   Wallet,
+  Signup,
   Confirm,
   Profile,
   Barbers,

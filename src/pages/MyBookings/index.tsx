@@ -35,7 +35,7 @@ export const MyBookings = () => {
   return (
     <Layout>
       <div className="flex flex-col justify-start items-center h-full w-full">
-        <Header title={"Minha Agenda"} backPath={"/home"} />
+        <Header title={"Minha Agenda"} backPath={"/"} />
         <div className="flex flex-col justify-start items-center h-full w-full p-4 pr-2 pt-2">
           <div className="flex w-full gap-3 mb-4">
             <div className="w-[71px] h-[71px] flex justify-center items-center rounded-[71px]  bg-[#6B7280] border-2 border-white filter drop-shadow-[0px_2px_4px_rgba(112,121,116,0.30)]">

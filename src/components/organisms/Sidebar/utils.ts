@@ -4,7 +4,7 @@ export const routes = [
   {
     id: 1,
     name: "Home",
-    path: "/home",
+    path: "/",
     icon: getIcons("home"),
     icon_active: getIcons("home_active"),
   },

@@ -47,7 +47,7 @@ export const Services = () => {
   return (
     <Layout>
       <div className="flex flex-col justify-start items-center h-full w-full">
-        <Header title={"Serviços"} backPath={"/home"} />
+        <Header title={"Serviços"} backPath={"/"} />
 
         <div className="flex flex-col w-full justify-between items-start gap-2 px-4 pb-2 overflow-auto h-[calc(100vh-0px)]">
           <div className="grid grid-cols-1 gap-1 w-full max-w-full pb-[10px] pr-1">

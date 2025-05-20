@@ -5,14 +5,15 @@ import {
   Home,
   Wallet,
   Signin,
+  Signup,
   Barbers,
   Account,
   Confirm,
   Profile,
   Calendar,
   Services,
-  DetailsOrder,
   MyBookings,
+  DetailsOrder,
 } from "@/pages";
 import { Loading } from "@/components/elements";
 
@@ -20,8 +21,9 @@ export const AppRoutes = () => {
   return (
     <Suspense fallback={<Loading />}>
       <Routes>
-        <Route index element={<Signin />} />
-        <Route path="/home" element={<Home />} />
+        <Route index element={<Home />} />
+        <Route path="/signin" element={<Signin />} />
+        <Route path="/signup" element={<Signup />} />
         <Route path="/wallet" element={<Wallet />} />
         <Route path="/barbers" element={<Barbers />} />
         <Route path="/account" element={<Account />} />

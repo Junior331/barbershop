@@ -7,7 +7,7 @@ export const Wallet = () => {
   return (
     <Layout>
       <div className="flex flex-col justify-start items-center h-full w-full">
-        <Header title={"Carteira"} backPath={"/home"} />
+        <Header title={"Carteira"} backPath={"/"} />
 
         <div className="flex flex-col w-full justify-center items-start gap-5 px-4">
           <div className="flex w-full p-[10px_15px] flex-col items-start gap-[25px] rounded-[5px] bg-white shadow-[0px_4px_44px_0px_rgba(0,0,0,0.06)]">

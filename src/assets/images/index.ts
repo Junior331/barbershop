@@ -1,6 +1,7 @@
 import Jaja from "./Jaja.jpg";
 import logo from "./logo.svg";
 import willian from "./willian.png";
+import logo_all from "./logo_all.jpeg";
 import fallback from "./placeholder.svg";
 import joao_pedro from "./joao_pedro.jpg";
 import angelo_lima from "./angelo_lima.jpg";
@@ -12,6 +13,7 @@ export const images = {
   Jaja,
   logo,
   willian,
+  logo_all,
   fallback,
   joao_pedro,
   angelo_lima,
