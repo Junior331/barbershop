@@ -50,7 +50,7 @@ export const getAccountItems = ({ setAuth, navigate }: AccountItems) => {
       title: "Autenticação de dois factores",
       children: getIcons("arrow_right"),
       subtitle: "Proteger ainda mais a sua conta",
-      path: "/account/security/2fa",
+      path: "",
     },
     {
       id: 4,
@@ -73,7 +73,7 @@ export const getMoreItems = () =>
       title: "Ajuda & Suporte",
       icon: getIcons("notification"),
       children: getIcons("arrow_right"),
-      path: "/account/help",
+      path: "",
     },
     {
       id: 2,
@@ -82,6 +82,6 @@ export const getMoreItems = () =>
       title: "Sobre o App",
       icon: getIcons("lock"),
       children: getIcons("arrow_right"),
-      path: "/account/about",
+      path: "",
     },
   ] satisfies AccountItem[];

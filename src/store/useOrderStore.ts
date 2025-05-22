@@ -27,8 +27,17 @@ export const useOrderStore = create<OrderStore>((set) => ({
     services: [],
     location: "",
     paymentFee: 0,
+    duration: 0,
+    barber_id: "",
+    client_id: "",
+    date_time: "",
+    service_id: "",
+    created_at: "",
+    payment_fee: 0,
+    total_price: 0,
     status: "pending",
     paymentMethod: "",
+    payment_method: ""
   },
   orders: [],
   actions: {

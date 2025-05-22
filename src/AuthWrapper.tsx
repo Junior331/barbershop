@@ -12,13 +12,10 @@ export const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
   const { pathname } = useLocation();
 
   const [isLoading, setIsLoading] = useState(true);
-    const isPublicRoute = useMemo(
-        () => PUBLIC_ROUTES.some((route) => pathname.startsWith(route)),
-        [pathname]
-      );
-
-      console.log(`pathname ::`, pathname)
-      console.log(`isPublicRoute ::`, isPublicRoute)
+  const isPublicRoute = useMemo(
+    () => PUBLIC_ROUTES.some((route) => pathname.startsWith(route)),
+    [pathname]
+  );
 
   useEffect(() => {
     const {
@@ -39,13 +36,11 @@ export const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
     });
 
     return () => subscription.unsubscribe();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
   if (isLoading) {
-    return (
-      <Loading />
-    );
+    return <Loading />;
   }
 
   return <>{children}</>;

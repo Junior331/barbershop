@@ -1,18 +1,31 @@
-import { useMemo } from "react";
 import { isBefore } from "date-fns";
 import { motion } from "framer-motion";
+import { useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { getIcons } from "@/assets/icons";
+import { useOrders } from "@/hooks/useOrders";
 import { Layout } from "@/components/templates";
-import { useOrderStore } from "@/store/useOrderStore";
+import { getServices } from "@/assets/services";
 import { Card, Header, SwipeableCard } from "@/components/organisms";
-import { formatDateTime, formatter, getCurrentDate } from "@/utils/utils";
+import {
+  Text,
+  Title,
+  Loading,
+  CircleIcon,
+  StatusBadge,
+} from "@/components/elements";
+import { formatCustomDateTime, formatter, getCurrentDate } from "@/utils/utils";
 
 export const MyBookings = () => {
   const navigate = useNavigate();
   const { dayOfWeek, formattedDate } = getCurrentDate();
-  const orders = useOrderStore((state) => state.orders);
+  const { orders, loading, fetchOrders, cancelOrder, deleteOrder } =
+    useOrders();
+
+  useEffect(() => {
+    fetchOrders();
+  }, [fetchOrders]);
 
   const processedOrders = useMemo(
     () =>
@@ -23,14 +36,46 @@ export const MyBookings = () => {
         serviceDate.setHours(0, 0, 0, 0);
         currentDate.setHours(0, 0, 0, 0);
 
-        const isCompleted = isBefore(serviceDate, currentDate);
+        const isCompleted =
+          isBefore(serviceDate, currentDate) ||
+          order.status === "completed" ||
+          order.status === "canceled";
 
         return { ...order, isCompleted };
       }),
     [orders]
   );
 
+  const handleCancelOrder = async (orderId: string) => {
+    const success = await cancelOrder(orderId);
+    if (success) {
+      // Atualizar a lista ou mostrar feedback
+      fetchOrders();
+    }
+  };
+
+  const handleDeleteOrder = async (orderId: string) => {
+    const success = await deleteOrder(orderId);
+    if (success) {
+      // Atualizar a lista ou mostrar feedback
+      fetchOrders();
+    }
+  };
+
+  console.log(`orders ::`, orders);
+
+
   const dotsArray = Array.from({ length: 20 });
+
+  if (loading && !orders.length) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center h-full">
+          <Loading />
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
@@ -38,9 +83,9 @@ export const MyBookings = () => {
         <Header title={"Minha Agenda"} backPath={"/"} />
         <div className="flex flex-col justify-start items-center h-full w-full p-4 pr-2 pt-2">
           <div className="flex w-full gap-3 mb-4">
-            <div className="w-[71px] h-[71px] flex justify-center items-center rounded-[71px]  bg-[#6B7280] border-2 border-white filter drop-shadow-[0px_2px_4px_rgba(112,121,116,0.30)]">
+            <CircleIcon>
               <img src={getIcons("calendar_solid_white")} alt="Icon calendar" />
-            </div>
+            </CircleIcon>
             <div className="flex flex-col justify-center">
               <p className="text-black inter text-base font-medium leading-normal">
                 {dayOfWeek}
@@ -57,13 +102,18 @@ export const MyBookings = () => {
                 {processedOrders
                   .filter((order) => !order.isCompleted)
                   .map((order) => (
-                    <SwipeableCard key={order.id} item={order} />
+                    <SwipeableCard
+                      item={order}
+                      key={order.id}
+                      onCancel={() => handleCancelOrder(order.id)}
+                      onDelete={() => handleDeleteOrder(order.id)}
+                    />
                   ))}
 
                 {Boolean(
                   processedOrders.filter((order) => order.isCompleted).length
                 ) && (
-                  <div className="flex gap-0.5 justify-center items-center w-full min-h-10 overflow-hidden">
+                  <div className="flex gap-0.5 justify-center items-center w-full min-h-10 overflow-hidden my-3">
                     {dotsArray.map((_, index) => (
                       <div
                         key={`left-${index}`}
@@ -93,54 +143,60 @@ export const MyBookings = () => {
                     >
                       <Card
                         style={{
-                          padding: 11.5,
+                          padding: 21.5,
                           paddingLeft: 2,
                           minWidth: "100%",
+                          position: "relative",
                           minHeight: "initial",
                         }}
                       >
-                        <div className="flex items-center w-full h-full">
-                          <img
-                            src={
-                              order.services[0]?.icon || getIcons("fallback")
-                            }
-                            alt={`Service ${order.services[0]?.name}`}
-                            className="w-[87px] h-[87px]"
-                          />
-                          <div className="flex flex-col justify-start items-start w-full gap-2 flex-grow pl-2">
-                            <p className="text-[#6B7280] inter text-[13px] font-bold leading-[150%] truncate max-w-[calc(100vw-32px)]">
+                        <div className="flex items-center w-full h-full pl-4">
+                          <CircleIcon className="min-w-[87px] h-[87px] my-auto overflow-hidden">
+                            <img
+                              src={
+                                order.services[0]?.icon ||
+                                getServices("fallback")
+                              }
+                              alt={`Service ${order.services[0]?.name}`}
+                              className="w-[calc(100%-25px)] h-[calc(100%-25px)] object-cover"
+                            />
+                          </CircleIcon>
+                          <div className="flex flex-col justify-start items-start w-full gap-2 flex-grow pl-2 relative">
+                            <Title className="font-bold leading-[150%] truncate max-w-[calc(100vw-32px)]">
                               {order.services.map((s) => s.name).join(", ")}
-                            </p>
-                            <p className="text-[#6B7280] inter text-[8px] font-[300] leading-none">
-                              <strong className="font-bold text-[11px]">
-                                Total:{" "}
+                            </Title>
+
+                            <Text className="font-[300] leading-none">
+                              <strong className="font-bold text-[#111827] textarea-sm">
+                                Date:{" "}
                               </strong>
+                              {formatCustomDateTime(order.date || "")}
+                            </Text>
+                            <Text className="font-[300] leading-none">
+                              <strong className="font-bold text-[#111827] textarea-sm">
+                                Barber:{" "}
+                              </strong>
+                              {order.barber.name}
+                            </Text>
+                          </div>
+
+                          <div className="flex flex-col items-center gap-[5px] absolute bottom-5 right-5">
+                            <Title className="textarea-md font-[300] ">
                               {formatter({
                                 type: "pt-BR",
                                 currency: "BRL",
                                 style: "currency",
-                              }).format(order.total)}
-                            </p>
-                            <p className="text-[#6B7280] inter text-[8px] font-[300] leading-none">
-                              <strong className="font-bold text-[11px]">
-                                Date:{" "}
-                              </strong>
-                              {formatDateTime(order.date || "", "date")} at{" "}
-                              {formatDateTime(order.date || "", "time")}
-                            </p>
-                            <p className="text-[#6B7280] inter text-[8px] font-[300] leading-none">
-                              <strong className="font-bold text-[11px]">
-                                Barber:{" "}
-                              </strong>
-                              {order.barber.name}
-                            </p>
-                            <p className="text-[#6B7280] inter text-[8px] font-[300] leading-none">
-                              <strong className="font-bold text-[11px]">
-                                Status:{" "}
-                              </strong>
-                              {order.status}
-                            </p>
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              }).format(order.total_price || 0)}
+                            </Title>
                           </div>
+
+                          <StatusBadge
+                            variant="outline"
+                            status={order.status}
+                            className="capitalize p-2.5 absolute top-5 right-5"
+                          />
                         </div>
                       </Card>
                     </div>
@@ -170,7 +226,7 @@ export const MyBookings = () => {
                 </div>
 
                 <motion.button
-                  className="flex items-center justify-center px-6 py-3 font-medium text-white rounded-lg shadow-lg bg-gradient-to-r bg-[#6b7280] focus:outline-none focus:ring-2 focus:ring-offset-2 cursor-pointer"
+                  className="flex items-center justify-center px-6 py-3 font-medium text-white rounded-lg shadow-lg bg-gradient-to-r bg-[#6C8762] focus:outline-none focus:ring-2 focus:ring-offset-2 cursor-pointer"
                   initial={{ boxShadow: "0 0 0 0 rgba(156,163,175, 0.7)" }}
                   animate={{
                     boxShadow: [

@@ -5,12 +5,16 @@ import { useSignin } from "./useSignin";
 import { getIcons } from "@/assets/icons";
 import { getImage } from "@/assets/images";
 import { Loading } from "@/components/elements";
+import { useGoogleSignin } from "@/hooks/useGoogleSignin";
 
 export const Signin = () => {
   const navigate = useNavigate();
-  const { formik, loading } = useSignin();
+  const { formik, loading: emailLoading } = useSignin();
   const [isShowPassword, setIsShowPassword] = useState(false);
-
+  const { signInWithGoogle, loading: googleLoading } = useGoogleSignin();
+  
+  const loading = emailLoading || googleLoading;
+  
   return (
     <div className="flex gap-5 flex-col justify-center items-center p-5 w-full h-full">
       <img width="258" height="258" src={getImage("logo")} alt="Image logo" />
@@ -87,15 +91,9 @@ export const Signin = () => {
         <button
           type="submit"
           disabled={loading}
-          className="btn max-w-full border-none bg-[#6B7280] rounded text-[14px] text-[#FFF] py-[10px] font-[500] tracking-[0.4px]"
+          className="btn max-w-full border-none bg-[#6C8762] rounded text-[14px] text-[#FFF] py-[10px] font-[500] tracking-[0.4px]"
         >
-          {loading ? (
-            <>
-              Entrando...
-            </>
-          ) : (
-            "Entrar"
-          )}
+          {loading ? <>Entrando...</> : "Entrar"}
         </button>
       </form>
 
@@ -109,7 +107,9 @@ export const Signin = () => {
         <div className="mt-6 grid grid-cols-3 gap-3">
           <button
             type="button"
-            className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
+            disabled={loading}
+            onClick={signInWithGoogle}
+            className="cursor-pointer w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
           >
             <img
               src={getIcons("social_google")}
@@ -118,8 +118,9 @@ export const Signin = () => {
             />
           </button>
           <button
+            disabled
             type="button"
-            className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
+            className="opacity-50 contrast-75 cursor-not-allowed w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
           >
             <img
               src={getIcons("social_facebook")}
@@ -128,8 +129,9 @@ export const Signin = () => {
             />
           </button>
           <button
+            disabled
             type="button"
-            className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
+            className="opacity-50 contrast-75 cursor-not-allowed w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
           >
             <img
               src={getIcons("social_apple")}

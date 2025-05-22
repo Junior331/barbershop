@@ -5,10 +5,12 @@ import { formatter } from "@/utils/utils";
 import { getIcons } from "@/assets/icons";
 import { Card } from "@/components/organisms";
 import { Layout } from "@/components/templates";
+import { useAuth } from "@/context/AuthContext";
 import { barbers, orders, promotionsWeek } from "./utils";
-
+import { CircleIcon, Text, Title } from "@/components/elements";
 export const Home = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   return (
     <Layout>
@@ -17,13 +19,15 @@ export const Home = () => {
         <div className="w-full mb-6">
           <h2 className="font-[300] flex flex-col text-[#283046] max-w-[145px] inter text-[26px] leading-[36px]">
             Olá,
-            <span className="font-bold">Junior</span>
+            <Title className="!text-3xl !text-[#566F4C]">
+              {user?.user_metadata?.name.split(" ")[0]}
+            </Title>
           </h2>
         </div>
 
         <div className="flex flex-1 flex-col w-full h-full items-start justify-start overflow-y-auto pb-20 z-10">
           <div className="flex flex-col items-center w-full pr-2">
-            <div className="flex items-center justify-between w-full gap-1 my-4">
+            <div className="flex items-center justify-between w-full gap-1 mb-2">
               <label className="text-[#000] inter textarea-lg font-bold leading-[150%]">
                 Promoções da semana
               </label>
@@ -39,13 +43,15 @@ export const Home = () => {
                       paddingLeft: 8,
                     }}
                   >
-                    <img
-                      src={item.icon}
-                      alt={`Service ${item.name}`}
-                      className="w-[calc(100%-35px)] h-[calc(100%-35px)] mx-auto"
-                    />
+                    <CircleIcon>
+                      <img
+                        src={item.icon}
+                        alt={`Service ${item.name}`}
+                        className="w-[calc(100%-15px)] h-[calc(100%-15px)] object-cover"
+                      />
+                    </CircleIcon>
                     <div className="flex-1 flex flex-col justify-end w-full h-full gap-2 mt-2">
-                      <p className="text-[#6b7280] inter text-[14px] font-bold leading-none">
+                      <Title className="textarea-md">
                         {formatter({
                           type: "pt-BR",
                           currency: "BRL",
@@ -53,10 +59,10 @@ export const Home = () => {
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,
                         }).format(item.price || 0)}
-                      </p>
-                      <p className="text-[#6b7280] w-full inter text-[14px] font-bold leading-none truncate max-w-[calc(100%-5px)]">
+                      </Title>
+                      <Text className="truncate max-w-[calc(100%-5px)]">
                         {item.name}
-                      </p>
+                      </Text>
                     </div>
                   </Card>
                 );
@@ -65,16 +71,16 @@ export const Home = () => {
           </div>
 
           <div className="flex flex-col items-center w-full mt-5 pr-2">
-            <div className="flex items-center justify-between w-full gap-1 my-4">
-              <label className="text-[#000] inter textarea-lg font-bold leading-[150%]">
-                Seus serviços
-              </label>
+            <div className="flex items-center justify-between w-full gap-1 mb-2">
+              <Title className="textarea-lg">Seus serviços</Title>
               <button
                 type="button"
-                onClick={() => navigate("/myBookings")}
-                className="btn p-0 m-0 btn-link border-none !no-underline text-[#000] font-[500] text-[14px] inter"
+                onClick={() => navigate("/mybookings")}
+                className="btn p-0 m-0 btn-link border-none !no-underline"
               >
-                Ver mais
+                <Text className="text-[#111827] font-medium textarea-md">
+                  Ver mais
+                </Text>
               </button>
             </div>
 
@@ -90,36 +96,36 @@ export const Home = () => {
                       }}
                     >
                       <div className="flex items-center w-full h-full">
-                        <img
-                          src={item.icon}
-                          alt={`Service ${item.name}`}
-                          className="w-[90px] h-[90px]"
-                        />
+                        <CircleIcon className="min-w-24 h-24">
+                          <img
+                            src={item.icon}
+                            alt={`Service ${item.name}`}
+                            className="w-[calc(100%-15px)] h-[calc(100%-15px)] object-cover"
+                          />
+                        </CircleIcon>
 
                         <div className="flex flex-col justify-start items-start w-full gap-[8px] flex-grow pl-2">
-                          <p className="w-full text-start text-[#6b7280] inter textarea-lg font-bold leading-[150%] border-b border-[#E5E7EB]">
+                          <Title className="w-full text-start border-b border-[#E5E7EB]">
                             {item.name}
-                          </p>
-                          <p className="text-[#6b7280] font-roboto textarea-md font-normal leading-none">
-                            {item.barber}
-                          </p>
-                          <p className="flex items-center gap-[1.5px] text-[#6b7280] inter textarea-md font-normal">
+                          </Title>
+                          <Text className="leading-none">{item.barber}</Text>
+                          <Text className="flex items-center gap-[1.5px]">
                             <img
                               className="size-4"
                               alt="Icon location"
                               src={getIcons("location_outlined_green")}
                             />
                             {item.location}
-                          </p>
-                          <p className="flex items-center gap-2 text-[#6b7280] inter textarea-md font-normal">
+                          </Text>
+                          <Text className="flex items-center gap-2">
                             <img
                               alt="Icon clock"
                               className="size-4"
                               src={getIcons("clock_outlined_green")}
                             />
-                            <div className="h-3 w-[1.5px] bg-[#6b7280]" />
+                            <div className="h-3 w-[1.5px] bg-[#6C8762]" />
                             {item.time}min
-                          </p>
+                          </Text>
                         </div>
                       </div>
                     </Card>
@@ -130,7 +136,7 @@ export const Home = () => {
           </div>
 
           <div className="flex flex-col items-center w-full mt-5">
-            <div className="flex items-center justify-between w-full gap-1 my-4">
+            <div className="flex items-center justify-between w-full gap-1 mb-2">
               <label className="text-[#000] inter textarea-lg font-bold leading-[150%]">
                 Barbeiros
               </label>
@@ -151,15 +157,17 @@ export const Home = () => {
                         overflow: "hidden",
                       }}
                     >
-                      <div className="flex items-center w-full h-full pr-[5px] min-h-28">
-                        <img
-                          src={item.image}
-                          alt={`Barber ${item.name}`}
-                          className="min-w-32 min-h-32 max-w-32 max-h-32 object-cover"
-                        />
+                      <div className="flex items-center w-full h-full px-3 min-h-28 my-auto">
+                        <CircleIcon className="min-w-24 h-24 my-auto overflow-hidden">
+                          <img
+                            src={item.image}
+                            alt={`Barber ${item.name}`}
+                            className="w-24 h-24 object-cover"
+                          />
+                        </CircleIcon>
 
                         <div className="flex flex-col justify-start items-start w-full gap-2 flex-grow pl-2">
-                          <p className="w-full text-start text-[#6b7280] inter textarea-lg font-bold leading-[150%] border-b border-[#9CA3AF] text_ellipsis">
+                          <p className="w-full text-start text-[#6b7280] inter textarea-lg font-bold leading-[150%] border-b border-[#9CA3AF] truncate">
                             {item.name}
                           </p>
                           <p className="text-[#6b7280] font-roboto textarea-md font-normal leading-none">
@@ -182,7 +190,7 @@ export const Home = () => {
                             <p className="flex items-center gap-[2.5px] text-[#6b7280] inter textarea-md font-normal">
                               {item.rating}
                             </p>
-                            <div className="h-[7px] w-[0.5px] bg-[#6b7280]" />
+                            <div className="h-[7px] w-[0.5px] bg-[#6C8762]" />
                             <p className="flex items-center gap-[2.5px] text-[#6b7280] inter textarea-md font-normal">
                               {item.cuts} Cuts
                             </p>
@@ -197,7 +205,7 @@ export const Home = () => {
           </div>
 
           <motion.button
-            className="fixed bottom-24 right-2 flex items-center justify-center border border-white px-6 py-3 font-medium text-white rounded-lg shadow-lg bg-gradient-to-r bg-[#6b7280] focus:outline-none focus:ring-2 focus:ring-offset-2 cursor-pointer"
+            className="fixed bottom-24 right-2 flex items-center justify-center border border-white px-6 py-3 font-medium text-white rounded-lg shadow-lg bg-gradient-to-r bg-[#6C8762] focus:outline-none focus:ring-2 focus:ring-offset-2 cursor-pointer"
             initial={{ boxShadow: "0 0 0 0 rgba(156,163,175, 0.7)" }}
             animate={{
               boxShadow: [

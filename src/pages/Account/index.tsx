@@ -1,18 +1,17 @@
 import { useNavigate } from "react-router-dom";
 
-import { getImage } from "@/assets/images";
+import { Avatar } from "@/components/elements";
 import { Layout } from "@/components/templates";
+import { useAuth } from "@/context/AuthContext";
 import { AccountHeader } from "./AccountHeader";
 import { Card, Header } from "@/components/organisms";
 import { getAccountItems, getMoreItems } from "./utils";
-import { useAuth } from "@/context/AuthContext";
-import { useEffect } from "react";
 
 export const Account = () => {
   const navigate = useNavigate();
+  const moreItems = getMoreItems();
   const { user, setAuth } = useAuth();
   const accountItems = getAccountItems({ setAuth, navigate });
-  const moreItems = getMoreItems();
 
   const handleAction = (item: ReturnType<typeof getAccountItems>[0]) => {
     if (item.handleAction) {
@@ -21,10 +20,6 @@ export const Account = () => {
       navigate(item.path);
     }
   };
-
-  useEffect(() => {
-    console.log(user);
-  }, [user]);
 
   return (
     <Layout>
@@ -43,11 +38,7 @@ export const Account = () => {
               }}
             >
               <div className="flex items-center w-full h-full">
-                <img
-                  alt="Image avatar"
-                  src={getImage("Jaja")}
-                  className="size-[69px] rounded-[70px] border-3 object-cover border-white shadow-[0_0_14px_rgba(0,0,0,0.14)]"
-                />
+                <Avatar />
                 <div className="flex flex-col justify-start items-start w-full flex-grow pl-2 gap-2">
                   <p className="text-[#000] inter textarea-lg font-medium leading-[150%]">
                     {user?.user_metadata.name}
@@ -60,12 +51,12 @@ export const Account = () => {
             </Card>
           </div>
 
-          <div className="flex w-full p-2.5 flex-col items-start rounded-[5px] gap-[25px] bg-white shadow-[0px_4px_44px_0px_rgba(0,0,0,0.06)]">
+          <div className="flex w-full p-2.5 px-1.5 flex-col items-start rounded-[5px] gap-[25px] bg-white shadow-[0px_4px_44px_0px_rgba(0,0,0,0.06)]">
             {accountItems.map((item) => (
               <div
                 key={item.id}
                 onClick={() => handleAction(item)}
-                className="w-full hover:bg-gray-50 transition-colors py-2 pl-2 rounded cursor-pointer"
+                className="w-full hover:bg-gray-50 transition-colors py-2 px-2 rounded cursor-pointer"
               >
                 <AccountHeader
                   title={item.title}
@@ -87,12 +78,12 @@ export const Account = () => {
             Mais
           </h2>
 
-          <div className="flex w-full p-[10px_15px] flex-col items-start rounded-[5px] gap-[25px] bg-white shadow-[0px_4px_44px_0px_rgba(0,0,0,0.06)]">
+          <div className="flex w-full p-2.5 px-1.5 flex-col items-start rounded-[5px] gap-[25px] bg-white shadow-[0px_4px_44px_0px_rgba(0,0,0,0.06)]">
             {moreItems.map((item) => (
               <div
                 key={item.id}
                 onClick={() => item.path && navigate(item.path)}
-                className="w-full hover:bg-gray-50 transition-colors py-2 pl-2 rounded cursor-pointer"
+                className="w-full hover:bg-gray-50 transition-colors py-2 px-2 rounded cursor-pointer"
               >
                 <AccountHeader
                   title={item.title}

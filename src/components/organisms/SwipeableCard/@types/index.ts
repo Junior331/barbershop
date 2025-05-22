@@ -8,4 +8,6 @@ export interface IUseSwipeProps {
 }
 export interface IProps {
   item: Order;
+  onCancel: (id: string) => void;
+  onDelete: (id: string) => void;
 }

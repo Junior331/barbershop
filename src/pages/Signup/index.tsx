@@ -121,7 +121,7 @@ export const Signup = () => {
         <button
           type="submit"
           disabled={loading}
-          className="btn max-w-full border-none bg-[#6B7280] rounded text-[14px] text-[#FFF] py-[10px] font-[500] tracking-[0.4px]"
+          className="btn max-w-full border-none bg-[#6C8762] rounded text-[14px] text-[#FFF] py-[10px] font-[500] tracking-[0.4px]"
         >
           Registrar
         </button>
@@ -145,17 +145,6 @@ export const Signup = () => {
         </p>
       </div>
 
-      <div className="flex gap-4 justify-center">
-        <div className="btn flex size-20 p-4 justify-center items-center gap-4  rounded-full border border-[rgba(227,227,227,0.8)] bg-white shadow-sm">
-          <img src={getIcons("social_facebook")} alt="Facebook" />
-        </div>
-        <div className="btn flex size-20 p-4 justify-center items-center gap-4  rounded-full border border-[rgba(227,227,227,0.8)] bg-white shadow-sm">
-          <img src={getIcons("social_google")} alt="Google" />
-        </div>
-        <div className="btn flex size-20 p-4 justify-center items-center gap-4  rounded-full border border-[rgba(227,227,227,0.8)] bg-white shadow-sm">
-          <img src={getIcons("social_apple")} alt="Apple" />
-        </div>
-      </div>
       {loading && <Loading />}
     </div>
   );

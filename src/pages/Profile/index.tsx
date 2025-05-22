@@ -1,24 +1,21 @@
 import { useEffect, useRef } from "react";
 
-import { getIcons } from "@/assets/icons";
 import { useProfile } from "./useProfile";
-import { getImage } from "@/assets/images";
 import { useAuth } from "@/context/AuthContext";
-import { Loading } from "@/components/elements";
 import { Layout } from "@/components/templates";
 import { Header } from "@/components/organisms";
+import { Avatar, Loading } from "@/components/elements";
 import { maskBirthday, maskPhone, maskZipCode } from "@/utils/utils";
 
 export const Profile = () => {
-  const { formik, loading } = useProfile();
   const { user } = useAuth();
-
+  const { formik, loading } = useProfile();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleAvatarClick = () => {
-    fileInputRef.current?.click();
-  };
+  // const handleAvatarClick = () => {
+  //   fileInputRef.current?.click();
+  // };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -35,20 +32,20 @@ export const Profile = () => {
 
   useEffect(() => {
     if (user) {
-      formik.setFieldValue("name", user.user_metadata.name);
-      formik.setFieldValue("email", user.user_metadata.email);
-      formik.setFieldValue("phone", user.phone);
-      // formik.setFieldValue("avatar", user.user_metadata.avatar);
-      // formik.setFieldValue("birthday", user.user_metadata.birthday);
-      // formik.setFieldValue("zip_code", user.user_metadata.zip_code);
-      // formik.setFieldValue("address", user.user_metadata.address);
-      // formik.setFieldValue("state", user.user_metadata.state);
-      // formik.setFieldValue("country", user.user_metadata.country);
+      formik.setValues({
+        email: user.email || "",
+        phone: user.phone || "",
+        name: user.user_metadata?.name || "",
+        state: user.user_metadata?.state || "",
+        avatar: user.user_metadata?.avatar || "",
+        address: user.user_metadata?.address || "",
+        country: user.user_metadata?.country || "",
+        birthday: user.user_metadata?.birthday || "",
+        zip_code: user.user_metadata?.zip_code || "",
+      });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
-
-  console.log(user)
 
   return (
     <Layout>
@@ -62,20 +59,16 @@ export const Profile = () => {
             <div className="flex items-center w-full h-full">
               <div
                 className="relative cursor-pointer min-w-fit"
-                onClick={handleAvatarClick}
+                // onClick={handleAvatarClick}
               >
-                <img
-                  alt="Image avatar"
-                  src={formik.values.avatar || getImage("Jaja")}
-                  className="size-[93px] rounded-[70px] border-3 object-cover border-white shadow-[0_0_14px_rgba(0,0,0,0.14)]"
-                />
-                <div className="absolute bottom-0 right-0 bg-white rounded-full p-1 shadow-sm">
+                <Avatar />
+                {/* <div className="absolute bottom-0 right-0 bg-white rounded-full p-1 shadow-sm">
                   <img
                     alt="Edit icon"
                     src={getIcons("camera")}
                     className="size-4"
                   />
-                </div>
+                </div> */}
               </div>
 
               <input
@@ -88,10 +81,10 @@ export const Profile = () => {
 
               <div className="flex flex-col justify-start items-start w-full flex-grow pl-2">
                 <p className="text-[#5E5873] inter text-2xl font-medium leading-[150%]">
-                  Jaja teste
+                  {user?.user_metadata.name}
                 </p>
                 <p className="text-[#5E5873] inter text-base font-light leading-none">
-                  teste@gmail.com
+                  {user?.email}
                 </p>
               </div>
             </div>
@@ -254,9 +247,12 @@ export const Profile = () => {
             </div>
             <button
               type="submit"
-              className="btn max-w-full border-none bg-[#6B7280] rounded text-[14px] text-[#FFF] py-[10px] font-[500] tracking-[0.4px]"
+              disabled={loading}
+              className={`btn max-w-full border-none rounded text-[14px] text-[#FFF] py-[10px] font-[500] tracking-[0.4px] ${
+                loading ? "bg-gray-400" : "bg-[#6C8762]"
+              }`}
             >
-              Confirm
+              {loading ? "Atualizando..." : "Confirmar"}
             </button>
           </form>
         </div>

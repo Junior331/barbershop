@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { v4 as uuidv4 } from "uuid";
+import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -13,17 +13,18 @@ import {
   formatPercentage,
   formatCustomDateTime,
 } from "@/utils/utils";
-import { Loading } from "@/components/elements";
+import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/context/AuthContext";
+import { CircleIcon, Loading, Text, Title } from "@/components/elements";
 
 export const Confirm = () => {
+  const { user } = useAuth();
   const navigate = useNavigate();
-  const { services } = useOrder();
+  const currentOrder = useOrder();
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { addOrder, toggleService } = useOrderActions();
   const [selectedMethod, setSelectedMethod] = useState<string>("");
-  const { addOrder, toggleService, setPaymentMethod } = useOrderActions();
-
-  const currentOrder = useOrder();
 
   const handleDelete = (serviceId: number) => {
     toggleService({
@@ -31,7 +32,10 @@ export const Confirm = () => {
       name: "",
       icon: "",
       price: 0,
+      discount: 0,
       id: serviceId,
+      public: false,
+      created_at: "",
     });
   };
 
@@ -41,37 +45,60 @@ export const Confirm = () => {
     { id: "credit_card", name: "Cartão de Crédito", fee: 0.084 },
   ];
 
-  const handleConfirm = () => {
-    if (selectedMethod) {
-      setPaymentMethod(selectedMethod);
-      setIsOpen(false);
-    }
-  };
-
   const handleFinalConfirm = async () => {
     setLoading(true);
+    console.log(`currentOrder ::`, currentOrder);
     try {
-      await new Promise((resolve, reject) => {
-        setTimeout(resolve, 5000);
+      if (!user) {
+        throw new Error("Usuário não autenticado");
+      }
 
-        setTimeout(() => {
-          reject(new Error("Payment processing failed."));
-        }, 5000);
-      });
+      if (
+        !currentOrder.barber?.id ||
+        !currentOrder.date ||
+        currentOrder.services.length === 0
+      ) {
+        throw new Error("Dados incompletos para o agendamento");
+      }
+
+      const totalDuration = currentOrder.services.reduce((acc, service) => {
+        return acc + (service.time || 30); // 30 minutos como padrão se não houver duration
+      }, 0);
+
+      const { data, error } = await supabase
+        .from("schedules")
+        .insert([
+          {
+            barber_id: currentOrder.barber.id,
+            client_id: user.id,
+            date_time: currentOrder.date,
+            service_id: currentOrder.services[0].id,
+            time: totalDuration,
+            status: "confirmed",
+            payment_method: selectedMethod,
+            payment_fee: currentOrder.paymentFee,
+            total_price: currentOrder.total,
+          },
+        ])
+        .select();
+
+      if (error) throw error;
 
       const newOrder: Order = {
         ...currentOrder,
-        id: uuidv4(),
+        id: data[0].id,
         status: "confirmed",
-        date: currentOrder.date || new Date().toISOString(),
+        date: currentOrder.date,
       };
 
       addOrder(newOrder);
       navigate("/mybookings");
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      console.error("Error:", error.message);
-      alert(`Error: ${error.message}`);
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Erro ao confirmar agendamento, tente novamente.";
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -84,7 +111,7 @@ export const Confirm = () => {
 
         <div className="flex flex-col w-full justify-start items-start gap-2.5 px-4 overflow-auto h-[calc(100vh-145px)]">
           <AnimatePresence>
-            {services.map((service) => (
+            {currentOrder.services.map((service) => (
               <motion.div
                 key={service.id}
                 initial={{ opacity: 0, y: 20 }}
@@ -103,49 +130,65 @@ export const Confirm = () => {
               >
                 <div
                   key={service.id}
-                  className="flex flex-col py-2.5 px-3.5 justify-between items-center self-stretch rounded-md bg-white shadow-lg relative"
+                  className="flex py-2.5 px-3.5 justify-between items-center self-stretch rounded-md bg-white shadow-lg relative"
                 >
-                  <div className="size-32 p-5 bg-[#FEFEFE] rounded-[70px] border-2 border-white shadow-[0px_1px_4px_0px_rgba(156,163,175,0.40)]">
+                  <CircleIcon className="min-w-32 h-32 my-auto overflow-hidden">
                     <img
-                      alt="Image avatar"
                       src={service.icon}
-                      className="size-full "
+                      alt={`Service ${service.name}`}
+                      className="w-[calc(100%-15px)] h-[calc(100%-15px)] object-cover"
                     />
-                  </div>
-                  <div className="flex flex-col justify-start items-start w-full flex-grow pl-2 gap-3">
-                    <p className="text-[#6B7280] dm_sans text-base font-light ">
-                      {currentOrder.barber.name}
-                    </p>
-                    <h2 className="text-[#494949] dm_sans textarea-lg font-medium ">
-                      {service.name}
-                    </h2>
+                  </CircleIcon>
 
-                    <p className="flex items-center gap-[1.5px] text-[#6B7280] dm_sans text-base">
+                  <div className="flex flex-col justify-start items-start w-full flex-grow pl-2 gap-1">
+                    <Text className="text-[#6B7280] dm_sans text-base font-light ">
+                      {currentOrder.barber.name}
+                    </Text>
+                    <Title className="dm_sans textarea-lg font-medium ">
+                      {service.name}
+                    </Title>
+
+                    <Text className="flex items-center gap-[1.5px] text-[#6B7280] dm_sans text-base">
                       <img
                         alt="Icon location"
                         className="size-5"
                         src={getIcons("location_outlined_green")}
                       />
                       Barbearia faz milagres
-                    </p>
-                    <p className="flex items-center gap-1 text-[#6B7280] dm_sans text-base">
+                    </Text>
+                    <Text className="flex items-center gap-1 text-[#6B7280] dm_sans text-base">
                       <img
                         alt="Icon calendar"
                         className="size-5"
                         src={getIcons("calendar_tick")}
                       />
-                      <div className="h-3 w-[0.5px] bg-[#6B7280] rounded-3xl" />
+                      <div className="h-3 w-[0.5px] bg-[#6C8762] rounded-3xl" />
                       {formatCustomDateTime(currentOrder.date || "")}
-                    </p>
-                    <h2 className="self-stretch text-[#494949] dm_sans text-base not-italic dm_sansfont-medium ">
-                      {formatter({
-                        type: "pt-BR",
-                        currency: "BRL",
-                        style: "currency",
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      }).format(service.price || 0)}{" "}
-                    </h2>
+                    </Text>
+                    <div className="flex flex-col items-center gap-[5px] absolute right-4 bottom-4">
+                      {Boolean(service.discount) && (
+                        <Text className="line-through">
+                          {formatter({
+                            type: "pt-BR",
+                            currency: "BRL",
+                            style: "currency",
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          }).format(
+                            service.price / (1 - (service?.discount || 1) / 100)
+                          )}
+                        </Text>
+                      )}
+                      <Title className="inter textarea-md font-[300] leading-none ">
+                        {formatter({
+                          type: "pt-BR",
+                          currency: "BRL",
+                          style: "currency",
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        }).format(service.price || 0)}
+                      </Title>
+                    </div>
                   </div>
 
                   <button
@@ -163,15 +206,13 @@ export const Confirm = () => {
             ))}
           </AnimatePresence>
 
-          <h2 className="text-black inter text-[18px] font-medium tracking-[1.2px]">
-            Resumo dos serviços
-          </h2>
+          <Title className="tracking-[1.2px]">Resumo dos serviços</Title>
           <div className="flex flex-col gap-2 py-6 px-3.5 justify-between items-center self-stretch rounded-md bg-white shadow-lg">
             <div className="flex justify-between items-center w-full">
-              <p className="text-[#181D27] opacity-60 dm_sans text-base font-normal ">
+              <Text className="opacity-60 dm_sans text-base font-normal ">
                 SubTotal
-              </p>
-              <h2 className="text-[#181D27] dm_sans textarea-lg font-medium ">
+              </Text>
+              <Title className="dm_sans textarea-lg font-medium ">
                 {formatter({
                   type: "pt-BR",
                   currency: "BRL",
@@ -179,33 +220,33 @@ export const Confirm = () => {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
                 }).format(currentOrder.subTotal || 0)}{" "}
-              </h2>
+              </Title>
             </div>
             <div className="flex justify-between items-center w-full">
-              <p className="text-[#181D27] opacity-60 dm_sans text-base font-normal ">
+              <Text className="opacity-60 dm_sans text-base font-normal ">
                 Payment fee
-              </p>
-              <p className="text-[#181D27] opacity-60 dm_sans text-base font-normal ">
+              </Text>
+              <Text className="opacity-60 dm_sans text-base font-normal ">
                 {formatPercentage(currentOrder.paymentFee)}
-              </p>
+              </Text>
             </div>
             <div className="flex justify-between items-center w-full">
-              <p className="text-[#181D27] opacity-60 dm_sans text-base font-normal ">
+              <Text className="opacity-60 dm_sans text-base font-normal ">
                 Payment method
-              </p>
+              </Text>
 
-              <p
+              <Text
                 className="text-[#9938FC] dm_sans text-base font-normal tracking-wide"
                 onClick={() => setIsOpen((prev) => !prev)}
               >
                 Visa **** 3708
-              </p>
+              </Text>
             </div>
             <div className="flex justify-between items-center w-full">
-              <p className="text-[#181D27] opacity-60 dm_sans text-base font-normal ">
+              <Text className="opacity-60 dm_sans text-base font-normal ">
                 Promotion discount
-              </p>
-              <p className="text-[#181D27] opacity-60 dm_sans text-base font-normal ">
+              </Text>
+              <Text className="text-[#181D27] opacity-60 dm_sans text-base font-normal ">
                 {formatter({
                   type: "pt-BR",
                   currency: "BRL",
@@ -213,13 +254,11 @@ export const Confirm = () => {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
                 }).format(currentOrder.discount || 0)}{" "}
-              </p>
+              </Text>
             </div>
             <div className="flex justify-between items-center w-full">
-              <h2 className="text-[#181D27] dm_sans textarea-lg font-medium ">
-                Total
-              </h2>
-              <h2 className="text-[#181D27] dm_sans textarea-lg font-medium ">
+              <Title className="dm_sans textarea-lg font-medium ">Total</Title>
+              <Title className="dm_sans textarea-lg font-medium ">
                 {formatter({
                   type: "pt-BR",
                   currency: "BRL",
@@ -227,13 +266,13 @@ export const Confirm = () => {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
                 }).format(currentOrder.total || 0)}{" "}
-              </h2>
+              </Title>
             </div>
 
             <button
               type="button"
               onClick={handleFinalConfirm}
-              className="btn mt-5 w-full max-w-full border-none bg-[#6B7280] disabled:!bg-[#e5e5e5] rounded text-[14px] text-[#FFF] py-[10px] font-[500] tracking-[0.4px]"
+              className="btn mt-5 w-full max-w-full border-none bg-[#6C8762] disabled:!bg-[#e5e5e5] rounded text-[14px] text-[#FFF] py-[10px] font-[500] tracking-[0.4px]"
             >
               Confirm
             </button>
@@ -276,8 +315,8 @@ export const Confirm = () => {
               <div className="modal-action">
                 <button
                   type="button"
-                  onClick={handleConfirm}
-                  className="btn w-full max-w-full border-none bg-[#6B7280] disabled:!bg-[#e5e5e5] rounded text-[14px] text-[#FFF] py-[10px] font-[500] tracking-[0.4px]"
+                  onClick={handleFinalConfirm}
+                  className="btn w-full max-w-full border-none bg-[#6C8762] disabled:!bg-[#e5e5e5] rounded text-[14px] text-[#FFF] py-[10px] font-[500] tracking-[0.4px]"
                   disabled={!selectedMethod}
                 >
                   Confirmar Método

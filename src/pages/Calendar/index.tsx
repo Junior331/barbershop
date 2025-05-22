@@ -4,6 +4,7 @@ import { useCalendar } from "./useCalendar";
 import { Layout } from "@/components/templates";
 import { Header } from "@/components/organisms";
 import { useEffect } from "react";
+import { cn } from "@/utils/utils";
 
 export const Calendar = () => {
   const {
@@ -11,16 +12,17 @@ export const Calendar = () => {
     order,
     navigate,
     dayOfWeek,
+    formatTime,
     monthNames,
     daysOfWeek,
     isSelected,
-    formatTime,
     currentDate,
     selectedTime,
     formattedDate,
+    setCurrentDate,
     handleDayClick,
     isCurrentMonth,
-    setCurrentDate,
+    isTimeAvailable,
     handlePrevMonth,
     handleNextMonth,
     isDateSelectable,
@@ -47,7 +49,7 @@ export const Calendar = () => {
             <img
               alt="Image avatar"
               src={getIcons("calendar_solid_white")}
-              className="w-[71px] h-[71px] p-2.5 bg-[#6B7280]  rounded-[70px] border-2 border-white object-cover filter drop-shadow-[0_2px_4px_rgba(112,121,116,0.30)]"
+              className="w-[71px] h-[71px] p-2.5 bg-[#6C8762]  rounded-[70px] border-2 border-white object-cover filter drop-shadow-[0_2px_4px_rgba(112,121,116,0.30)]"
             />
             <div className="flex flex-col justify-start items-start w-full flex-grow pl-2 gap-1">
               <p className=" text-black inter textarea-md font-medium leading-none">
@@ -115,19 +117,15 @@ export const Calendar = () => {
                     <div
                       key={index}
                       onClick={() => isValidDay && handleDayClick(day)}
-                      className={`h-12 flex items-center justify-center text-sm transition-all text-[#000]
-                ${day ? "cursor-pointer" : "opacity-0"}
-                ${isToday ? "bg-blue-500 text-white rounded-[10px]" : ""}
-                ${
-                  isSelected(day as number)
-                    ? "w-[48px] !bg-[#9CA3AF] text-white rounded-[10px]"
-                    : ""
-                }
-                ${
-                  isValidDay
-                    ? "hover:bg-gray-100"
-                    : "cursor-not-allowed opacity-50"
-                }`}
+                      className={cn(
+                        "w-12 h-12 flex items-center justify-center text-sm transition-all text-[#000] rounded-[10px] mx-auto",
+                        day ? "cursor-pointer" : "opacity-0",
+                        isToday && "!bg-blue-500 text-white",
+                        isSelected(day as number) && "!bg-[#6C8762] text-white",
+                        isValidDay
+                          ? "hover:bg-gray-100"
+                          : "cursor-not-allowed opacity-50"
+                      )}
                     >
                       {day}
                     </div>
@@ -143,31 +141,42 @@ export const Calendar = () => {
             <div className="w-full grid grid-cols-3 gap-3">
               {timeSlots.map((item) => {
                 const isSelected = selectedTime === item.time;
+                const isAvailable = isTimeAvailable(item.time);
 
                 return (
                   <div
                     key={item.id}
                     className="w-full cursor-pointer"
-                    onClick={() => handleTimeSelection(item.time)}
+                    onClick={() =>
+                      isAvailable && handleTimeSelection(item.time)
+                    }
                   >
                     <div
-                      className={`
-          w-full h-[33.568px] rounded-[21px]
-          flex items-center justify-center transition-colors
-          ${
-            isSelected
-              ? "bg-[#ECEFF1]"
-              : "bg-[#FEFEFE] filter drop-shadow-[0px_2px_4px_0px_rgba(156,163,175,0.20)] border border-[#6B7280]"
-          }
-        `}
+                      className={cn(
+                        "w-full h-[33.568px] rounded-[21px] flex items-center justify-center transition-colors",
+                        isSelected
+                          ? "bg-[#ECEFF1]"
+                          : !isAvailable
+                          ? "bg-gray-100 cursor-not-allowed opacity-50"
+                          : "bg-[#FFFFFF] filter drop-shadow-[0px_2px_4px_0px_rgba(156,163,175,0.20)] border border-[#6B7280]"
+                      )}
                     >
                       <p
-                        className={`
-            textarea-md inter font-medium leading-none
-            ${isSelected ? "text-[rgba(107,114,128,0.2)]" : "text-[#6B7280]"}
-          `}
+                        className={cn(
+                          "textarea-md inter font-medium leading-none",
+                          isSelected
+                            ? "text-[rgba(107,114,128,0.2)]"
+                            : !isAvailable
+                            ? "text-gray-400"
+                            : "text-[#6B7280]"
+                        )}
                       >
                         {formatTime(item.time)}{" "}
+                        {!isAvailable && (
+                          <span className="text-xs text-gray-400">
+                            (Indisponível)
+                          </span>
+                        )}
                       </p>
                     </div>
                   </div>
@@ -179,7 +188,7 @@ export const Calendar = () => {
               type="button"
               disabled={!order.date}
               onClick={() => navigate("/confirm")}
-              className="btn w-full max-w-full border-none bg-[#6B7280] disabled:!bg-[#e5e5e5] rounded text-[14px] text-[#FFF] py-[10px] font-[500] tracking-[0.4px] mt-10"
+              className="btn w-full max-w-full border-none bg-[#6C8762] disabled:!bg-[#e5e5e5] rounded text-[14px] text-[#FFF] py-[10px] font-[500] tracking-[0.4px] mt-10"
             >
               Confirm
             </button>

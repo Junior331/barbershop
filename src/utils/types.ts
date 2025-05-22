@@ -50,11 +50,15 @@ export type Service = {
   time: number;
   icon: string;
   price: number;
+  public: boolean;
+  discount: number;
   checked?: boolean;
+  created_at: string;
+  description?: string;
 };
 
 export type BarberSchedule = {
-  endTime: string;   // "18:00"
+  endTime: string; // "18:00"
   weekday: number; // 0 (domingo) a 6 (sábado)
   startTime: string; // "08:00"
 };
@@ -76,13 +80,22 @@ export interface Order {
   total: number;
   discount: number;
   subTotal: number;
-  paymentFee: number;
-  date: string | null;
-  barber: BarberType;
-  services: Service[];
-  status: "pending" | "confirmed" | "canceled";
-  paymentMethod: "pix" | "credit_card" | "debit_card" | string;
   location: string;
+  duration: number;
+  barber_id: string;
+  client_id: string;
+  date_time: string;
+  service_id: string;
+  paymentFee: number;
+  created_at: string;
+  barber: BarberType;
+  date: string | null;
+  services: Service[];
+  payment_fee: number;
+  total_price: number;
+  payment_method: string;
+  status: 'pending' | 'confirmed' | 'canceled' | 'completed';
+  paymentMethod: "pix" | "credit_card" | "debit_card" | string;
 }
 
 export interface CurrentOrder extends Omit<Order, "id" | "status"> {
@@ -105,3 +118,10 @@ export interface OrderStore {
   actions: OrderActions;
   currentOrder: CurrentOrder;
 }
+
+export type UseAvatarOptions = {
+  size?: number;
+  rounded?: boolean;
+  textColor?: string | "auto";
+  backgroundColors?: string[];
+};

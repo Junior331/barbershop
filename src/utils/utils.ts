@@ -1,4 +1,6 @@
+import { twMerge } from "tailwind-merge";
 import { formatterProps } from "./types";
+import { clsx, type ClassValue } from "clsx";
 
 export const formatter = ({
   currency,
@@ -57,9 +59,6 @@ export const formatDateTime = (dateString: string, type: "date" | "time") => {
   });
 };
 
-// export const maskPhone = (value: string) =>
-//   value.replace(/(\d{2})(\d{5})(\d{4})/g, "($1) $2-$3");
-
 export const maskPhone = (value: string) =>
   value
     .replace(/\D/g, "")
@@ -110,27 +109,59 @@ export const getCurrentDate = (): {
 
 export const formatCustomDateTime = (isoString: string): string => {
   const date = new Date(isoString);
-  
-  const formattedDate = date.toLocaleDateString('pt-BR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric'
+
+  const formattedDate = date.toLocaleDateString("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
   });
 
-  const formattedTime = date.toLocaleTimeString('en-US', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: true
+  const formattedTime = date.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
   });
 
-  return `${formattedDate} as ${formattedTime}`;
+  return `${formattedDate} às ${formattedTime}`;
 };
 
 export const formatPercentage = (value: number): string => {
-  return new Intl.NumberFormat('pt-BR', {
-    style: 'percent',
+  return new Intl.NumberFormat("pt-BR", {
+    style: "percent",
     minimumFractionDigits: 0,
-    maximumFractionDigits: 1
+    maximumFractionDigits: 1,
   }).format(value);
 };
 
+export const getContrastColor = (hexColor: string) => {
+  // Converte hex para RGB
+  const r = parseInt(hexColor.substring(1, 3), 16);
+  const g = parseInt(hexColor.substring(3, 5), 16);
+  const b = parseInt(hexColor.substring(5, 7), 16);
+
+  // Calcula luminância
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return luminance > 0.5 ? '#000000' : '#FFFFFF';
+};
+
+export const convertToDateObject = (dateString: string): Date | null => {
+  if (!dateString) return null;
+  
+  const [day, month, year] = dateString.split('/');
+  if (!day || !month || !year) return null;
+
+  // Cria uma data no formato AAAA-MM-DD
+  return new Date(`${year}-${month}-${day}`);
+};
+
+export const formatDateForSupabase = (dateString: string): string | null => {
+  const date = convertToDateObject(dateString);
+  if (!date) return null;
+
+  // Formata para AAAA-MM-DD
+  return date.toISOString().split('T')[0];
+};
+
+export const cn = (...inputs: ClassValue[]) => {
+  return twMerge(clsx(inputs));
+};

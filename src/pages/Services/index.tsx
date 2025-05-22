@@ -6,6 +6,7 @@ import { Layout } from "@/components/templates";
 import { useServices } from "@/hooks/useServices";
 import { Card, Header } from "@/components/organisms";
 import { useOrder, useOrderActions } from "@/store/useOrderStore";
+import { Button, CircleIcon, Text, Title } from "@/components/elements";
 
 export const Services = () => {
   const navigate = useNavigate();
@@ -50,7 +51,7 @@ export const Services = () => {
         <Header title={"Serviços"} backPath={"/"} />
 
         <div className="flex flex-col w-full justify-between items-start gap-2 px-4 pb-2 overflow-auto h-[calc(100vh-0px)]">
-          <div className="grid grid-cols-1 gap-1 w-full max-w-full pb-[10px] pr-1">
+          <div className="grid grid-cols-1 gap-4 w-full max-w-full pb-[10px] pr-1">
             {services.map((item) => {
               const checked = isServiceSelected(item.id);
 
@@ -67,40 +68,62 @@ export const Services = () => {
                     style={{
                       minWidth: "100%",
                       minHeight: "100%",
-                      overflow: "hidden",
                     }}
                   >
-                    <div className="flex items-center w-full h-auto flex-1">
-                      <img
-                        src={item.icon}
-                        alt={`Service ${item.name}`}
-                        className="min-w-16 min-h-min-w-16 max-w-32 max-h-32 object-cover"
-                      />
+                    <div className="flex items-center w-full h-auto flex-1 relative">
+                      {Boolean(item.discount) && (
+                        <div className="absolute -top-4 -right-4 bg-[#6C8762] text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-sm">
+                          {item.discount}%
+                        </div>
+                      )}
+
+                      <CircleIcon className="!max-w-32 !max-h-32">
+                        <img
+                          src={item.icon}
+                          alt={`Service ${item.name}`}
+                          className="w-[calc(100%-15px)] h-[calc(100%-15px)] object-cover"
+                        />
+                      </CircleIcon>
 
                       <div className="flex flex-col justify-start items-start w-full h-auto gap-2 flex-grow pl-2">
-                        <p className="w-full text-start text-[#6b7280] inter textarea-lg font-bold text_ellipsis">
+                        <Title className="w-full text-start truncate max-w-[70%]">
                           {item.name}
-                        </p>
+                        </Title>
 
-                        <p className="flex items-center gap-[5px] text-[#6b7280] font-[300] inter textarea-md leading-0">
+                        <Text className="flex items-center gap-[5px] truncate max-w-[calc(100% - 25px)]">
                           <img
                             alt="Icon clock"
                             className="size-5"
                             src={getIcons("clock_outlined_green")}
                           />
-                          <div className="h-2.5 rounded-2xl w-[0.8px] bg-[#6b7280] " />
+                          <div className="h-2.5 rounded-2xl w-[0.8px] bg-[#6B7280] " />
                           {item.time}min
-                        </p>
+                        </Text>
 
-                        <p className="text-[#6b7280] inter textarea-md font-[300] leading-none">
-                          {formatter({
-                            type: "pt-BR",
-                            currency: "BRL",
-                            style: "currency",
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          }).format(item.price || 0)}
-                        </p>
+                        <div className="flex flex-col items-center gap-[5px] absolute right-2 bottom-2">
+                          {Boolean(item.discount) && (
+                            <Text className="line-through">
+                              {formatter({
+                                type: "pt-BR",
+                                currency: "BRL",
+                                style: "currency",
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              }).format(
+                                item.price / (1 - (item?.discount || 1) / 100)
+                              )}
+                            </Text>
+                          )}
+                          <Title className="textarea-md font-[300]">
+                            {formatter({
+                              type: "pt-BR",
+                              currency: "BRL",
+                              style: "currency",
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            }).format(item.price || 0)}
+                          </Title>
+                        </div>
                       </div>
 
                       <input
@@ -108,7 +131,7 @@ export const Services = () => {
                         type="checkbox"
                         name="rememberMe"
                         checked={checked}
-                        className="relative top-[7px] left-[-5px] self-stretch checkbox custom_before_service w-4 h-4 border border-[#6b7280] p-[3px] rounded-3xl !shadow-none"
+                        className="absolute top-[7px] right-[5px] self-stretch checkbox custom_before_service w-4 h-4 border border-[#6b7280] p-[3px] rounded-3xl !shadow-none"
                       />
                     </div>
                   </Card>
@@ -116,14 +139,28 @@ export const Services = () => {
               );
             })}
           </div>
-          <button
+
+          <Button
             type="button"
             disabled={!selectedServices.length}
             onClick={() => navigate("/barbers")}
-            className="btn w-full max-w-full border-none bg-[#6B7280] disabled:!bg-[#e5e5e5] rounded text-[14px] text-[#FFF] py-[10px] font-[500] tracking-[0.4px]"
           >
-            Confirm
-          </button>
+            {/* {selectedServices.length
+              ? `Confirmar • ${formatter({
+                  type: "pt-BR",
+                  currency: "BRL",
+                  style: "currency",
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                }).format(
+                  selectedServices.reduce(
+                    (total, service) => total + service.price,
+                    0
+                  )
+                )}`
+              : "Confirmar"} */}
+              Confirmar
+          </Button>
         </div>
       </div>
     </Layout>

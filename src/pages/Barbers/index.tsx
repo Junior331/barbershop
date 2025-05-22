@@ -5,6 +5,7 @@ import { Layout } from "@/components/templates";
 import { Card, Header } from "@/components/organisms";
 import { useOrder, useOrderActions } from "@/store/useOrderStore";
 import { useBarbers } from "@/hooks/useBarbers";
+import { CircleIcon } from "@/components/elements";
 
 export const Barbers = () => {
   const { barber } = useOrder();
@@ -13,10 +14,10 @@ export const Barbers = () => {
 
   const isBarberSelected = (id: string): boolean => barber.id === id;
 
-  const { barbers, loading, error } = useBarbers()
+  const { barbers, loading, error } = useBarbers();
 
-  if (loading) return <div>Carregando...</div>
-  if (error) return <div>Erro: {error}</div>
+  if (loading) return <div>Carregando...</div>;
+  if (error) return <div>Erro: {error}</div>;
 
   return (
     <Layout>
@@ -45,15 +46,17 @@ export const Barbers = () => {
                       overflow: "hidden",
                     }}
                   >
-                    <div className="flex items-center w-full h-full pr-[5px] min-h-28 relative">
-                      <img
-                        src={item.image}
-                        alt={`Barber ${item.name}`}
-                        className="min-w-32 min-h-32 max-w-32 max-h-32 object-cover border-r-[2px] border-[#E5E7EB]"
-                      />
+                    <div className="flex items-center w-full h-full px-3 min-h-28 my-auto relative">
+                      <CircleIcon className="min-w-24 h-24 my-auto overflow-hidden">
+                        <img
+                          src={item.image}
+                          alt={`Barber ${item.name}`}
+                          className="w-24 h-24 object-cover"
+                        />
+                      </CircleIcon>
 
                       <div className="flex flex-col justify-start items-start w-full gap-2 flex-grow pl-2">
-                        <p className="w-full text-start text-[#6b7280] inter textarea-lg font-bold leading-[150%] border-b border-[#9CA3AF] text_ellipsis">
+                        <p className="w-full text-start text-[#6b7280] inter textarea-lg font-bold leading-[150%] border-b border-[#9CA3AF] truncate">
                           {item.name}
                         </p>
                         <p className="text-[#6b7280] font-roboto textarea-md font-normal leading-none">
@@ -76,7 +79,7 @@ export const Barbers = () => {
                           <p className="flex items-center gap-[2.5px] text-[#6b7280] inter textarea-md font-normal">
                             {item.rating}
                           </p>
-                          <div className="h-[7px] rounded-2xl w-[0.5px] bg-[#6b7280]" />
+                          <div className="h-[7px] rounded-2xl w-[0.5px] bg-[#6C8762]" />
                           <p className="flex items-center gap-[2.5px] text-[#6b7280] inter textarea-md font-normal">
                             {item.cuts} Cuts
                           </p>
@@ -88,7 +91,7 @@ export const Barbers = () => {
                         type="checkbox"
                         name="rememberMe"
                         checked={checked}
-                        className="self-stretch checkbox custom_before_service w-4 h-4 border border-[#6b7280] p-[3px] rounded-3xl !shadow-none absolute top-[12px] right-[8px]"
+                        className="self-stretch checkbox custom_before_service w-4 h-4 border border-[#6b7280] p-[3px] rounded-3xl !shadow-none absolute top-1.5 right-3"
                       />
                     </div>
                   </Card>
@@ -100,7 +103,7 @@ export const Barbers = () => {
             type="button"
             disabled={!barber}
             onClick={() => navigate("/calendar")}
-            className="btn w-full max-w-full border-none bg-[#6B7280] disabled:!bg-[#e5e5e5] rounded text-[14px] text-[#FFF] py-[10px] font-[500] tracking-[0.4px]"
+            className="btn w-full max-w-full border-none bg-[#6C8762] disabled:!bg-[#e5e5e5] rounded text-[14px] text-[#FFF] py-[10px] font-[500] tracking-[0.4px]"
           >
             Confirm
           </button>

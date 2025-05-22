@@ -9,7 +9,7 @@
 @layer base {
   :root {
     --radius: 0.5rem;
-    --card: #6b7280;
+    --card: #6C8762;
     --link: #7367f0;
     --text: #6e6b7b;
     --span: #b9b9c3;
@@ -17,14 +17,14 @@
     --title: #000000;
     --title: #283046;
     --border: #e9eaec;
-    --background: #f7f8fd;
+    --background: #F7F8FD;
     --foreground: #d4d7d4;
     --border-card: #ffffff;
   }
 
   .dark {
     --radius: 0.5rem;
-    --card: #6b7280;
+    --card: #6C8762;
     --link: #7367f0;
     --text: #6e6b7b;
     --span: #b9b9c3;
@@ -32,7 +32,7 @@
     --title: #000000;
     --title: #283046;
     --border: #e9eaec;
-    --background: #f7f8fd;
+    --background: #F7F8FD;
     --foreground: #d4d7d4;
     --border-card: #ffffff;
   }
