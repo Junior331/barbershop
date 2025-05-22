@@ -10,6 +10,7 @@ export const services: Service[] = [
     public: true,
     name: "Barba e Cabelo",
     icon: getServices("beard_hair"),
+    created_at: ""
   },
   {
     id: 2,
@@ -19,6 +20,7 @@ export const services: Service[] = [
     public: true,
     name: "Barba",
     icon: getServices("beard"),
+    created_at: ""
   },
   {
     id: 3,
@@ -28,6 +30,7 @@ export const services: Service[] = [
     public: true,
     name: "Corte com Máquina",
     icon: getServices("electric_razor_cut"),
+    created_at: ""
   },
   {
     id: 4,
@@ -37,6 +40,7 @@ export const services: Service[] = [
     public: true,
     name: "Corte com Tesoura",
     icon: getServices("scissor_cut"),
+    created_at: ""
   },
   {
     id: 5,
@@ -46,6 +50,7 @@ export const services: Service[] = [
     public: true,
     name: "Reflexo",
     icon: getServices("reflex"),
+    created_at: ""
   },
   {
     id: 6,
@@ -55,6 +60,7 @@ export const services: Service[] = [
     public: true,
     name: "Pigmentação",
     icon: getServices("pigmentation"),
+    created_at: ""
   },
   {
     id: 7,
@@ -64,6 +70,7 @@ export const services: Service[] = [
     public: true,
     name: "Cortes Infantis",
     icon: getServices("kids_cuts"),
+    created_at: ""
   },
   {
     id: 8,
@@ -73,6 +80,7 @@ export const services: Service[] = [
     public: true,
     name: "Cortes de Cabelo",
     icon: getServices("haircuts"),
+    created_at: ""
   },
   {
     id: 9,
@@ -82,5 +90,6 @@ export const services: Service[] = [
     public: true,
     name: "Sobrancelha",
     icon: getServices("eyebrow"),
+    created_at: ""
   },
 ];
