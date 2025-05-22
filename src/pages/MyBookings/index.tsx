@@ -96,7 +96,7 @@ export const MyBookings = () => {
             </div>
           </div>
 
-          <div className="flex flex-1 flex-col w-full h-full items-start justify-start overflow-y-auto pr-2 pb-[50px]">
+          <div className="flex flex-1 flex-col w-full h-full items-start justify-start overflow-y-auto pr-2 pb-[50px] gap-3.5">
             {processedOrders.length ? (
               <>
                 {processedOrders
