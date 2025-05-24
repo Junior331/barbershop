@@ -29,6 +29,8 @@ export const useWallet = (userId: string) => {
         .select("*")
         .eq("wallet_id", walletData.id);
 
+        console.log(`paymentMethods ::`, paymentMethods)
+
       if (methodsError) throw methodsError;
 
       // Se não houver métodos, cria os padrões

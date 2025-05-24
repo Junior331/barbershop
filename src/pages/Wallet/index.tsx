@@ -18,8 +18,11 @@ export const Wallet = () => {
   };
 
   const getPaymentMethodIcon = (methodType: string) => {
+    console.log(`methodType ::`, methodType)
     switch (methodType) {
       case "apple_pay":
+        return "apple_solid";
+      case "google_pay":
         return "apple_solid";
       case "credit_card":
         return "card_credit";
