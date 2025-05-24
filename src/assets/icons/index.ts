@@ -8,6 +8,7 @@ import barber from "./barber.png";
 import profile from "./profile.svg";
 import calendar from "./calendar.svg";
 import card_add from "./card_add.svg";
+import pix_solid from "./pix_solid.png";
 import trash_red from "./trash_red.svg";
 import pole_left from "./pole_left.svg";
 import user_edit from "./user_edit.svg";
@@ -59,6 +60,7 @@ export const icons = {
   fallback,
   calendar,
   card_add,
+  pix_solid,
   trash_red,
   pole_left,
   user_edit,
