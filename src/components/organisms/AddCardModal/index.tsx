@@ -2,7 +2,11 @@ import { AddCardModalProps } from "./@types";
 import { Select, Title } from "@/components/elements";
 import { useAddCardModal } from "@/hooks/useAddCardModal";
 
-export const AddCardModal = ({ isOpen, onClose }: AddCardModalProps) => {
+export const AddCardModal = ({ 
+  isOpen, 
+  onClose,
+  addPaymentMethod 
+}: AddCardModalProps) => {
   const {
     cardData,
     loading,
@@ -10,7 +14,7 @@ export const AddCardModal = ({ isOpen, onClose }: AddCardModalProps) => {
     handleSubmit,
     formatCardNumber,
     formatExpiryDate,
-  } = useAddCardModal(onClose);
+  } = useAddCardModal(onClose, addPaymentMethod);
 
   if (!isOpen) return null;
 

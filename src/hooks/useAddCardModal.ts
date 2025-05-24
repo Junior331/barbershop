@@ -1,10 +1,23 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 
-import { useAuth } from "@/context/AuthContext";
-import { useWallet } from "@/pages/Wallet/useWallet";
 import { CardFormData } from "@/components/organisms/AddCardModal/@types";
+import { PaymentMethod } from "@/pages/Wallet/@types";
 
-export const useAddCardModal = (onClose: () => void) => {
+type AddPaymentMethodFn = (
+  method: Omit<PaymentMethod, "id" | "created_at" | "is_default"> & {
+    cvv?: string;
+    method_type: string;
+    card_number?: string;
+    expiry_date?: string;
+    cardholder_name: string;
+  }
+) => Promise<any>;
+
+export const useAddCardModal = (
+  onClose: () => void,
+  addPaymentMethod: AddPaymentMethodFn
+) => {
   const [cardData, setCardData] = useState<CardFormData>({
     cvv: "",
     name: "",
@@ -12,10 +25,8 @@ export const useAddCardModal = (onClose: () => void) => {
     expiry: "",
     method_type: "credit_card",
   });
-  const { user } = useAuth();
 
   const [loading, setLoading] = useState(false);
-  const { addPaymentMethod } = useWallet(user?.id || "");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

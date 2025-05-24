@@ -28,6 +28,7 @@ export const Wallet = () => {
     setIsAddCardModalOpen,
     toggleBalanceVisibility,
     handlePaymentMethodClick,
+    addPaymentMethod,
   } = useWallet(user?.id || "");
 
   useEffect(() => {
@@ -46,7 +47,7 @@ export const Wallet = () => {
       <div className="p-4 text-center">
         <Text className="!text-red-500">{error}</Text>
         <button
-          onClick={refresh}
+          onClick={() => refresh()}
           className="mt-2 px-4 py-2 bg-blue-500 text-white rounded"
         >
           Tentar novamente
@@ -54,7 +55,17 @@ export const Wallet = () => {
       </div>
     );
   if (!wallet)
-    return <div className="p-4">Nenhum dado da carteira encontrado</div>;
+    return (
+      <div className="p-4 text-center">
+        <Text>Nenhum dado da carteira encontrado</Text>
+        <button
+          onClick={() => refresh()}
+          className="mt-2 px-4 py-2 bg-blue-500 text-white rounded"
+        >
+          Tentar novamente
+        </button>
+      </div>
+    );
 
   return (
     <Layout>
@@ -199,6 +210,7 @@ export const Wallet = () => {
       <AddCardModal
         isOpen={isAddCardModalOpen}
         onClose={() => setIsAddCardModalOpen(false)}
+        addPaymentMethod={addPaymentMethod}
       />
 
       <PixModal
