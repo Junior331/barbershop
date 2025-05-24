@@ -1,17 +1,35 @@
 import { useState } from "react";
-
+import { useWallet } from "./useWallet";
 import { formatter } from "@/utils/utils";
 import { getIcons } from "@/assets/icons";
+import { useAuth } from "@/context/AuthContext";
 import { Header } from "@/components/organisms";
 import { Layout } from "@/components/templates";
 import { Text, Title } from "@/components/elements";
 
 export const Wallet = () => {
+  const { user } = useAuth();
+  const { wallet, loading, error } = useWallet(user?.id || "");
   const [showBalance, setShowBalance] = useState(true);
 
   const toggleBalanceVisibility = () => {
     setShowBalance(!showBalance);
   };
+
+  const getPaymentMethodIcon = (methodType: string) => {
+    switch (methodType) {
+      case "apple_pay":
+        return "apple_solid";
+      case "credit_card":
+        return "card_credit";
+      default:
+        return "card_add";
+    }
+  };
+
+  if (loading) return <div>Carregando...</div>;
+  if (error) return <div>Erro: {error}</div>;
+  if (!wallet) return <div>Nenhum dado da carteira encontrado</div>;
 
   return (
     <Layout>
@@ -19,6 +37,7 @@ export const Wallet = () => {
         <Header title={"Carteira"} backPath={"/"} />
 
         <div className="flex flex-col w-full justify-center items-start gap-5 px-4">
+          {/* Saldo disponível */}
           <div className="flex w-full p-[10px_15px] flex-col items-start gap-2.5 rounded-[5px] bg-white shadow-[0px_4px_44px_0px_rgba(0,0,0,0.06)]">
             <div className="flex items-center justify-between w-full gap-2">
               <Title className="font-medium">Saldo disponível</Title>
@@ -44,15 +63,15 @@ export const Wallet = () => {
                     style: "currency",
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
-                  }).format(0)
-                : "••••••"}{" "}
+                  }).format(wallet.balance)
+                : "••••••"}
             </Text>
           </div>
 
+          {/* Métodos de pagamento */}
           <div className="flex w-full p-[10px_8px] flex-col items-start gap-[8px] rounded-[5px] bg-white shadow-[0px_4px_44px_0px_rgba(0,0,0,0.06)]">
             <div className="flex items-center justify-between w-full gap-1">
               <Title className="font-normal">Métodos de pagamento</Title>
-
               <button
                 type="button"
                 className="btn p-0 m-0 btn-link border-none !no-underline"
@@ -62,54 +81,41 @@ export const Wallet = () => {
             </div>
 
             <div className="flex items-center w-full gap-1.5">
-              <div className="flex w-full flex-1 h-[94px]  rounded-[10px] border-[0.5px] border-[#EAEAEA] bg-white p-2">
-                <img
-                  alt="Ícone"
-                  className="w-6 h-6 absolute"
-                  src={getIcons("apple_solid")}
-                />
-
-                <div className="mt-auto">
-                  <Text className="!font-light !text-[#111827] !text-sm">
-                    Payment
-                  </Text>
-
-                  <Title className="!text-[#111827] inter textarea-md font-medium">
-                    Apple pay
-                  </Title>
+              {wallet.payment_methods.slice(0, 2).map((method) => (
+                <div
+                  key={method.id}
+                  className="flex w-fit flex-1 md:flex-none md:min-w-36 h-[94px] rounded-[10px] border-[0.5px] border-[#EAEAEA] bg-white p-2 relative"
+                >
+                  <img
+                    alt="Ícone"
+                    className="w-6 h-6 absolute"
+                    src={getIcons(getPaymentMethodIcon(method.method_type))}
+                  />
+                  <div className="mt-auto">
+                    <Text className="!font-light !text-[#111827] !text-sm">
+                      {method.method_type === "credit_card"
+                        ? method.card_brand
+                        : "Payment"}
+                    </Text>
+                    <Title className="!text-[#111827] inter textarea-md font-medium">
+                      {method.method_type === "credit_card"
+                        ? `**** ${method.card_last_four}`
+                        : "Apple pay"}
+                    </Title>
+                  </div>
                 </div>
-              </div>
+              ))}
 
-              <div className="flex w-full flex-1 h-[94px]  rounded-[10px] border-[0.5px] border-[#EAEAEA] bg-white p-2">
-                <img
-                  alt="Ícone"
-                  className="w-6 h-6 absolute"
-                  src={getIcons("card_credit")}
-                />
-
-                <div className="mt-auto">
-                  <Text className="!font-light !text-[#111827] !text-sm">
-                    Visa
-                  </Text>
-
-                  <Title className="!text-[#111827] inter textarea-md font-medium">
-                    **** 3708
-                  </Title>
-                </div>
-              </div>
-
-              <div className="flex w-full flex-1 h-[94px]  rounded-[10px] border-[0.5px] border-[#EAEAEA] bg-white p-2">
+              <div className="flex w-fit flex-1 md:flex-none md:min-w-36 h-[94px] rounded-[10px] border-[0.5px] border-[#EAEAEA] bg-white p-2">
                 <img
                   alt="Ícone"
                   className="w-6 h-6 absolute"
                   src={getIcons("card_add")}
                 />
-
                 <div className="mt-auto">
                   <Text className="!font-light !text-[#111827] !text-sm">
                     Register
                   </Text>
-
                   <Title className="!text-[#111827] inter textarea-md font-medium">
                     new card
                   </Title>
@@ -118,10 +124,10 @@ export const Wallet = () => {
             </div>
           </div>
 
+          {/* Transações recentes */}
           <div className="flex w-full p-[10px_15px] flex-col items-start gap-[25px] rounded-[5px] bg-white shadow-[0px_4px_44px_0px_rgba(0,0,0,0.06)]">
             <div className="flex items-center justify-between w-full gap-1">
-              <Title className="font-normal">Transacções recentes</Title>
-
+              <Title className="font-normal">Transações recentes</Title>
               <button
                 type="button"
                 className="btn p-0 m-0 btn-link border-none !no-underline"
@@ -129,6 +135,34 @@ export const Wallet = () => {
                 <Text className="!text-xs !text-[#181D27]">Ver mais</Text>
               </button>
             </div>
+
+            {wallet.transactions.length > 0 ? (
+              <div className="w-full space-y-4">
+                {wallet.transactions.map((transaction) => (
+                  <div key={transaction.id} className="flex flex-col gap-1">
+                    <Text className="!text-sm !font-medium">
+                      {transaction.service_name}
+                    </Text>
+                    <div className="flex justify-between items-center">
+                      <Text className="!text-xs !text-gray-500">
+                        {transaction.barber_name} • {transaction.date}
+                      </Text>
+                      <Text className="!text-sm !font-medium">
+                        {formatter({
+                          type: "pt-BR",
+                          currency: "BRL",
+                          style: "currency",
+                        }).format(transaction.amount)}
+                      </Text>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <Text className="!text-sm !text-gray-500">
+                Nenhuma transação recente
+              </Text>
+            )}
           </div>
         </div>
       </div>
