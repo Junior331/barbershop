@@ -2,10 +2,10 @@ import { useNavigate } from "react-router-dom";
 
 import { getIcons } from "@/assets/icons";
 import { Layout } from "@/components/templates";
-import { Card, Header } from "@/components/organisms";
-import { useOrder, useOrderActions } from "@/store/useOrderStore";
 import { useBarbers } from "@/hooks/useBarbers";
-import { CircleIcon } from "@/components/elements";
+import { Card, Header } from "@/components/organisms";
+import { CircleIcon, Loading } from "@/components/elements";
+import { useOrder, useOrderActions } from "@/store/useOrderStore";
 
 export const Barbers = () => {
   const { barber } = useOrder();
@@ -16,7 +16,7 @@ export const Barbers = () => {
 
   const { barbers, loading, error } = useBarbers();
 
-  if (loading) return <div>Carregando...</div>;
+  if (loading) return <Loading />;
   if (error) return <div>Erro: {error}</div>;
 
   return (

@@ -5,9 +5,16 @@ import { isAndroid } from "@/utils/platform";
 import { WalletData, PaymentMethod, Transaction } from "./@types";
 
 export const useWallet = (userId: string) => {
-  const [wallet, setWallet] = useState<WalletData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showBalance, setShowBalance] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isPixModalOpen, setIsPixModalOpen] = useState(false);
+  const [wallet, setWallet] = useState<WalletData | null>(null);
+  const [isAddCardModalOpen, setIsAddCardModalOpen] = useState(false);
+
+  const toggleBalanceVisibility = () => {
+    setShowBalance(!showBalance);
+  };
 
   // Buscar dados da carteira com useCallback
   const fetchWalletData = useCallback(async () => {
@@ -204,6 +211,13 @@ export const useWallet = (userId: string) => {
     }
   };
 
+  const handlePaymentMethodClick = (method: PaymentMethod) => {
+    if (method.method_type === "pix") {
+      setIsPixModalOpen(true);
+    }
+    // Você pode adicionar outras lógicas para outros tipos de método aqui
+  };
+
   // Carregar dados quando o hook é inicializado
   useEffect(() => {
     if (userId) {
@@ -215,11 +229,18 @@ export const useWallet = (userId: string) => {
     error,
     wallet,
     loading,
+    showBalance,
+    isPixModalOpen,
     addPaymentMethod,
+    setIsPixModalOpen,
+    isAddCardModalOpen,
     removePaymentMethod,
     getPaymentMethodIcon,
     getPaymentMethodLabel,
+    setIsAddCardModalOpen,
+    toggleBalanceVisibility,
     refresh: fetchWalletData,
+    handlePaymentMethodClick,
   };
 };
 

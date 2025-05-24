@@ -1,23 +1,32 @@
-import { useState } from "react";
 import { useWallet } from "./useWallet";
 import { formatter } from "@/utils/utils";
 import { getIcons } from "@/assets/icons";
 import { Layout } from "@/components/templates";
 import { useAuth } from "@/context/AuthContext";
-import { Text, Title } from "@/components/elements";
-import { AddCardModal, Header } from "@/components/organisms";
+import { Loading, Text, Title } from "@/components/elements";
+import { AddCardModal, Header, PixModal } from "@/components/organisms";
 
 export const Wallet = () => {
   const { user } = useAuth();
-  const [showBalance, setShowBalance] = useState(true);
-  const { wallet, loading, error, getPaymentMethodIcon, getPaymentMethodLabel } = useWallet(user?.id || "");
-  const [isAddCardModalOpen, setIsAddCardModalOpen] = useState(false);
+  const {
+    error,
+    wallet,
+    loading,
+    showBalance,
+    isPixModalOpen,
+    setIsPixModalOpen,
+    isAddCardModalOpen,
+    getPaymentMethodIcon,
+    getPaymentMethodLabel,
+    setIsAddCardModalOpen,
+    toggleBalanceVisibility,
+    handlePaymentMethodClick,
+  } = useWallet(user?.id || "");
 
-  const toggleBalanceVisibility = () => {
-    setShowBalance(!showBalance);
-  };
+  const pixCode =
+    "00020126580014br.gov.bcb.pix013668fd7e48-1234-5678-9abc-123456789def5204000053039865802BR5925João da Silva Santos6009São Paulo62070503***6304ABCD";
 
-  if (loading) return <div>Carregando...</div>;
+  if (loading) return <Loading />;
   if (error) return <div>Erro: {error}</div>;
   if (!wallet) return <div>Nenhum dado da carteira encontrado</div>;
 
@@ -74,7 +83,8 @@ export const Wallet = () => {
               {wallet.payment_methods.slice(0, 2).map((method) => (
                 <div
                   key={method.id}
-                  className="flex w-fit flex-1 md:flex-none md:min-w-36 h-[94px] rounded-[10px] border-[0.5px] border-[#EAEAEA] bg-white p-2 relative"
+                  className="flex w-fit flex-1 md:flex-none md:min-w-36 h-[94px] rounded-[10px] border-[0.5px] border-[#EAEAEA] bg-white p-2 relative cursor-pointer"
+                  onClick={() => handlePaymentMethodClick(method)}
                 >
                   <img
                     alt="Ícone"
@@ -163,6 +173,13 @@ export const Wallet = () => {
       <AddCardModal
         isOpen={isAddCardModalOpen}
         onClose={() => setIsAddCardModalOpen(false)}
+      />
+
+      <PixModal
+        title="Depósito"
+        value={pixCode}
+        isOpen={isPixModalOpen}
+        onClose={() => setIsPixModalOpen(false)}
       />
     </Layout>
   );

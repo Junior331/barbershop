@@ -6,7 +6,7 @@ import { Layout } from "@/components/templates";
 import { useServices } from "@/hooks/useServices";
 import { Card, Header } from "@/components/organisms";
 import { useOrder, useOrderActions } from "@/store/useOrderStore";
-import { Button, CircleIcon, Text, Title } from "@/components/elements";
+import { Button, CircleIcon, Loading, Text, Title } from "@/components/elements";
 
 export const Services = () => {
   const navigate = useNavigate();
@@ -18,12 +18,7 @@ export const Services = () => {
   const isServiceSelected = (id: number): boolean =>
     selectedServices.some((service) => service.id === id);
 
-  if (loading)
-    return (
-      <div className="flex justify-center py-8">
-        <span className="loading loading-spinner loading-lg"></span>
-      </div>
-    );
+  if (loading) return <Loading />;
 
   if (error)
     return (
@@ -159,7 +154,7 @@ export const Services = () => {
                   )
                 )}`
               : "Confirmar"} */}
-              Confirmar
+            Confirmar
           </Button>
         </div>
       </div>

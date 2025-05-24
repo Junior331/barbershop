@@ -16,10 +16,10 @@ export const AddCardModal = ({ isOpen, onClose }: AddCardModalProps) => {
 
   return (
     <dialog open={isOpen} className="modal z-50">
-      <div className="modal-box bg-white w-full max-w-11/12 md:max-w-10/12">
+      <div className="modal-box bg-white w-full max-w-11/12 md:max-w-md">
         <button
           onClick={onClose}
-          className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+          className="btn btn-sm btn-circle shadow-none btn-ghost absolute hover:bg-[#eaeaea80] !border-none !text-black right-2 top-2"
         >
           ✕
         </button>

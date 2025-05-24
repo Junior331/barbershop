@@ -282,8 +282,8 @@ export const Confirm = () => {
           <div className="modal-box bg-white w-96 max-w-[calc(100vw-32px)]">
             <button
               onClick={() => setIsOpen(false)}
-              className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-            >
+              className="btn btn-sm btn-circle shadow-none btn-ghost absolute hover:bg-[#eaeaea80] !border-none !text-black right-2 top-2"
+              >
               ✕
             </button>
 
