@@ -2,11 +2,10 @@ import { useState } from "react";
 import { useWallet } from "./useWallet";
 import { formatter } from "@/utils/utils";
 import { getIcons } from "@/assets/icons";
-import { AddCardModal } from "./AddCardModal";
-import { useAuth } from "@/context/AuthContext";
-import { Header } from "@/components/organisms";
 import { Layout } from "@/components/templates";
+import { useAuth } from "@/context/AuthContext";
 import { Text, Title } from "@/components/elements";
+import { AddCardModal, Header } from "@/components/organisms";
 
 export const Wallet = () => {
   const { user } = useAuth();
