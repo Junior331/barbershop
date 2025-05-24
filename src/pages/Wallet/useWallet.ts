@@ -8,7 +8,7 @@ import { WalletData, PaymentMethod, Transaction } from "./@types";
 
 export const useWallet = (userId: string) => {
   const [loading, setLoading] = useState(true);
-  const [showBalance, setShowBalance] = useState(true);
+  const [showBalance, setShowBalance] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPixModalOpen, setIsPixModalOpen] = useState(false);
   const [wallet, setWallet] = useState<WalletData | null>(null);
