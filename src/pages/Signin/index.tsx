@@ -97,7 +97,7 @@ export const Signin = () => {
         </button>
       </form>
 
-      <div className="mt-8 w-full">
+      <div className="mt-2 w-full">
         <div className="flex items-center w-full gap-2">
           <div className="flex-1 h-[1px] bg-[#D8D6DE]" />
           <span className="text-[#6E6B7B] text-base">Ou</span>
