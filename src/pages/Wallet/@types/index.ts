@@ -4,7 +4,7 @@ export interface PaymentMethod {
   card_brand?: string;
   is_default: boolean;
   card_last_four?: string;
-  method_type: 'credit_card' | 'apple_pay' | 'google_pay' | 'pix' | 'other';
+  method_type: 'debit_card'| 'credit_card' | 'apple_pay' | 'google_pay' | 'pix' | 'other';
 }
 
 export interface Transaction {

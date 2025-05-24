@@ -8,4 +8,5 @@ export type CardFormData = {
   name: string;
   number: string;
   expiry: string;
+  method_type: "credit_card" | "debit_card";
 };

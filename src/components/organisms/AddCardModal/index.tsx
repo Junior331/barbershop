@@ -1,5 +1,5 @@
 import { AddCardModalProps } from "./@types";
-import { Title } from "@/components/elements";
+import { Select, Title } from "@/components/elements";
 import { useAddCardModal } from "@/hooks/useAddCardModal";
 
 export const AddCardModal = ({ isOpen, onClose }: AddCardModalProps) => {
@@ -14,6 +14,11 @@ export const AddCardModal = ({ isOpen, onClose }: AddCardModalProps) => {
 
   if (!isOpen) return null;
 
+  const paymentMethodOptions = [
+    { value: "credit_card", label: "Cartão de Crédito" },
+    { value: "debit_card", label: "Cartão de Débito" },
+  ];
+
   return (
     <dialog open={isOpen} className="modal z-50">
       <div className="modal-box bg-white w-full max-w-11/12 md:max-w-md">
@@ -27,7 +32,7 @@ export const AddCardModal = ({ isOpen, onClose }: AddCardModalProps) => {
         <Title className="font-bold text-lg mb-4">Adicionar cartão</Title>
 
         <form onSubmit={handleSubmit} className="flex flex-col w-full gap-4">
-          <div className="form-control">
+          <div className="form-control ">
             <label className="text-[#6E6B7B] text-base font-normal leading-[18px]">
               Número do cartão
             </label>
@@ -41,6 +46,23 @@ export const AddCardModal = ({ isOpen, onClose }: AddCardModalProps) => {
               className="w-full h-[48px] px-[10px] rounded-[5px] border border-[#D8D6DE]"
               maxLength={19}
               required
+            />
+          </div>
+
+          <div className="form-control">
+            <label className="text-[#6E6B7B] text-base font-normal leading-[18px]">
+              Tipo
+            </label>
+            <Select
+              options={paymentMethodOptions}
+              defaultValue={cardData.method_type || ""}
+              onChange={(value) =>
+                setCardData({
+                  ...cardData,
+                  method_type: value as "credit_card" | "debit_card",
+                })
+              }
+              className="h-[48px]"
             />
           </div>
 

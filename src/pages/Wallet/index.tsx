@@ -5,14 +5,21 @@ import { Layout } from "@/components/templates";
 import { useAuth } from "@/context/AuthContext";
 import { Loading, Text, Title } from "@/components/elements";
 import { AddCardModal, Header, PixModal } from "@/components/organisms";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 export const Wallet = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
+
   const {
     error,
     wallet,
     loading,
+    refresh,
     showBalance,
+    transactions,
+    paymentMethods,
     isPixModalOpen,
     setIsPixModalOpen,
     isAddCardModalOpen,
@@ -23,12 +30,31 @@ export const Wallet = () => {
     handlePaymentMethodClick,
   } = useWallet(user?.id || "");
 
-  const pixCode =
-    "00020126580014br.gov.bcb.pix013668fd7e48-1234-5678-9abc-123456789def5204000053039865802BR5925João da Silva Santos6009São Paulo62070503***6304ABCD";
+  useEffect(() => {
+    if (!user) {
+      navigate("/login");
+    }
+  }, [user, navigate]);
 
+  const pixCode =
+    "00020101021126330014br.gov.bcb.pix0111195274927185204000053039865802BR5919JARILSON R T JUNIOR6013RIO DE JANEIR62070503***63047D65";
+
+  if (!user) return null;
   if (loading) return <Loading />;
-  if (error) return <div>Erro: {error}</div>;
-  if (!wallet) return <div>Nenhum dado da carteira encontrado</div>;
+  if (error)
+    return (
+      <div className="p-4 text-center">
+        <Text className="!text-red-500">{error}</Text>
+        <button
+          onClick={refresh}
+          className="mt-2 px-4 py-2 bg-blue-500 text-white rounded"
+        >
+          Tentar novamente
+        </button>
+      </div>
+    );
+  if (!wallet)
+    return <div className="p-4">Nenhum dado da carteira encontrado</div>;
 
   return (
     <Layout>
@@ -80,7 +106,7 @@ export const Wallet = () => {
             </div>
 
             <div className="flex items-center w-full gap-1.5">
-              {wallet.payment_methods.slice(0, 2).map((method) => (
+              {paymentMethods.slice(0, 2).map((method) => (
                 <div
                   key={method.id}
                   className="flex w-fit flex-1 md:flex-none md:min-w-36 h-[94px] rounded-[10px] border-[0.5px] border-[#EAEAEA] bg-white p-2 relative cursor-pointer"
@@ -139,9 +165,9 @@ export const Wallet = () => {
               </button>
             </div>
 
-            {wallet.transactions.length > 0 ? (
+            {transactions.length > 0 ? (
               <div className="w-full space-y-4">
-                {wallet.transactions.map((transaction) => (
+                {transactions.map((transaction) => (
                   <div key={transaction.id} className="flex flex-col gap-1">
                     <Text className="!text-sm !font-medium">
                       {transaction.service_name}
@@ -162,7 +188,7 @@ export const Wallet = () => {
                 ))}
               </div>
             ) : (
-              <Text className="!text-sm !text-gray-500">
+              <Text className="!text-sm m-auto mb-4 !text-gray-500">
                 Nenhuma transação recente
               </Text>
             )}

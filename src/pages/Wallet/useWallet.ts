@@ -1,7 +1,9 @@
-import { useState, useEffect, useCallback } from "react";
+import { toast } from "react-hot-toast";
+import { useState, useEffect, useCallback, useMemo } from "react";
 
 import { supabase } from "@/lib/supabase";
 import { isAndroid } from "@/utils/platform";
+import { detectCardBrand } from "@/utils/utils";
 import { WalletData, PaymentMethod, Transaction } from "./@types";
 
 export const useWallet = (userId: string) => {
@@ -16,12 +18,17 @@ export const useWallet = (userId: string) => {
     setShowBalance(!showBalance);
   };
 
-  // Buscar dados da carteira com useCallback
   const fetchWalletData = useCallback(async () => {
     try {
-      setLoading(true);
+      if (!userId) {
+        setWallet(null);
+        setLoading(false);
+        return;
+      }
 
-      // Buscar wallet incluindo o id
+      setLoading(true);
+      setError(null);
+
       const { data: walletData, error: walletError } = await supabase
         .from("wallet")
         .select("id, balance")
@@ -29,9 +36,8 @@ export const useWallet = (userId: string) => {
         .single();
 
       if (walletError) throw walletError;
-      if (!walletData) throw new Error("Wallet not found");
+      if (!walletData) throw new Error("Carteira não encontrada");
 
-      // Buscar métodos de pagamento existentes
       const { data: paymentMethods, error: methodsError } = await supabase
         .from("payment_methods")
         .select("*")
@@ -39,7 +45,6 @@ export const useWallet = (userId: string) => {
 
       if (methodsError) throw methodsError;
 
-      // Se não houver métodos, cria os padrões
       let methods = paymentMethods;
       if (methods.length === 0) {
         const defaultMethod: Omit<PaymentMethod, "id" | "created_at"> = {
@@ -59,9 +64,9 @@ export const useWallet = (userId: string) => {
 
         if (insertError) throw insertError;
         methods = insertedMethod;
+        toast.success("Método de pagamento padrão adicionado");
       }
 
-      // Buscar transações
       const { data: transactionsData, error: transactionsError } =
         await supabase
           .from("transactions")
@@ -81,7 +86,6 @@ export const useWallet = (userId: string) => {
 
       if (transactionsError) throw transactionsError;
 
-      // Formatando os dados
       const formattedTransactions: Transaction[] = transactionsData.map(
         (item) => ({
           id: item.id,
@@ -100,74 +104,42 @@ export const useWallet = (userId: string) => {
         payment_methods: methods as PaymentMethod[],
         transactions: formattedTransactions,
       });
+
+      toast.success("Dados da carteira atualizados");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro desconhecido");
+      const errorMsg = err instanceof Error ? err.message : "Erro desconhecido";
+      setError(errorMsg);
+      toast.error(`Erro ao carregar carteira: ${errorMsg}`);
       console.error("Error fetching wallet data:", err);
     } finally {
       setLoading(false);
     }
   }, [userId]);
 
-  // Adicionar novo método de pagamento
-  const addPaymentMethod = async (
-    method: Omit<PaymentMethod, "id" | "created_at" | "is_default"> & {
-      card_number?: string;
-      expiry_date?: string;
-      cvv?: string;
+  useEffect(() => {
+    setWallet(null);
+    setError(null);
+
+    if (userId) {
+      fetchWalletData();
     }
-  ) => {
-    try {
-      if (!wallet) return;
+  }, [userId, fetchWalletData]);
 
-      // Para cartões de crédito, processar os dados
-      if (method.method_type === "credit_card" && method.card_number) {
-        const lastFour = method.card_number.slice(-4);
-        const brand = detectCardBrand(method.card_number);
+  const paymentMethods = useMemo(
+    () => wallet?.payment_methods || [],
+    [wallet?.payment_methods]
+  );
+  const transactions = useMemo(
+    () => wallet?.transactions || [],
+    [wallet?.transactions]
+  );
 
-        const { data, error } = await supabase
-          .from("payment_methods")
-          .insert([
-            {
-              wallet_id: wallet.id,
-              method_type: "credit_card",
-              card_last_four: lastFour,
-              card_brand: brand,
-              is_default: false,
-            },
-          ])
-          .select();
-
-        if (error) throw error;
-        await fetchWalletData();
-        return data[0];
-      } else {
-        // Para outros métodos
-        const { data, error } = await supabase
-          .from("payment_methods")
-          .insert([
-            {
-              wallet_id: wallet.id,
-              ...method,
-              is_default: false,
-            },
-          ])
-          .select();
-
-        if (error) throw error;
-        await fetchWalletData();
-        return data[0];
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro ao adicionar método");
-      console.error("Error adding payment method:", err);
-      return null;
-    }
-  };
-
-  // Remover método de pagamento
   const removePaymentMethod = async (methodId: string) => {
     try {
-      if (!wallet) return;
+      if (!wallet) {
+        toast.error("Carteira não disponível");
+        return;
+      }
 
       const { error } = await supabase
         .from("payment_methods")
@@ -176,10 +148,14 @@ export const useWallet = (userId: string) => {
         .eq("wallet_id", wallet.id);
 
       if (error) throw error;
+
       await fetchWalletData();
+      toast.success("Método de pagamento removido com sucesso");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro ao remover método");
-      console.error("Error removing payment method:", err);
+      const errorMsg =
+        err instanceof Error ? err.message : "Erro ao remover método";
+      setError(errorMsg);
+      toast.error(`Erro ao remover método: ${errorMsg}`);
     }
   };
 
@@ -215,13 +191,104 @@ export const useWallet = (userId: string) => {
     if (method.method_type === "pix") {
       setIsPixModalOpen(true);
     }
-    // Você pode adicionar outras lógicas para outros tipos de método aqui
   };
 
-  // Carregar dados quando o hook é inicializado
+  const addPaymentMethod = async (
+    method: Omit<PaymentMethod, "id" | "created_at" | "is_default"> & {
+      cvv?: string;
+      method_type: string;
+      card_number?: string;
+      expiry_date?: string;
+      cardholder_name: string;
+    }
+  ) => {
+    try {
+      if (!wallet) {
+        toast.error("Carteira não carregada. Por favor, tente novamente.");
+        throw new Error("Wallet not loaded");
+      }
+
+      // Validação básica para cartão de crédito
+      if (method.method_type === "credit_card") {
+        if (!method.card_number || method.card_number.length < 13) {
+          toast.error("Número do cartão inválido");
+          throw new Error("Número do cartão inválido");
+        }
+        if (!method.expiry_date) {
+          toast.error("Data de expiração inválida");
+          throw new Error("Data de expiração inválida");
+        }
+      }
+
+      let result;
+      if (method.method_type === "credit_card" && method.card_number) {
+        const lastFour = method.card_number.slice(-4);
+        const brand = detectCardBrand(method.card_number);
+
+        const { data, error } = await supabase
+          .from("payment_methods")
+          .insert([
+            {
+              wallet_id: wallet.id,
+              method_type: "credit_card",
+              card_last_four: lastFour,
+              card_brand: brand,
+              is_default: false,
+              cardholder_name: method.cardholder_name,
+              expiry_date: method.expiry_date,
+            },
+          ])
+          .select();
+
+        if (error) throw error;
+
+        result = data[0];
+        toast.success("Cartão adicionado com sucesso!");
+      } else {
+        const { data, error } = await supabase
+          .from("payment_methods")
+          .insert([
+            {
+              wallet_id: wallet.id,
+              ...method,
+              is_default: false,
+            },
+          ])
+          .select();
+
+        if (error) throw error;
+
+        result = data[0];
+        toast.success("Método de pagamento adicionado com sucesso!");
+      }
+
+      await fetchWalletData();
+      return result;
+    } catch (err) {
+      const errorMsg =
+        err instanceof Error ? err.message : "Erro ao adicionar método";
+      toast.error(errorMsg);
+      console.error("Error adding payment method:", err);
+      throw err; // Re-lança o erro para ser tratado no UI
+    }
+  };
+
   useEffect(() => {
+    setError(null);
+    setWallet(null);
+
+    // if (userId) {
+    //   fetchWalletData()
+    // }
+
     if (userId) {
-      fetchWalletData();
+      toast
+        .promise(fetchWalletData(), {
+          loading: "Carregando dados da carteira...",
+          success: "Dados da carteira carregados!",
+          error: (err) => `Erro ao carregar: ${err.message}`,
+        })
+        .catch(() => {});
     }
   }, [userId, fetchWalletData]);
 
@@ -230,6 +297,8 @@ export const useWallet = (userId: string) => {
     wallet,
     loading,
     showBalance,
+    transactions,
+    paymentMethods,
     isPixModalOpen,
     addPaymentMethod,
     setIsPixModalOpen,
@@ -243,12 +312,3 @@ export const useWallet = (userId: string) => {
     handlePaymentMethodClick,
   };
 };
-
-// Helper para detectar a bandeira do cartão
-function detectCardBrand(cardNumber: string): string {
-  // Implementação simplificada
-  if (/^4/.test(cardNumber)) return "Visa";
-  if (/^5[1-5]/.test(cardNumber)) return "Mastercard";
-  if (/^3[47]/.test(cardNumber)) return "American Express";
-  return "Other";
-}

@@ -1,29 +1,55 @@
 import { useState } from "react";
+
+import { useAuth } from "@/context/AuthContext";
 import { useWallet } from "@/pages/Wallet/useWallet";
 import { CardFormData } from "@/components/organisms/AddCardModal/@types";
 
 export const useAddCardModal = (onClose: () => void) => {
   const [cardData, setCardData] = useState<CardFormData>({
-    number: "",
-    expiry: "",
     cvv: "",
     name: "",
+    number: "",
+    expiry: "",
+    method_type: "credit_card",
   });
+  const { user } = useAuth();
 
   const [loading, setLoading] = useState(false);
-  const { addPaymentMethod } = useWallet("");
+  const { addPaymentMethod } = useWallet(user?.id || "");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
+    if (!cardData.number.replace(/\s/g, "").match(/^\d{13,16}$/)) {
+      setLoading(false);
+      return;
+    }
+
+    if (!cardData.expiry.match(/^(0[1-9]|1[0-2])\/?([0-9]{2})$/)) {
+      setLoading(false);
+      return;
+    }
+
+    if (!cardData.cvv.match(/^\d{3,4}$/)) {
+      setLoading(false);
+      return;
+    }
+    const [month, year] = cardData.expiry.split("/");
+    const expiryDate = `20${year}-${month}-01`;
+
     try {
       await addPaymentMethod({
-        method_type: "credit_card",
+        method_type: cardData.method_type,
         card_number: cardData.number.replace(/\s/g, ""),
-        expiry_date: cardData.expiry,
+        expiry_date: expiryDate,
         cvv: cardData.cvv,
+        cardholder_name: cardData.name,
       });
+
       onClose();
+    } catch (err) {
+      console.error("Erro ao adicionar cartão:", err);
     } finally {
       setLoading(false);
     }

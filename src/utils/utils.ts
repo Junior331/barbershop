@@ -141,13 +141,13 @@ export const getContrastColor = (hexColor: string) => {
 
   // Calcula luminância
   const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-  return luminance > 0.5 ? '#000000' : '#FFFFFF';
+  return luminance > 0.5 ? "#000000" : "#FFFFFF";
 };
 
 export const convertToDateObject = (dateString: string): Date | null => {
   if (!dateString) return null;
-  
-  const [day, month, year] = dateString.split('/');
+
+  const [day, month, year] = dateString.split("/");
   if (!day || !month || !year) return null;
 
   // Cria uma data no formato AAAA-MM-DD
@@ -159,9 +159,16 @@ export const formatDateForSupabase = (dateString: string): string | null => {
   if (!date) return null;
 
   // Formata para AAAA-MM-DD
-  return date.toISOString().split('T')[0];
+  return date.toISOString().split("T")[0];
 };
 
 export const cn = (...inputs: ClassValue[]) => {
   return twMerge(clsx(inputs));
+};
+
+export const detectCardBrand = (cardNumber: string): string => {
+  if (/^4/.test(cardNumber)) return "Visa";
+  if (/^5[1-5]/.test(cardNumber)) return "Mastercard";
+  if (/^3[47]/.test(cardNumber)) return "American Express";
+  return "Other";
 };
