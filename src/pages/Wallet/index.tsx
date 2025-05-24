@@ -51,15 +51,13 @@ export const Wallet = () => {
 
           <div className="flex w-full p-[10px_8px] flex-col items-start gap-[8px] rounded-[5px] bg-white shadow-[0px_4px_44px_0px_rgba(0,0,0,0.06)]">
             <div className="flex items-center justify-between w-full gap-1">
-              <h2 className="flex w-fit h-auto flex-col justify-center text-[#181D27] text-base font-medium">
-                Métodos de pagamento
-              </h2>
+              <Title className="font-normal">Métodos de pagamento</Title>
 
               <button
                 type="button"
-                className="btn p-0 m-0 btn-link border-none !no-underline text-[#181D27] font-[500] text-[12px] inter opacity-80"
+                className="btn p-0 m-0 btn-link border-none !no-underline"
               >
-                Ver mais
+                <Text className="!text-xs !text-[#111827]">Ver mais</Text>
               </button>
             </div>
 
@@ -72,13 +70,13 @@ export const Wallet = () => {
                 />
 
                 <div className="mt-auto">
-                  <p className="flex flex-col justify-center  text-[#181D27] inter textarea-sm font-extralight leading-[19.5px]">
+                  <Text className="!font-light !text-[#111827] !text-sm">
                     Payment
-                  </p>
+                  </Text>
 
-                  <p className="flex flex-col justify-center  text-[#181D27] inter textarea-md font-medium ">
+                  <Title className="!text-[#111827] inter textarea-md font-medium">
                     Apple pay
-                  </p>
+                  </Title>
                 </div>
               </div>
 
@@ -90,13 +88,13 @@ export const Wallet = () => {
                 />
 
                 <div className="mt-auto">
-                  <p className="flex flex-col justify-center  text-[#181D27] inter textarea-sm font-extralight leading-[19.5px]">
+                  <Text className="!font-light !text-[#111827] !text-sm">
                     Visa
-                  </p>
+                  </Text>
 
-                  <p className="flex flex-col justify-center  text-[#181D27] inter textarea-md font-medium leading-[19.5px]">
+                  <Title className="!text-[#111827] inter textarea-md font-medium">
                     **** 3708
-                  </p>
+                  </Title>
                 </div>
               </div>
 
@@ -108,13 +106,13 @@ export const Wallet = () => {
                 />
 
                 <div className="mt-auto">
-                  <p className="flex flex-col justify-center  text-[#181D27] inter textarea-sm font-extralight leading-[19.5px]">
+                  <Text className="!font-light !text-[#111827] !text-sm">
                     Register
-                  </p>
+                  </Text>
 
-                  <p className="flex flex-col justify-center  text-[#181D27] inter textarea-md font-medium leading-[19.5px]">
+                  <Title className="!text-[#111827] inter textarea-md font-medium">
                     new card
-                  </p>
+                  </Title>
                 </div>
               </div>
             </div>
@@ -122,15 +120,13 @@ export const Wallet = () => {
 
           <div className="flex w-full p-[10px_15px] flex-col items-start gap-[25px] rounded-[5px] bg-white shadow-[0px_4px_44px_0px_rgba(0,0,0,0.06)]">
             <div className="flex items-center justify-between w-full gap-1">
-              <h2 className="flex w-fit h-auto flex-col justify-center  text-[#181D27] text-base font-medium leading-[19.5px]">
-                Recent transactions
-              </h2>
+              <Title className="font-normal">Transacções recentes</Title>
 
               <button
                 type="button"
-                className="btn p-0 m-0 btn-link border-none !no-underline text-[#181D27] font-[500] text-[12px] inter opacity-80"
+                className="btn p-0 m-0 btn-link border-none !no-underline"
               >
-                Ver mais
+                <Text className="!text-xs !text-[#181D27]">Ver mais</Text>
               </button>
             </div>
           </div>
