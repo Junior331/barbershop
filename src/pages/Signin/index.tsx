@@ -12,9 +12,9 @@ export const Signin = () => {
   const { formik, loading: emailLoading } = useSignin();
   const [isShowPassword, setIsShowPassword] = useState(false);
   const { signInWithGoogle, loading: googleLoading } = useGoogleSignin();
-  
+
   const loading = emailLoading || googleLoading;
-  
+
   return (
     <div className="flex gap-5 flex-col justify-center items-center p-5 w-full h-full">
       <img width="258" height="258" src={getImage("logo")} alt="Image logo" />
@@ -106,6 +106,17 @@ export const Signin = () => {
 
         <div className="mt-6 grid grid-cols-3 gap-3">
           <button
+            disabled
+            type="button"
+            className="opacity-50 contrast-75 cursor-not-allowed w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
+          >
+            <img
+              src={getIcons("social_facebook")}
+              alt="Facebook"
+              className="h-5 w-5"
+            />
+          </button>
+          <button
             type="button"
             disabled={loading}
             onClick={signInWithGoogle}
@@ -114,17 +125,6 @@ export const Signin = () => {
             <img
               src={getIcons("social_google")}
               alt="Google"
-              className="h-5 w-5"
-            />
-          </button>
-          <button
-            disabled
-            type="button"
-            className="opacity-50 contrast-75 cursor-not-allowed w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
-          >
-            <img
-              src={getIcons("social_facebook")}
-              alt="Facebook"
               className="h-5 w-5"
             />
           </button>
