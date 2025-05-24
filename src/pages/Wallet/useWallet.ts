@@ -3,12 +3,12 @@ import { useState, useEffect, useCallback } from "react";
 import { isIOS } from "@/utils/platform";
 import { supabase } from "@/lib/supabase";
 import { WalletData, PaymentMethod, Transaction } from "./@types";
-
 export const useWallet = (userId: string) => {
   const [wallet, setWallet] = useState<WalletData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Buscar dados da carteira com useCallback
   const fetchWalletData = useCallback(async () => {
     try {
       setLoading(true);
@@ -40,11 +40,11 @@ export const useWallet = (userId: string) => {
 
         // Adiciona método padrão baseado na plataforma
         if (isIOS()) {
-          defaultMethods.push({ method_type: "apple_pay", is_default: false });
-        } else {
-          // Android ou outros dispositivos
-          defaultMethods.push({ method_type: "google_pay", is_default: false });
-        }
+            defaultMethods.push({ method_type: "apple_pay", is_default: false });
+          } else {
+            // Android ou outros dispositivos
+            defaultMethods.push({ method_type: "google_pay", is_default: false });
+          }
 
         // Insere os métodos padrão
         const { data: insertedMethods, error: insertError } = await supabase
@@ -59,7 +59,7 @@ export const useWallet = (userId: string) => {
         methods = insertedMethods;
       }
 
-      // Restante do código permanece igual...
+      // Buscar transações
       const { data: transactionsData, error: transactionsError } = await supabase
         .from("transactions")
         .select(`
@@ -76,6 +76,7 @@ export const useWallet = (userId: string) => {
 
       if (transactionsError) throw transactionsError;
 
+      // Formatando os dados
       const formattedTransactions: Transaction[] = transactionsData.map(item => ({
         id: item.id,
         service_name: item.services?.[0]?.name || "Serviço não especificado",
@@ -100,7 +101,7 @@ export const useWallet = (userId: string) => {
     }
   }, [userId]);
 
-  // Restante do código permanece igual...
+  // Adicionar novo método de pagamento
   const addPaymentMethod = async (
     method: Omit<PaymentMethod, "id" | "created_at" | "is_default"> & {
       card_number?: string;
@@ -111,6 +112,7 @@ export const useWallet = (userId: string) => {
     try {
       if (!wallet) return;
 
+      // Para cartões de crédito, processar os dados
       if (method.method_type === "credit_card" && method.card_number) {
         const lastFour = method.card_number.slice(-4);
         const brand = detectCardBrand(method.card_number);
@@ -130,6 +132,7 @@ export const useWallet = (userId: string) => {
         await fetchWalletData();
         return data[0];
       } else {
+        // Para outros métodos
         const { data, error } = await supabase
           .from("payment_methods")
           .insert([{
@@ -150,6 +153,7 @@ export const useWallet = (userId: string) => {
     }
   };
 
+  // Remover método de pagamento
   const removePaymentMethod = async (methodId: string) => {
     try {
       if (!wallet) return;
@@ -168,6 +172,7 @@ export const useWallet = (userId: string) => {
     }
   };
 
+  // Carregar dados quando o hook é inicializado
   useEffect(() => {
     if (userId) {
       fetchWalletData();
@@ -186,6 +191,7 @@ export const useWallet = (userId: string) => {
 
 // Helper para detectar a bandeira do cartão
 function detectCardBrand(cardNumber: string): string {
+  // Implementação simplificada
   if (/^4/.test(cardNumber)) return "Visa";
   if (/^5[1-5]/.test(cardNumber)) return "Mastercard";
   if (/^3[47]/.test(cardNumber)) return "American Express";
