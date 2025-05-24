@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 
-import { isIOS } from "@/utils/platform";
+import { isAndroid, isIOS } from "@/utils/platform";
 import { supabase } from "@/lib/supabase";
 import { WalletData, PaymentMethod, Transaction } from "./@types";
 export const useWallet = (userId: string) => {
@@ -29,7 +29,8 @@ export const useWallet = (userId: string) => {
         .select("*")
         .eq("wallet_id", walletData.id);
 
-        console.log(`paymentMethods ::`, paymentMethods)
+        console.log(`isAndroid ::`, isAndroid())
+        console.log(`isIOS ::`, isIOS())
 
       if (methodsError) throw methodsError;
 
