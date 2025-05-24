@@ -78,8 +78,8 @@ export const useWallet = (userId: string) => {
 
       const formattedTransactions: Transaction[] = transactionsData.map(item => ({
         id: item.id,
-        service_name: item.services?.name || "Serviço não especificado",
-        barber_name: item.users?.name || "Barbeiro não especificado",
+        service_name: item.services?.[0]?.name || "Serviço não especificado",
+        barber_name: item.users?.[0]?.name || "Barbeiro não especificado",
         payment_method: "Apple Pay",
         date: new Date(item.transaction_date).toLocaleDateString("pt-BR"),
         amount: item.amount,
