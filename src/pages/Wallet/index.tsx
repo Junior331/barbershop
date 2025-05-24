@@ -6,7 +6,6 @@ import { Layout } from "@/components/templates";
 import { useAuth } from "@/context/AuthContext";
 import { Text, Title } from "@/components/elements";
 import { AddCardModal, Header } from "@/components/organisms";
-import { isAndroid, isIOS } from "@/utils/platform";
 
 export const Wallet = () => {
   const { user } = useAuth();
@@ -171,9 +170,6 @@ export const Wallet = () => {
               </Text>
             )}
           </div>
-
-          <h2>isAndroid: {`${isAndroid()}`}</h2>
-          <h2>isIOS: {`${isIOS()}`}</h2>
         </div>
       </div>
 

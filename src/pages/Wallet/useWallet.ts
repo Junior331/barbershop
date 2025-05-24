@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
 
-import { isAndroid, isIOS } from "@/utils/platform";
 import { supabase } from "@/lib/supabase";
+import { isAndroid } from "@/utils/platform";
 import { WalletData, PaymentMethod, Transaction } from "./@types";
+
 export const useWallet = (userId: string) => {
   const [wallet, setWallet] = useState<WalletData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -29,16 +30,13 @@ export const useWallet = (userId: string) => {
         .select("*")
         .eq("wallet_id", walletData.id);
 
-        console.log(`isAndroid ::`, isAndroid())
-        console.log(`isIOS ::`, isIOS())
-
       if (methodsError) throw methodsError;
 
       // Se não houver métodos, cria os padrões
       let methods = paymentMethods;
       if (methods.length === 0) {
         const defaultMethod: Omit<PaymentMethod, "id" | "created_at"> = {
-          method_type: isIOS() ? "apple_pay" : "google_pay",
+          method_type: isAndroid() ? "google_pay" : "apple_pay",
           is_default: true,
         };
 
