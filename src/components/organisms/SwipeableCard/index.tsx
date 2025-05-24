@@ -37,7 +37,7 @@ export const SwipeableCard = ({ item, onDelete }: IProps) => {
           left: 7,
           top: "50%",
           padding: 21.5,
-          minHeight: 130,
+          minHeight: 241,
           display: "flex",
           paddingLeft: 20,
           alignItems: "center",
@@ -120,7 +120,7 @@ export const SwipeableCard = ({ item, onDelete }: IProps) => {
         style={{
           right: 7,
           top: "50%",
-          minHeight: 130,
+          minHeight: 241,
           display: "flex",
           paddingRight: 20,
           alignItems: "center",
