@@ -2,8 +2,15 @@ import { getIcons } from "@/assets/icons";
 import { Header } from "@/components/organisms";
 import { Layout } from "@/components/templates";
 import { formatter } from "@/utils/utils";
+import { useState } from "react";
 
 export const Wallet = () => {
+  const [showBalance, setShowBalance] = useState(true);
+
+  const toggleBalanceVisibility = () => {
+    setShowBalance(!showBalance);
+  };
+
   return (
     <Layout>
       <div className="flex flex-col justify-start items-center h-full w-full">
@@ -15,16 +22,29 @@ export const Wallet = () => {
               Saldo disponível
             </h2>
 
-            <div>
+            <div className="flex items-center gap-2">
               <p className="w-[169.177px] text-[#000] inter textarea-lg font-normal opacity-80">
-                {formatter({
-                  type: "pt-BR",
-                  currency: "BRL",
-                  style: "currency",
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                }).format(1800)}{" "}
+                {showBalance
+                  ? formatter({
+                      type: "pt-BR",
+                      currency: "BRL",
+                      style: "currency",
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }).format(0)
+                  : "••••••"}{" "}
               </p>
+              <button
+                onClick={toggleBalanceVisibility}
+                className="flex items-center justify-center p-1 rounded-full hover:bg-gray-100"
+                aria-label={showBalance ? "Esconder saldo" : "Mostrar saldo"}
+              >
+                <img
+                  src={getIcons(showBalance ? "eye_slash_outline" : "eye_outline")}
+                  alt={showBalance ? "Esconder saldo" : "Mostrar saldo"}
+                  className="w-5 h-5 opacity-60"
+                />
+              </button>
             </div>
           </div>
 
