@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useWallet } from "./useWallet";
 import { formatter } from "@/utils/utils";
 import { getIcons } from "@/assets/icons";
+import { AddCardModal } from "./AddCardModal";
 import { useAuth } from "@/context/AuthContext";
 import { Header } from "@/components/organisms";
 import { Layout } from "@/components/templates";
@@ -9,8 +10,9 @@ import { Text, Title } from "@/components/elements";
 
 export const Wallet = () => {
   const { user } = useAuth();
-  const { wallet, loading, error } = useWallet(user?.id || "");
   const [showBalance, setShowBalance] = useState(true);
+  const { wallet, loading, error } = useWallet(user?.id || "");
+  const [isAddCardModalOpen, setIsAddCardModalOpen] = useState(false);
 
   const toggleBalanceVisibility = () => {
     setShowBalance(!showBalance);
@@ -106,7 +108,10 @@ export const Wallet = () => {
                 </div>
               ))}
 
-              <div className="flex w-fit flex-1 md:flex-none md:min-w-36 h-[94px] rounded-[10px] border-[0.5px] border-[#EAEAEA] bg-white p-2">
+              <div
+                className="flex w-fit flex-1 md:flex-none md:min-w-36 h-[94px] rounded-[10px] border-[0.5px] border-[#EAEAEA] bg-white p-2 cursor-pointer"
+                onClick={() => setIsAddCardModalOpen(true)}
+              >
                 <img
                   alt="Ícone"
                   className="w-6 h-6 absolute"
@@ -114,10 +119,10 @@ export const Wallet = () => {
                 />
                 <div className="mt-auto">
                   <Text className="!font-light !text-[#111827] !text-sm">
-                    Register
+                    Adicionar
                   </Text>
                   <Title className="!text-[#111827] inter textarea-md font-medium">
-                    new card
+                    Cartão
                   </Title>
                 </div>
               </div>
@@ -166,6 +171,11 @@ export const Wallet = () => {
           </div>
         </div>
       </div>
+
+      <AddCardModal
+        isOpen={isAddCardModalOpen}
+        onClose={() => setIsAddCardModalOpen(false)}
+      />
     </Layout>
   );
 };

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 
@@ -21,10 +21,6 @@ export const SwipeableCard = ({ item, onDelete }: IProps) => {
     setIsSwipedLeft,
     setIsSwipedRight,
   });
-
-  useEffect(() => {
-    console.log(`item ::`, item);
-  }, [item]);
 
   return (
     <div

@@ -47,7 +47,6 @@ export const Confirm = () => {
 
   const handleFinalConfirm = async () => {
     setLoading(true);
-    console.log(`currentOrder ::`, currentOrder);
     try {
       if (!user) {
         throw new Error("Usuário não autenticado");

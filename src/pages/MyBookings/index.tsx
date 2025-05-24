@@ -62,9 +62,6 @@ export const MyBookings = () => {
     }
   };
 
-  console.log(`orders ::`, orders);
-
-
   const dotsArray = Array.from({ length: 20 });
 
   if (loading && !orders.length) {

@@ -34,58 +34,57 @@ export const useWallet = (userId: string) => {
       // Se não houver métodos, cria os padrões
       let methods = paymentMethods;
       if (methods.length === 0) {
-        const defaultMethods: Omit<PaymentMethod, "id" | "created_at">[] = [
-          { method_type: "pix", is_default: true }
-        ];
+        const defaultMethod: Omit<PaymentMethod, "id" | "created_at"> = {
+          method_type: isIOS() ? "apple_pay" : "google_pay",
+          is_default: true,
+        };
 
-        // Adiciona método padrão baseado na plataforma
-        if (isIOS()) {
-            defaultMethods.push({ method_type: "apple_pay", is_default: false });
-          } else {
-            // Android ou outros dispositivos
-            defaultMethods.push({ method_type: "google_pay", is_default: false });
-          }
-
-        // Insere os métodos padrão
-        const { data: insertedMethods, error: insertError } = await supabase
+        const { data: insertedMethod, error: insertError } = await supabase
           .from("payment_methods")
-          .insert(defaultMethods.map(m => ({
-            ...m,
-            wallet_id: walletData.id
-          })))
+          .insert([
+            {
+              ...defaultMethod,
+              wallet_id: walletData.id,
+            },
+          ])
           .select();
 
         if (insertError) throw insertError;
-        methods = insertedMethods;
+        methods = insertedMethod;
       }
 
       // Buscar transações
-      const { data: transactionsData, error: transactionsError } = await supabase
-        .from("transactions")
-        .select(`
+      const { data: transactionsData, error: transactionsError } =
+        await supabase
+          .from("transactions")
+          .select(
+            `
           id,
           amount,
           transaction_date,
           status,
           services:service_id(name),
           users:barber_id(name)
-        `)
-        .eq("wallet_id", walletData.id)
-        .order("transaction_date", { ascending: false })
-        .limit(5);
+        `
+          )
+          .eq("wallet_id", walletData.id)
+          .order("transaction_date", { ascending: false })
+          .limit(5);
 
       if (transactionsError) throw transactionsError;
 
       // Formatando os dados
-      const formattedTransactions: Transaction[] = transactionsData.map(item => ({
-        id: item.id,
-        service_name: item.services?.[0]?.name || "Serviço não especificado",
-        barber_name: item.users?.[0]?.name || "Barbeiro não especificado",
-        payment_method: "Apple Pay",
-        date: new Date(item.transaction_date).toLocaleDateString("pt-BR"),
-        amount: item.amount,
-        status: item.status,
-      }));
+      const formattedTransactions: Transaction[] = transactionsData.map(
+        (item) => ({
+          id: item.id,
+          service_name: item.services?.[0]?.name || "Serviço não especificado",
+          barber_name: item.users?.[0]?.name || "Barbeiro não especificado",
+          payment_method: "Apple Pay",
+          date: new Date(item.transaction_date).toLocaleDateString("pt-BR"),
+          amount: item.amount,
+          status: item.status,
+        })
+      );
 
       setWallet({
         id: walletData.id,
@@ -116,16 +115,18 @@ export const useWallet = (userId: string) => {
       if (method.method_type === "credit_card" && method.card_number) {
         const lastFour = method.card_number.slice(-4);
         const brand = detectCardBrand(method.card_number);
-        
+
         const { data, error } = await supabase
           .from("payment_methods")
-          .insert([{
-            wallet_id: wallet.id,
-            method_type: "credit_card",
-            card_last_four: lastFour,
-            card_brand: brand,
-            is_default: false,
-          }])
+          .insert([
+            {
+              wallet_id: wallet.id,
+              method_type: "credit_card",
+              card_last_four: lastFour,
+              card_brand: brand,
+              is_default: false,
+            },
+          ])
           .select();
 
         if (error) throw error;
@@ -135,11 +136,13 @@ export const useWallet = (userId: string) => {
         // Para outros métodos
         const { data, error } = await supabase
           .from("payment_methods")
-          .insert([{
-            wallet_id: wallet.id,
-            ...method,
-            is_default: false,
-          }])
+          .insert([
+            {
+              wallet_id: wallet.id,
+              ...method,
+              is_default: false,
+            },
+          ])
           .select();
 
         if (error) throw error;
