@@ -19,7 +19,7 @@ export const Wallet = () => {
         <Header title={"Carteira"} backPath={"/"} />
 
         <div className="flex flex-col w-full justify-center items-start gap-5 px-4">
-          <div className="flex w-full p-[10px_15px] flex-col items-start gap-[25px] rounded-[5px] bg-white shadow-[0px_4px_44px_0px_rgba(0,0,0,0.06)]">
+          <div className="flex w-full p-[10px_15px] flex-col items-start gap-2.5 rounded-[5px] bg-white shadow-[0px_4px_44px_0px_rgba(0,0,0,0.06)]">
             <div className="flex items-center justify-between w-full gap-2">
               <Title className="font-medium">Saldo disponível</Title>
               <button
@@ -36,7 +36,7 @@ export const Wallet = () => {
                 />
               </button>
             </div>
-            <Text className="text-[#181D27]">
+            <Text className="!text-base font-medium text-[#181D27]">
               {showBalance
                 ? formatter({
                     type: "pt-BR",
