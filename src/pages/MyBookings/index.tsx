@@ -159,7 +159,7 @@ export const MyBookings = () => {
                             />
                           </CircleIcon>
                           <div className="flex flex-col justify-start items-start w-full gap-2 flex-grow pl-2 relative">
-                            <Title className="font-bold leading-[150%] truncate max-w-[calc(100vw-32px)]">
+                            <Title className="font-bold leading-[150%] truncate max-w-[65%]">
                               {order.services.map((s) => s.name).join(", ")}
                             </Title>
 

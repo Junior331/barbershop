@@ -81,7 +81,7 @@ export const Services = () => {
                       </CircleIcon>
 
                       <div className="flex flex-col justify-start items-start w-full h-auto gap-2 flex-grow pl-2">
-                        <Title className="w-full text-start truncate max-w-[70%]">
+                        <Title className="w-full text-start truncate max-w-[65%]">
                           {item.name}
                         </Title>
 

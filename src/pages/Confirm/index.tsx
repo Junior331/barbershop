@@ -129,7 +129,7 @@ export const Confirm = () => {
               >
                 <div
                   key={service.id}
-                  className="flex py-2.5 px-3.5 justify-between items-center self-stretch rounded-md bg-white shadow-lg relative"
+                  className="flex flex-col py-2.5 px-3.5 justify-between items-center self-stretch rounded-md bg-white shadow-lg relative"
                 >
                   <CircleIcon className="min-w-32 h-32 my-auto overflow-hidden">
                     <img

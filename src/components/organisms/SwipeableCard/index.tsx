@@ -70,8 +70,8 @@ export const SwipeableCard = ({ item, onDelete }: IProps) => {
             
           }}
         >
-          <div className="flex items-center w-full h-full">
-            <CircleIcon className="min-w-[87px] h-[87px] my-auto overflow-hidden">
+          <div className="flex flex-col items-center w-full h-full">
+            <CircleIcon className="w-32 h-32 my-auto overflow-hidden">
               <img
                 alt={`Service ${item.services[0]?.name}`}
                 src={item.services[0]?.icon || getServices("fallback")}

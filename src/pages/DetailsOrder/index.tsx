@@ -7,7 +7,7 @@ import { getIcons } from "@/assets/icons";
 import { useOrders } from "@/hooks/useOrders";
 import { Layout } from "@/components/templates";
 import { Header } from "@/components/organisms";
-import { Loading } from "@/components/elements";
+import { CircleIcon, Loading } from "@/components/elements";
 import { formatCustomDateTime, formatter } from "@/utils/utils";
 
 export const DetailsOrder = () => {
@@ -171,14 +171,14 @@ export const DetailsOrder = () => {
                 }}
                 className="w-full"
               >
-                <div className="flex py-2.5 px-3.5 justify-between items-center self-stretch rounded-md bg-white shadow-lg relative">
-                  <div className="size-32 p-5 bg-[#FFFFFF] rounded-[70px] border-2 border-white shadow-[0px_1px_4px_0px_rgba(156,163,175,0.40)]">
+                <div className="flex flex-col py-2.5 px-3.5 justify-between items-center self-stretch rounded-md bg-white shadow-lg relative">
+                  <CircleIcon className="w-32 h-32 my-auto overflow-hidden">
                     <img
-                      alt="Image avatar"
+                      alt="Image service"
                       src={service.icon || getIcons("fallback")}
-                      className="size-full"
+                      className="w-[calc(100%-25px)] h-[calc(100%-25px)] object-cover"
                     />
-                  </div>
+                  </CircleIcon>
 
                   <div className="flex flex-col justify-start items-start w-full flex-grow pl-2 gap-3 mt-4">
                     <p className="text-[#6B7280] dm_sans text-base font-light">
