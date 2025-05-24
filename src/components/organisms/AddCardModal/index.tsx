@@ -102,7 +102,7 @@ export const AddCardModal = ({ isOpen, onClose }: AddCardModalProps) => {
             />
           </div>
 
-          <div className="modal-action">
+          <div className="modal-action flex items-center justify-between">
             <button
               type="button"
               onClick={onClose}
@@ -118,7 +118,7 @@ export const AddCardModal = ({ isOpen, onClose }: AddCardModalProps) => {
               {loading ? (
                 <span className="loading loading-spinner"></span>
               ) : (
-                "Adicionar cartão"
+                "Adicionar"
               )}
             </button>
           </div>
