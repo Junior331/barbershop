@@ -10,26 +10,11 @@ import { AddCardModal, Header } from "@/components/organisms";
 export const Wallet = () => {
   const { user } = useAuth();
   const [showBalance, setShowBalance] = useState(true);
-  const { wallet, loading, error } = useWallet(user?.id || "");
+  const { wallet, loading, error, getPaymentMethodIcon, getPaymentMethodLabel } = useWallet(user?.id || "");
   const [isAddCardModalOpen, setIsAddCardModalOpen] = useState(false);
 
   const toggleBalanceVisibility = () => {
     setShowBalance(!showBalance);
-  };
-
-  const getPaymentMethodIcon = (methodType: string) => {
-    switch (methodType) {
-      case "pix":
-        return "pix_solid";
-      case "apple_pay":
-        return "apple_solid";
-      case "google_pay":
-        return "apple_solid";
-      case "credit_card":
-        return "card_credit";
-      default:
-        return "card_add";
-    }
   };
 
   if (loading) return <div>Carregando...</div>;
@@ -100,12 +85,12 @@ export const Wallet = () => {
                     <Text className="!font-light !text-[#111827] !text-sm">
                       {method.method_type === "credit_card"
                         ? method.card_brand
-                        : "Payment"}
+                        : "Pagamento"}
                     </Text>
                     <Title className="!text-[#111827] inter textarea-md font-medium">
                       {method.method_type === "credit_card"
                         ? `**** ${method.card_last_four}`
-                        : "Apple pay"}
+                        : getPaymentMethodLabel(method.method_type)}
                     </Title>
                   </div>
                 </div>

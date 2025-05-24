@@ -176,6 +176,34 @@ export const useWallet = (userId: string) => {
     }
   };
 
+  const getPaymentMethodIcon = (methodType: string) => {
+    switch (methodType) {
+      case "pix":
+        return "pix_solid";
+      case "apple_pay":
+        return "apple_solid";
+      case "google_pay":
+        return "apple_solid";
+      case "credit_card":
+        return "card_credit";
+      default:
+        return "card_add";
+    }
+  };
+
+  const getPaymentMethodLabel = (methodType: string) => {
+    switch (methodType) {
+      case "apple_pay":
+        return "Apple Pay";
+      case "google_pay":
+        return "Google Pay";
+      case "pix":
+        return "PIX";
+      default:
+        return "Pagamento";
+    }
+  };
+
   // Carregar dados quando o hook é inicializado
   useEffect(() => {
     if (userId) {
@@ -184,12 +212,14 @@ export const useWallet = (userId: string) => {
   }, [userId, fetchWalletData]);
 
   return {
+    error,
     wallet,
     loading,
-    error,
-    refresh: fetchWalletData,
     addPaymentMethod,
     removePaymentMethod,
+    getPaymentMethodIcon,
+    getPaymentMethodLabel,
+    refresh: fetchWalletData,
   };
 };
 
