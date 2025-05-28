@@ -1,154 +1,28 @@
 import { create } from "zustand";
+import { IOrderState } from "@/utils/types";
 
-import { OrderStore, Service } from "@/utils/types";
-
-const calculatePaymentFee = (method: string, amount: number): number => {
-  if (method === "pix") return amount * 0.01;
-  if (method === "credit_card") return amount * 0.084;
-  return 0;
-};
-
-export const useOrderStore = create<OrderStore>((set) => ({
-  currentOrder: {
-    id: "",
-    total: 0,
-    date: null,
-    barber: {
-      id: '',
-      cuts: 0,
-      type: "",
-      name: "",
-      image: "",
-      rating: 0,
-      location: "",
-    },
-    subTotal: 0,
-    discount: 0,
-    services: [],
-    location: "",
-    paymentFee: 0,
-    duration: 0,
-    barber_id: "",
-    client_id: "",
-    date_time: "",
-    service_id: "",
-    created_at: "",
-    payment_fee: 0,
-    total_price: 0,
-    status: "pending",
-    paymentMethod: "",
-    payment_method: ""
-  },
-  orders: [],
-  actions: {
-    addOrder: (order) =>
-      set((state) => ({
-        orders: [...state.orders, order],
-        currentOrder: {
-          ...state.currentOrder,
-          id: "",
-          total: 0,
-          barber: {
-            id: '',
-            cuts: 0,
-            type: "",
-            name: "",
-            image: "",
-            rating: 0,
-            location: "",
-          },
-          date: null,
-          discount: 0,
-          subTotal: 0,
-          services: [],
-          paymentFee: 0,
-          paymentMethod: "",
-          status: "pending",
-          location: state.currentOrder.location,
-        },
-      })),
-
-    updateOrderStatus: (orderId, status) =>
-      set((state) => ({
-        orders: state.orders.map((order) =>
-          order.id === orderId ? { ...order, status } : order
-        ),
-      })),
-
-    setDate: (date) =>
-      set((state) => ({
-        currentOrder: { ...state.currentOrder, date },
-      })),
-    toggleService: (service: Service) =>
-      set((state) => {
-        const exists = state.currentOrder.services.some(
-          (s) => s.id === service.id
-        );
-        const newServices = exists
-          ? state.currentOrder.services.filter((s) => s.id !== service.id)
-          : [...state.currentOrder.services, service];
-
-        const subTotal = newServices.reduce((sum, s) => sum + s.price, 0);
-        const paymentFee = calculatePaymentFee(
-          state.currentOrder.paymentMethod,
-          subTotal
-        );
-        const total = subTotal - state.currentOrder.discount + paymentFee;
-
+export const useOrder = create<IOrderState>((set) => ({
+  date: null,
+  time: null,
+  services: [],
+  barber: null,
+  toggleService: (service) =>
+    set((state) => {
+      const existingIndex = state.services.findIndex(
+        (s) => s.id === service.id
+      );
+      if (existingIndex >= 0) {
         return {
-          currentOrder: {
-            ...state.currentOrder,
-            services: newServices,
-            subTotal,
-            paymentFee,
-            total,
-          },
+          services: [
+            ...state.services.slice(0, existingIndex),
+            ...state.services.slice(existingIndex + 1),
+          ],
         };
-      }),
-    setDiscount: (discount) =>
-      set((state) => {
-        const total =
-          state.currentOrder.subTotal -
-          discount +
-          state.currentOrder.paymentFee;
-        return {
-          currentOrder: {
-            ...state.currentOrder,
-            discount,
-            total,
-          },
-        };
-      }),
-    setPaymentMethod: (method) =>
-      set((state) => {
-        const paymentFee = calculatePaymentFee(
-          method,
-          state.currentOrder.subTotal
-        );
-        const total =
-          state.currentOrder.subTotal -
-          state.currentOrder.discount +
-          paymentFee;
-
-        return {
-          currentOrder: {
-            ...state.currentOrder,
-            paymentMethod: method,
-            paymentFee,
-            total,
-          },
-        };
-      }),
-
-    setBarber: (barber) =>
-      set((state) => ({
-        currentOrder: {
-          ...state.currentOrder,
-          barber: barber,
-        },
-      })),
-  },
+      }
+      return { services: [...state.services, service] };
+    }),
+  clearServices: () => set({ services: [] }),
+  setBarber: (barber) => set({ barber }),
+  setDateTime: (date, time) => set({ date, time }),
+  clearOrder: () => set({ services: [], barber: null, date: null, time: null }),
 }));
-
-export const useOrder = () => useOrderStore((state) => state.currentOrder);
-export const useOrderActions = () => useOrderStore((state) => state.actions);

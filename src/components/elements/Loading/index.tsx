@@ -17,7 +17,7 @@ export const Loading = () => (
       }}
     />
 
-    <motion.p
+    <motion.div
       className="flex gap-1 items-end text-xl text-text leading-[12px]"
       initial="hidden"
       animate="visible"
@@ -41,6 +41,6 @@ export const Loading = () => (
         />
       ))}
 
-    </motion.p>
+    </motion.div>
   </div>
 );

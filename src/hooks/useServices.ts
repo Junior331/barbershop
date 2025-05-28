@@ -1,11 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
 
-import { Service } from "@/utils/types";
 import { supabase } from "@/lib/supabase";
+import { IService } from "@/utils/types";
 
 export const useServices = () => {
-  const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
+  const [services, setServices] = useState<IService[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   const fetchServices = useCallback(async () => {
@@ -14,14 +14,17 @@ export const useServices = () => {
       const { data, error: supabaseError } = await supabase
         .from("services")
         .select("*")
-        .order("name", { ascending: true });
+        .eq("is_active", true)
+        .order("nome", { ascending: true });
 
       if (supabaseError) throw supabaseError;
-      setServices(data.filter((item) => item.public) || []);
+
+      setServices(data || []);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Falha ao carregar serviços"
-      );
+      const errorMessage =
+        err instanceof Error ? err.message : "Falha ao carregar serviços";
+      setError(errorMessage);
+      console.error("Erro ao buscar serviços:", err);
     } finally {
       setLoading(false);
     }
@@ -31,12 +34,23 @@ export const useServices = () => {
     fetchServices();
   }, [fetchServices]);
 
-  // Função para buscar um serviço específico por ID
   const getServiceById = useCallback(async (id: string) => {
     try {
       const { data, error: supabaseError } = await supabase
         .from("services")
-        .select("*")
+        .select(
+          `
+          id,
+          nome,
+          descricao,
+          duracao_minutos,
+          imagem_url,
+          preco,
+          desconto,
+          is_active,
+          created_at
+        `
+        )
         .eq("id", id)
         .single();
 

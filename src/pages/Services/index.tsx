@@ -1,21 +1,26 @@
 import { useNavigate } from "react-router-dom";
 
-import { formatter } from "@/utils/utils";
 import { getIcons } from "@/assets/icons";
+import { cn, formatter } from "@/utils/utils";
 import { Layout } from "@/components/templates";
+import { useOrder } from "@/store/useOrderStore";
 import { useServices } from "@/hooks/useServices";
 import { Card, Header } from "@/components/organisms";
-import { useOrder, useOrderActions } from "@/store/useOrderStore";
-import { Button, CircleIcon, Loading, Text, Title } from "@/components/elements";
+import {
+  Text,
+  Title,
+  Button,
+  Loading,
+  CircleIcon,
+} from "@/components/elements";
 
 export const Services = () => {
   const navigate = useNavigate();
-  const { toggleService } = useOrderActions();
-  const { services: selectedServices } = useOrder();
+  const { services: selectedServices, toggleService } = useOrder();
 
   const { services, loading, error } = useServices();
 
-  const isServiceSelected = (id: number): boolean =>
+  const isServiceSelected = (id: string): boolean =>
     selectedServices.some((service) => service.id === id);
 
   if (loading) return <Loading />;
@@ -64,39 +69,53 @@ export const Services = () => {
                       minWidth: "100%",
                       minHeight: "100%",
                     }}
+                    className={cn(checked && "!bg-[#99B58E]")}
                   >
                     <div className="flex items-center w-full h-auto flex-1 relative">
-                      {Boolean(item.discount) && (
+                      {Boolean(item.desconto) && (
                         <div className="absolute -top-4 -right-4 bg-[#6C8762] text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-sm">
-                          {item.discount}%
+                          {item.desconto}%
                         </div>
                       )}
 
                       <CircleIcon className="!max-w-32 !max-h-32">
                         <img
-                          src={item.icon}
-                          alt={`Service ${item.name}`}
+                          src={item.imagem_url || getIcons("fallback")}
+                          alt={`Service ${item.nome}`}
                           className="w-[calc(100%-15px)] h-[calc(100%-15px)] object-cover"
                         />
                       </CircleIcon>
 
                       <div className="flex flex-col justify-start items-start w-full h-auto gap-2 flex-grow pl-2">
                         <Title className="w-full text-start truncate max-w-[65%]">
-                          {item.name}
+                          {item.nome}
                         </Title>
 
-                        <Text className="flex items-center gap-[5px] truncate max-w-[calc(100% - 25px)]">
+                        <Text
+                          className={cn(
+                            "flex items-center gap-[5px] truncate max-w-[calc(100% - 25px)]",
+                            checked && "text-[#111827]"
+                          )}
+                        >
                           <img
                             alt="Icon clock"
-                            className="size-5"
+                            className={cn(
+                              "size-5",
+                              checked && "brightness-[0.65]"
+                            )}
                             src={getIcons("clock_outlined_green")}
                           />
-                          <div className="h-2.5 rounded-2xl w-[0.8px] bg-[#6B7280] " />
-                          {item.time}min
+                          <div
+                            className={cn(
+                              "h-2.5 rounded-2xl w-[0.8px] bg-[#6B7280]",
+                              checked && "bg-[#111827]"
+                            )}
+                          />
+                          {item.duracao_minutos}min
                         </Text>
 
                         <div className="flex flex-col items-center gap-[5px] absolute right-2 bottom-2">
-                          {Boolean(item.discount) && (
+                          {Boolean(item.desconto) && (
                             <Text className="line-through">
                               {formatter({
                                 type: "pt-BR",
@@ -105,7 +124,7 @@ export const Services = () => {
                                 minimumFractionDigits: 2,
                                 maximumFractionDigits: 2,
                               }).format(
-                                item.price / (1 - (item?.discount || 1) / 100)
+                                item.preco / (1 - (item?.desconto || 1) / 100)
                               )}
                             </Text>
                           )}
@@ -116,7 +135,7 @@ export const Services = () => {
                               style: "currency",
                               minimumFractionDigits: 2,
                               maximumFractionDigits: 2,
-                            }).format(item.price || 0)}
+                            }).format(item.preco || 0)}
                           </Title>
                         </div>
                       </div>
@@ -126,7 +145,10 @@ export const Services = () => {
                         type="checkbox"
                         name="rememberMe"
                         checked={checked}
-                        className="absolute top-[7px] right-[5px] self-stretch checkbox custom_before_service w-4 h-4 border border-[#6b7280] p-[3px] rounded-3xl !shadow-none"
+                        className={cn(
+                          "absolute top-[7px] right-[5px] self-stretch checkbox custom_before_service w-4 h-4 border border-[#6b7280] p-[3px] rounded-3xl !shadow-none",
+                          checked && "border-[#111827] brightness-[0.65]"
+                        )}
                       />
                     </div>
                   </Card>
@@ -137,10 +159,11 @@ export const Services = () => {
 
           <Button
             type="button"
+            className="bottom-0 sticky max-w-80 m-auto h-14"
             disabled={!selectedServices.length}
             onClick={() => navigate("/barbers")}
           >
-            {/* {selectedServices.length
+            {selectedServices.length
               ? `Confirmar • ${formatter({
                   type: "pt-BR",
                   currency: "BRL",
@@ -149,12 +172,11 @@ export const Services = () => {
                   maximumFractionDigits: 2,
                 }).format(
                   selectedServices.reduce(
-                    (total, service) => total + service.price,
+                    (total, service) => total + service.preco,
                     0
                   )
                 )}`
-              : "Confirmar"} */}
-            Confirmar
+              : "Confirmar"}
           </Button>
         </div>
       </div>
