@@ -1,3 +1,5 @@
+import { User } from "@supabase/supabase-js";
+
 export type formatterProps = {
   type?: string;
   currency?: string;
@@ -19,81 +21,6 @@ export type randomMessage = {
   message: string;
 };
 
-// export type Service = {
-//   id: number;
-//   name: string;
-//   time: number;
-//   icon: string;
-//   price: number;
-//   public: boolean;
-//   discount: number;
-//   checked?: boolean;
-//   created_at: string;
-//   description?: string;
-// };
-
-// export type BarberSchedule = {
-//   endTime: string; // "18:00"
-//   weekday: number; // 0 (domingo) a 6 (sábado)
-//   startTime: string; // "08:00"
-// };
-
-// export type BarberType = {
-//   id: string;
-//   type: string;
-//   cuts: number;
-//   name: string;
-//   image: string;
-//   rating: number;
-//   location: string;
-//   checked?: boolean;
-//   schedule?: BarberSchedule[];
-// };
-
-// export interface Order {
-//   id: string;
-//   total: number;
-//   discount: number;
-//   subTotal: number;
-//   location: string;
-//   duration: number;
-//   barber_id: string;
-//   client_id: string;
-//   date_time: string;
-//   service_id: string;
-//   paymentFee: number;
-//   created_at: string;
-//   barber: BarberType;
-//   date: string | null;
-//   services: Service[];
-//   payment_fee: number;
-//   total_price: number;
-//   payment_method: string;
-//   status: 'pending' | 'confirmed' | 'canceled' | 'completed';
-//   paymentMethod: "pix" | "credit_card" | "debit_card" | string;
-// }
-
-// export interface CurrentOrder extends Omit<Order, "id" | "status"> {
-//   id: string;
-//   status: "pending" | "confirmed" | "canceled";
-// }
-
-// export interface OrderActions {
-//   addOrder: (order: Order) => void;
-//   setBarber: (barber: BarberType) => void;
-//   setDiscount: (discount: number) => void;
-//   toggleService: (service: Service) => void;
-//   setDate: (dateTime: string | null) => void;
-//   setPaymentMethod: (method: string) => void;
-//   updateOrderStatus: (orderId: string, status: Order["status"]) => void;
-// }
-
-// export interface OrderStore {
-//   orders: Order[];
-//   actions: OrderActions;
-//   currentOrder: CurrentOrder;
-// }
-
 export type UseAvatarOptions = {
   size?: number;
   rounded?: boolean;
@@ -103,24 +30,94 @@ export type UseAvatarOptions = {
 
 export interface IService {
   id: string;
-  nome: string;
-  preco: number;
-  desconto: number;
-  imagem_url: string;
-  duracao_minutos: number;
-  descricao: string;
+  name: string;
+  price: number;
+  discount: number;
+  image_url: string;
   is_active: boolean;
   created_at: string;
+  description?: string;
+  duration_minutes: number;
+}
+
+export interface BarberService {
+  id: string;
+  name: string;
+  price: number;
+  duration_minutes: number;
+  image_url: string | null;
+  description: string | null;
+}
+
+export interface BarberDetails {
+  id: string;
+  is_active: boolean;
+  barber_rating: number;
+  // cuts_completed?: number;
+  description: string | null;
+}
+
+export interface IBarber {
+  id: string;
+  role: "barber" | "admin";
+  name: string;
+  services: string[];
+  email: string | null;
+  phone: string | null;
+  total_price?: number;
+  avatar_url: string | null;
+  barber_details: BarberDetails;
+  services_full: BarberService[];
 }
 
 export interface IOrderState {
   date: Date | null;
   time: string | null;
   services: IService[];
+  barber: IBarber | null;
   clearOrder: () => void;
   clearServices: () => void;
   toggleService: (service: IService) => void;
-  barber: { id: string; name: string } | null;
-  setDateTime: (date: Date, time: string) => void;
-  setBarber: (barber: { id: string; name: string }) => void;
+  setBarber: (barber: IBarber) => void;
+  setDateTime: (date: Date | null, time: string | null) => void;
+}
+
+export interface IUserData extends User {
+  role: string;
+  name: string;
+  city: string;
+  state: string;
+  email: string;
+  phone: string;
+  street: string;
+  auth_id: string;
+  country: string;
+  biography: string;
+  is_verified: true;
+  created_at: string;
+  avatar_url: string;
+  birth_date: string;
+  updated_at: string;
+  postal_code: string;
+  neighborhood: string;
+  password_hash: string;
+}
+
+export interface BarberResponse {
+  barber_id: string;
+  barber_name: string;
+  total_price: number;
+  barber_rating: number;
+  barber_email: string | null;
+  barber_phone: string | null;
+  services_info: BarberService[];
+  barber_description: string | null;
+  barber_avatar_url: string | null;
+}
+
+export interface UseBarbersResult {
+  loading: boolean;
+  barbers: IBarber[];
+  error: string | null;
+  refetch: () => Promise<void>;
 }

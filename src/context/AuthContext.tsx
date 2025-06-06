@@ -1,17 +1,17 @@
-import { User } from "@supabase/supabase-js";
+import { IUserData } from "@/utils/types";
 import { createContext, useContext, useState } from "react";
 
 interface AuthContextType {
-  user: User | null;
-  setAuth: (user: User | null) => void;
+  user: IUserData | null;
+  setAuth: (user: IUserData | null) => void;
 }
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<IUserData | null>(null);
 
-  const setAuth = (authUser: User | null) => {
+  const setAuth = (authUser: IUserData | null) => {
     setUser(authUser);
   };
 

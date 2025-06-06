@@ -1,6 +1,7 @@
-import { User } from "@supabase/supabase-js";
 import { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
+
+import { IUserData } from "@/utils/types";
 
 export interface AccountHeaderProps {
   title?: string;
@@ -22,6 +23,6 @@ export interface AccountItem {
 }
 
 export interface AccountItems {
-  setAuth: (user: User | null) => void;
+  setAuth: (user: IUserData | null) => void;
   navigate: ReturnType<typeof useNavigate>;
 }

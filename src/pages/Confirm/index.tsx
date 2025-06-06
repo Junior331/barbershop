@@ -3,11 +3,10 @@ import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 
-import { Order } from "@/utils/types";
 import { getIcons } from "@/assets/icons";
 import { Header } from "@/components/organisms";
 import { Layout } from "@/components/templates";
-import { useOrder, useOrderActions } from "@/store/useOrderStore";
+import { useOrder } from "@/store/useOrderStore";
 import {
   formatter,
   formatPercentage,
@@ -23,11 +22,10 @@ export const Confirm = () => {
   const currentOrder = useOrder();
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { addOrder, toggleService } = useOrderActions();
   const [selectedMethod, setSelectedMethod] = useState<string>("");
 
   const handleDelete = (serviceId: number) => {
-    toggleService({
+    currentOrder.toggleService({
       time: 0,
       name: "",
       icon: "",
@@ -83,14 +81,14 @@ export const Confirm = () => {
 
       if (error) throw error;
 
-      const newOrder: Order = {
-        ...currentOrder,
-        id: data[0].id,
-        status: "confirmed",
-        date: currentOrder.date,
-      };
+      // const newOrder: Order = {
+      //   ...currentOrder,
+      //   id: data[0].id,
+      //   status: "confirmed",
+      //   date: currentOrder.date,
+      // };
 
-      addOrder(newOrder);
+      // currentOrder.addOrder(newOrder);
       navigate("/mybookings");
     } catch (error: unknown) {
       const errorMessage =

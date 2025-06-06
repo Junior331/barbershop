@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { IOrderState } from "@/utils/types";
-
+ 
 export const useOrder = create<IOrderState>((set) => ({
   date: null,
   time: null,

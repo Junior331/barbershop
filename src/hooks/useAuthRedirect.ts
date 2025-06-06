@@ -20,7 +20,6 @@ export const useAuthRedirect = () => {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session) {
-        setAuth(session.user);
         if (isPublicRoute) {
           navigate("/");
         }
@@ -40,7 +39,15 @@ export const useAuthRedirect = () => {
   useEffect(() => {
     const checkAuth = async () => {
       const { data } = await supabase.auth.getSession();
-      
+
+      const { data: customUser } = await supabase
+        .from("users")
+        .select("*")
+        .eq("id", data.session?.user.id)
+        .single();
+
+      setAuth(customUser);
+
       if (!data.session && !isPublicRoute) {
         navigate("/signin");
       }

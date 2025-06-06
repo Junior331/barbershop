@@ -35,29 +35,25 @@ export const useSignup = () => {
           options: {
             data: {
               name: values.name,
-              email: values.email,
             },
+            emailRedirectTo: `${window.location.origin}/signin`,
           },
         });
-        
-        if (signUpError) {
-          if (signUpError.message.includes("User already registered")) {
-            setError("Este e-mail já está cadastrado");
-          } else {
-            setError(signUpError.message);
-          }
-          setLoading(false);
-          return;
-        }
 
-        if (signUpError) {
-          throw signUpError;
-        }
+        if (signUpError) throw signUpError;
 
-        toast.success("Usuário cadastrado com sucesso!");
+        const { error: rpcError } = await supabase
+          .rpc('register_user_with_role', {
+            name: values.name,
+            email: values.email,
+            password: values.password,
+            role: 'client'
+          });
 
+        if (rpcError) throw rpcError;
+
+        toast.success("Usuário cadastrado com sucesso! Verifique seu e-mail para confirmação.");
         navigate("/signin");
-
       } catch (error: unknown) {
         const errorMessage =
           error instanceof Error
@@ -65,7 +61,6 @@ export const useSignup = () => {
             : "Erro ao realizar o cadastrado.";
 
         toast.error(errorMessage);
-
         setError(errorMessage);
       } finally {
         setLoading(false);

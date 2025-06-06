@@ -25,7 +25,7 @@ export const Signup = () => {
             Nome
           </label>
           <input
-            type="name"
+            type="text"
             name="name"
             onBlur={formik.handleBlur}
             value={formik.values.name}
@@ -121,9 +121,11 @@ export const Signup = () => {
         <button
           type="submit"
           disabled={loading}
-          className="btn max-w-full border-none bg-[#6C8762] rounded text-[14px] text-[#FFF] py-[10px] font-[500] tracking-[0.4px]"
+          className={`btn max-w-full border-none rounded text-[14px] text-white py-[10px] font-[500] tracking-[0.4px] ${
+            loading ? "bg-gray-400 cursor-not-allowed" : "bg-[#6C8762]"
+          }`}
         >
-          Registrar
+          {loading ? "Registrando..." : "Registrar"}
         </button>
       </form>
 

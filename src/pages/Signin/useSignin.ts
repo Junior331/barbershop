@@ -3,8 +3,8 @@ import { useFormik } from "formik";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
-import { supabase } from "@/lib/supabase";
 import { schema } from "./schema";
+import { supabase } from "@/lib/supabase";
 
 export const useSignin = () => {
   const navigate = useNavigate();
@@ -21,19 +21,34 @@ export const useSignin = () => {
       setLoading(true);
 
       try {
-        const { error: supabaseError } = await supabase.auth.signInWithPassword(
-          {
-            email: values.email,
-            password: values.password,
-          }
-        );
+        const { data: { user }, error } = await supabase.auth.signInWithPassword({
+          email: values.email,
+          password: values.password,
+        });
 
-        if (supabaseError) {
-          throw new Error(supabaseError.message);
+        if (error) throw error;
+
+        // Verificar se o usuário está na tabela public.users
+        const { data: publicUser, error: publicUserError } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', user?.id)
+          .single();
+
+        if (publicUserError || !publicUser) {
+          await supabase.auth.signOut();
+          throw new Error('Perfil de usuário não encontrado');
         }
 
         toast.success("Login realizado com sucesso!");
-        navigate("/");
+        
+        // Redirecionar baseado no role
+        if (publicUser.role === 'admin' || publicUser.role === 'barber') {
+          navigate('/barber/dashboard');
+        } else {
+          navigate('/');
+        }
+
       } catch (error: unknown) {
         const errorMessage =
           error instanceof Error

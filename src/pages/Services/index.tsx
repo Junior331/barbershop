@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { getIcons } from "@/assets/icons";
@@ -16,12 +17,25 @@ import {
 
 export const Services = () => {
   const navigate = useNavigate();
-  const { services: selectedServices, toggleService } = useOrder();
-
+  const [isLoading, setIsLoading] = useState(true);
   const { services, loading, error } = useServices();
+  const { services: selectedServices, toggleService } = useOrder();
 
   const isServiceSelected = (id: string): boolean =>
     selectedServices.some((service) => service.id === id);
+
+  const handleImageLoad = () => {
+    setIsLoading(false);
+  };
+
+  const handleImageError = (
+    e: React.SyntheticEvent<HTMLImageElement>,
+    avatarUrl: string
+  ) => {
+    const target = e.target as HTMLImageElement;
+    target.src = avatarUrl;
+    setIsLoading(false);
+  };
 
   if (loading) return <Loading />;
 
@@ -57,12 +71,16 @@ export const Services = () => {
 
               return (
                 <div
-                  tabIndex={0}
-                  key={item.id}
                   role="button"
+                  tabIndex={0}
                   onClick={() => toggleService(item)}
                   onKeyDown={(e) => e.key === "Enter" && toggleService(item)}
-                  className="btn size-auto bg-transparent border-0 shadow-none min-h-24 p-0"
+                  className={cn(
+                    "w-full h-auto bg-transparent border-0 shadow-none p-0",
+                    "focus:outline-none cursor-pointer",
+                    "transition-transform hover:scale-[1.005] active:scale-[0.98]"
+                  )}
+                  aria-label={`Select service ${item.name}`}
                 >
                   <Card
                     style={{
@@ -72,23 +90,34 @@ export const Services = () => {
                     className={cn(checked && "!bg-[#99B58E]")}
                   >
                     <div className="flex items-center w-full h-auto flex-1 relative">
-                      {Boolean(item.desconto) && (
+                      {Boolean(item.discount) && (
                         <div className="absolute -top-4 -right-4 bg-[#6C8762] text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-sm">
-                          {item.desconto}%
+                          {item.discount}%
                         </div>
                       )}
 
                       <CircleIcon className="!max-w-32 !max-h-32">
+                        {isLoading && (
+                          <div className="size-full flex items-center justify-center">
+                            <div className="loading loading-spinner text-white"></div>
+                          </div>
+                        )}
+
                         <img
-                          src={item.imagem_url || getIcons("fallback")}
-                          alt={`Service ${item.nome}`}
-                          className="w-[calc(100%-15px)] h-[calc(100%-15px)] object-cover"
+                          onLoad={handleImageLoad}
+                          alt={`Service ${item.name}`}
+                          src={item.image_url || getIcons("fallback")}
+                          onError={(e) => handleImageError(e, item.image_url)}
+                          className={cn(
+                            "w-[calc(100%-15px)] h-[calc(100%-15px)] object-cover",
+                            isLoading && "hidden"
+                          )}
                         />
                       </CircleIcon>
 
                       <div className="flex flex-col justify-start items-start w-full h-auto gap-2 flex-grow pl-2">
                         <Title className="w-full text-start truncate max-w-[65%]">
-                          {item.nome}
+                          {item.name}
                         </Title>
 
                         <Text
@@ -111,11 +140,11 @@ export const Services = () => {
                               checked && "bg-[#111827]"
                             )}
                           />
-                          {item.duracao_minutos}min
+                          {item.duration_minutes}min
                         </Text>
 
                         <div className="flex flex-col items-center gap-[5px] absolute right-2 bottom-2">
-                          {Boolean(item.desconto) && (
+                          {Boolean(item.discount) && (
                             <Text className="line-through">
                               {formatter({
                                 type: "pt-BR",
@@ -124,7 +153,7 @@ export const Services = () => {
                                 minimumFractionDigits: 2,
                                 maximumFractionDigits: 2,
                               }).format(
-                                item.preco / (1 - (item?.desconto || 1) / 100)
+                                item.price / (1 - (item?.discount || 1) / 100)
                               )}
                             </Text>
                           )}
@@ -135,7 +164,7 @@ export const Services = () => {
                               style: "currency",
                               minimumFractionDigits: 2,
                               maximumFractionDigits: 2,
-                            }).format(item.preco || 0)}
+                            }).format(item.price || 0)}
                           </Title>
                         </div>
                       </div>
@@ -172,7 +201,7 @@ export const Services = () => {
                   maximumFractionDigits: 2,
                 }).format(
                   selectedServices.reduce(
-                    (total, service) => total + service.preco,
+                    (total, service) => total + service.price,
                     0
                   )
                 )}`

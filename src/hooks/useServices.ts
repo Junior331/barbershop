@@ -15,7 +15,7 @@ export const useServices = () => {
         .from("services")
         .select("*")
         .eq("is_active", true)
-        .order("nome", { ascending: true });
+        .order("name", { ascending: true });
 
       if (supabaseError) throw supabaseError;
 
@@ -41,12 +41,12 @@ export const useServices = () => {
         .select(
           `
           id,
-          nome,
-          descricao,
-          duracao_minutos,
-          imagem_url,
-          preco,
-          desconto,
+          name,
+          description,
+          duration_minutes,
+          image_url,
+          price,
+          discount,
           is_active,
           created_at
         `

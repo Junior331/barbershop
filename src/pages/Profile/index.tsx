@@ -13,10 +13,6 @@ export const Profile = () => {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // const handleAvatarClick = () => {
-  //   fileInputRef.current?.click();
-  // };
-
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -35,17 +31,19 @@ export const Profile = () => {
       formik.setValues({
         email: user.email || "",
         phone: user.phone || "",
-        name: user.user_metadata?.name || "",
+        name: user?.name || "",
         state: user.user_metadata?.state || "",
         avatar: user.user_metadata?.avatar || "",
-        address: user.user_metadata?.address || "",
+        street: user.user_metadata?.street || "",
         country: user.user_metadata?.country || "",
-        birthday: user.user_metadata?.birthday || "",
-        zip_code: user.user_metadata?.zip_code || "",
+        birth_date: user.user_metadata?.birth_date || "",
+        postal_code: user.user_metadata?.postal_code || "",
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
+
+  if (!user) return <Loading />;
 
   return (
     <Layout>
@@ -53,22 +51,11 @@ export const Profile = () => {
         <Header title={"Profile"} backPath={"/account"} />
         <div className="bg-[#f7f8fde8] w-screen h-screen fixed top-[180px]" />
 
-        {loading && <Loading />}
         <div className="flex flex-col h-full w-full p-4 pt-2 gap-2.5 overflow-y-auto z-10">
           <div className="btn w-full h-auto bg-transparent border-0 shadow-none px-0 py-2.5 border-b-2 border-[#EBE9F1]">
             <div className="flex items-center w-full h-full">
-              <div
-                className="relative cursor-pointer min-w-fit"
-                // onClick={handleAvatarClick}
-              >
+              <div className="relative cursor-pointer min-w-fit">
                 <Avatar />
-                {/* <div className="absolute bottom-0 right-0 bg-white rounded-full p-1 shadow-sm">
-                  <img
-                    alt="Edit icon"
-                    src={getIcons("camera")}
-                    className="size-4"
-                  />
-                </div> */}
               </div>
 
               <input
@@ -81,7 +68,7 @@ export const Profile = () => {
 
               <div className="flex flex-col justify-start items-start w-full flex-grow pl-2">
                 <p className="text-[#5E5873] inter text-2xl font-medium leading-[150%]">
-                  {user?.user_metadata.name}
+                  {user?.name}
                 </p>
                 <p className="text-[#5E5873] inter text-base font-light leading-none">
                   {user?.email}
@@ -96,7 +83,7 @@ export const Profile = () => {
           >
             <div className="flex flex-col w-full gap-1">
               <label className="text-[#6E6B7B] text-base font-normal leading-[18px]">
-                Name
+                Nome
               </label>
               <input
                 type="text"
@@ -132,7 +119,7 @@ export const Profile = () => {
             </div>
             <div className="flex flex-col w-full gap-1">
               <label className="text-[#6E6B7B] text-base font-normal leading-[18px]">
-                Phone
+                Telefone
               </label>
               <input
                 type="text"
@@ -151,64 +138,64 @@ export const Profile = () => {
             </div>
             <div className="flex flex-col w-full gap-1">
               <label className="text-[#6E6B7B] text-base font-normal leading-[18px]">
-                Birthday
+                Data de nascimento
               </label>
               <input
                 type="text"
-                name="birthday"
+                name="birth_date"
                 onBlur={formik.handleBlur}
                 placeholder="Digite aqui..."
                 onChange={formik.handleChange}
-                value={maskBirthday(formik.values.birthday)}
+                value={maskBirthday(formik.values.birth_date)}
                 className="w-full h-[48px] px-[10px]  rounded-[5px] border border-[#D8D6DE] bg-[#f7f8fde8]"
               />
-              {formik.touched.birthday && formik.errors.birthday ? (
+              {formik.touched.birth_date && formik.errors.birth_date ? (
                 <div className="text-red-500 text-sm">
-                  {formik.errors.birthday}
+                  {formik.errors.birth_date}
                 </div>
               ) : null}
             </div>
             <div className="flex flex-col w-full gap-1">
               <label className="text-[#6E6B7B] text-base font-normal leading-[18px]">
-                Zip code
+                CEP
               </label>
               <input
                 type="text"
-                name="zip_code"
+                name="postal_code"
                 onBlur={formik.handleBlur}
                 placeholder="Digite aqui..."
                 onChange={formik.handleChange}
-                value={maskZipCode(formik.values.zip_code)}
+                value={maskZipCode(formik.values.postal_code)}
                 className="w-full h-[48px] px-[10px]  rounded-[5px] border border-[#D8D6DE] bg-[#f7f8fde8]"
               />
-              {formik.touched.zip_code && formik.errors.zip_code ? (
+              {formik.touched.postal_code && formik.errors.postal_code ? (
                 <div className="text-red-500 text-sm">
-                  {formik.errors.zip_code}
+                  {formik.errors.postal_code}
                 </div>
               ) : null}
             </div>
             <div className="flex flex-col w-full gap-1">
               <label className="text-[#6E6B7B] text-base font-normal leading-[18px]">
-                Address
+                Rua
               </label>
               <input
                 type="text"
-                name="address"
+                name="street"
                 onBlur={formik.handleBlur}
-                value={formik.values.address}
+                value={formik.values.street}
                 placeholder="Digite aqui..."
                 onChange={formik.handleChange}
                 className="w-full h-[48px] px-[10px]  rounded-[5px] border border-[#D8D6DE] bg-[#f7f8fde8]"
               />
-              {formik.touched.address && formik.errors.address ? (
+              {formik.touched.street && formik.errors.street ? (
                 <div className="text-red-500 text-sm">
-                  {formik.errors.address}
+                  {formik.errors.street}
                 </div>
               ) : null}
             </div>
             <div className="flex flex-col w-full gap-1">
               <label className="text-[#6E6B7B] text-base font-normal leading-[18px]">
-                State
+                Estado (UF)
               </label>
               <input
                 type="text"
@@ -228,7 +215,7 @@ export const Profile = () => {
             </div>
             <div className="flex flex-col w-full gap-1">
               <label className="text-[#6E6B7B] text-base font-normal leading-[18px]">
-                Country
+                País
               </label>
               <input
                 type="text"

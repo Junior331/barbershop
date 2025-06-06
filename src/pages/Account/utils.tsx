@@ -29,31 +29,31 @@ export const getAccountItems = ({ setAuth, navigate }: AccountItems) => {
       subtitle: "Fazer alterações na sua conta",
       path: "/account/profile",
     },
+    // {
+    //   id: 2,
+    //   alt: "biometric",
+    //   icon: getIcons("lock"),
+    //   title: "Face ID / Touch ID",
+    //   subtitle: "Usar a segurança do seu dispositivo",
+    //   children: (
+    //     <input
+    //       type="checkbox"
+    //       defaultChecked
+    //       className="toggle toggle-primary !bg-transparent border-[#E8E8E8]"
+    //     />
+    //   ),
+    // },
+    // {
+    //   id: 3,
+    //   alt: "shield",
+    //   icon: getIcons("shield_done"),
+    //   title: "Autenticação de dois factores",
+    //   children: getIcons("arrow_right"),
+    //   subtitle: "Proteger ainda mais a sua conta",
+    //   path: "",
+    // },
     {
       id: 2,
-      alt: "biometric",
-      icon: getIcons("lock"),
-      title: "Face ID / Touch ID",
-      subtitle: "Usar a segurança do seu dispositivo",
-      children: (
-        <input
-          type="checkbox"
-          defaultChecked
-          className="toggle toggle-primary !bg-transparent border-[#E8E8E8]"
-        />
-      ),
-    },
-    {
-      id: 3,
-      alt: "shield",
-      icon: getIcons("shield_done"),
-      title: "Autenticação de dois factores",
-      children: getIcons("arrow_right"),
-      subtitle: "Proteger ainda mais a sua conta",
-      path: "",
-    },
-    {
-      id: 4,
       alt: "logout",
       subtitle: "",
       title: "Sair da conta",

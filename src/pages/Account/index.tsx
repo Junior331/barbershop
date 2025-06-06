@@ -41,7 +41,7 @@ export const Account = () => {
                 <Avatar />
                 <div className="flex flex-col justify-start items-start w-full flex-grow pl-2 gap-2">
                   <p className="text-[#000] inter textarea-lg font-medium leading-[150%]">
-                    {user?.user_metadata.name}
+                    {user?.name}
                   </p>
                   <p className="text-[#000] inter textarea-md font-light leading-none">
                     {user?.email}
