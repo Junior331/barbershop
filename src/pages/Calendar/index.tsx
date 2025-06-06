@@ -12,7 +12,6 @@ export const Calendar = () => {
     navigate,
     monthNames,
     daysOfWeek,
-    formatTime,
     isSelected,
     currentDate,
     selectedDate,
@@ -32,7 +31,9 @@ export const Calendar = () => {
   useEffect(() => {
     if (date) {
       const storedDate = new Date(date);
-      setCurrentDate(new Date(storedDate.getFullYear(), storedDate.getMonth(), 1));
+      setCurrentDate(
+        new Date(storedDate.getFullYear(), storedDate.getMonth(), 1)
+      );
     }
   }, [date, setCurrentDate]);
 
@@ -88,7 +89,10 @@ export const Calendar = () => {
 
               <div className="grid grid-cols-7 gap-1 mb-2">
                 {daysOfWeek.map((day) => (
-                  <div key={day} className="text-center text-sm font-medium text-[#000]">
+                  <div
+                    key={day}
+                    className="text-center text-sm font-medium text-[#000]"
+                  >
                     {day}
                   </div>
                 ))}
@@ -101,15 +105,21 @@ export const Calendar = () => {
                   return (
                     <div
                       key={index}
-                      onClick={() => isDateSelectable(day) && handleDayClick(day)}
+                      onClick={() =>
+                        isDateSelectable(day) && handleDayClick(day)
+                      }
                       className={cn(
                         "w-12 h-12 flex items-center justify-center text-sm transition-all text-[#000] rounded-[10px] mx-auto",
                         isToday && "!bg-blue-500 text-white",
                         isSelected(day) && "!bg-[#6C8762] text-white",
-                        isDateSelectable(day) ? "cursor-pointer hover:bg-gray-100" : "cursor-not-allowed opacity-50"
+                        isDateSelectable(day)
+                          ? "cursor-pointer hover:bg-gray-100"
+                          : day
+                          ? "cursor-not-allowed opacity-50"
+                          : "cursor-context-menu opacity-50"
                       )}
                     >
-                      {day}
+                      {day || ""}
                     </div>
                   );
                 })}
@@ -120,51 +130,61 @@ export const Calendar = () => {
               Horários
             </h2>
 
-            <div className="w-full grid grid-cols-3 gap-3">
-              {availableSlots.length ? (
-                availableSlots.map((timeSlot) => {
+            {availableSlots.length ? (
+              <div className="w-full grid grid-cols-3 gap-3">
+                {availableSlots.map((timeSlot) => {
                   const isAvailable = isTimeAvailable(timeSlot);
 
                   return (
                     <div
                       key={timeSlot}
                       className="w-full cursor-pointer"
-                      onClick={() => isAvailable && handleTimeSelection(timeSlot)}
+                      onClick={() =>
+                        isAvailable && handleTimeSelection(timeSlot)
+                      }
                     >
                       <div
                         className={cn(
                           "w-full h-[33.568px] rounded-[21px] flex items-center justify-center transition-colors",
-                          selectedTime === timeSlot ? "bg-[#ECEFF1]" : !isAvailable ? "bg-gray-100 cursor-not-allowed opacity-50" : "bg-[#FFFFFF] filter drop-shadow-[0px_2px_4px_0px_rgba(156,163,175,0.20)] border border-[#6B7280]"
+                          selectedTime === timeSlot
+                            ? "bg-[#99B58E]"
+                            : !isAvailable
+                            ? "bg-gray-100 cursor-not-allowed opacity-50"
+                            : "bg-[#FFFFFF] filter drop-shadow-[0px_2px_4px_0px_rgba(156,163,175,0.20)] border border-[#6B7280]"
                         )}
                       >
                         <p
                           className={cn(
                             "textarea-md inter font-medium leading-none",
                             selectedTime === timeSlot
-                              ? "text-[rgba(107,114,128,0.2)]"
+                              ? "!text-white"
                               : !isAvailable
                               ? "text-gray-400"
                               : "text-[#6B7280]"
                           )}
                         >
-                          {formatTime(timeSlot)}{" "}
+                          {timeSlot}{" "}
                           {!isAvailable && (
-                            <span className="text-xs text-gray-400">(Indisponível)</span>
+                            <span className="text-xs text-gray-400">
+                              (Indisponível)
+                            </span>
                           )}
                         </p>
                       </div>
                     </div>
                   );
-                })
-              ) : (
-                <p className="text-center text-gray-400">Nenhum horário disponível.</p>
-              )}
-            </div>
+                })}
+              </div>
+            ) : (
+              <p className="text-center text-gray-400">
+                Nenhum horário disponível.
+              </p>
+            )}
 
             <button
               type="button"
-              disabled={!selectedTime || !selectedDate}
               onClick={() => navigate("/confirm")}
+              disabled={!selectedTime || !selectedDate}
               className="btn w-full max-w-full border-none bg-[#6C8762] disabled:!bg-[#e5e5e5] rounded text-[14px] text-[#FFF] py-[10px] font-[500] tracking-[0.4px] mt-10"
             >
               Confirmar

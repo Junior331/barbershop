@@ -24,16 +24,16 @@ export const Confirm = () => {
   const [loading, setLoading] = useState(false);
   const [selectedMethod, setSelectedMethod] = useState<string>("");
 
-  const handleDelete = (serviceId: number) => {
+  const handleDelete = (serviceId: string) => {
     currentOrder.toggleService({
-      time: 0,
       name: "",
-      icon: "",
       price: 0,
       discount: 0,
       id: serviceId,
-      public: false,
+      image_url: "",
       created_at: "",
+      is_active: false,
+      duration_minutes: 0,
     });
   };
 
@@ -59,36 +59,25 @@ export const Confirm = () => {
       }
 
       const totalDuration = currentOrder.services.reduce((acc, service) => {
-        return acc + (service.time || 30); // 30 minutos como padrão se não houver duration
+        return acc + (service.duration_minutes || 30);
       }, 0);
 
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from("schedules")
         .insert([
           {
-            barber_id: currentOrder.barber.id,
             client_id: user.id,
-            date_time: currentOrder.date,
-            service_id: currentOrder.services[0].id,
             time: totalDuration,
-            status: "confirmed",
+            date_time: currentOrder.date,
             payment_method: selectedMethod,
-            payment_fee: currentOrder.paymentFee,
-            total_price: currentOrder.total,
+            barber_id: currentOrder.barber.id,
+            service_id: currentOrder.services[0].id,
           },
         ])
         .select();
 
       if (error) throw error;
 
-      // const newOrder: Order = {
-      //   ...currentOrder,
-      //   id: data[0].id,
-      //   status: "confirmed",
-      //   date: currentOrder.date,
-      // };
-
-      // currentOrder.addOrder(newOrder);
       navigate("/mybookings");
     } catch (error: unknown) {
       const errorMessage =
@@ -131,7 +120,7 @@ export const Confirm = () => {
                 >
                   <CircleIcon className="min-w-32 h-32 my-auto overflow-hidden">
                     <img
-                      src={service.icon}
+                      src={service.image_url}
                       alt={`Service ${service.name}`}
                       className="w-[calc(100%-15px)] h-[calc(100%-15px)] object-cover"
                     />
@@ -139,7 +128,7 @@ export const Confirm = () => {
 
                   <div className="flex flex-col justify-start items-start w-full flex-grow pl-2 gap-1">
                     <Text className="text-[#6B7280] dm_sans text-base font-light ">
-                      {currentOrder.barber.name}
+                      {currentOrder?.barber?.name}
                     </Text>
                     <Title className="dm_sans textarea-lg font-medium ">
                       {service.name}
@@ -160,7 +149,7 @@ export const Confirm = () => {
                         src={getIcons("calendar_tick")}
                       />
                       <div className="h-3 w-[0.5px] bg-[#6C8762] rounded-3xl" />
-                      {formatCustomDateTime(currentOrder.date || "")}
+                      {formatCustomDateTime(currentOrder.date)}
                     </Text>
                     <div className="flex flex-col items-center gap-[5px] absolute right-4 bottom-4">
                       {Boolean(service.discount) && (
@@ -281,7 +270,7 @@ export const Confirm = () => {
             <button
               onClick={() => setIsOpen(false)}
               className="btn btn-sm btn-circle shadow-none btn-ghost absolute hover:bg-[#eaeaea80] !border-none !text-black right-2 top-2"
-              >
+            >
               ✕
             </button>
 

@@ -107,9 +107,8 @@ export const getCurrentDate = (): {
   return { dayOfWeek, formattedDate };
 };
 
-export const formatCustomDateTime = (isoString: string): string => {
-  const date = new Date(isoString);
-
+export const formatCustomDateTime = (date: Date | null): string => {
+  if (!date) return "";
   const formattedDate = date.toLocaleDateString("pt-BR", {
     day: "2-digit",
     month: "2-digit",
