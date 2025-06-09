@@ -1,12 +1,13 @@
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+
 import { useWallet } from "./useWallet";
-import { formatter } from "@/utils/utils";
 import { getIcons } from "@/assets/icons";
 import { Layout } from "@/components/templates";
 import { useAuth } from "@/context/AuthContext";
+import { formatter, getPaymentMethodIcon } from "@/utils/utils";
 import { Loading, Text, Title } from "@/components/elements";
 import { AddCardModal, Header, PixModal } from "@/components/organisms";
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 
 export const Wallet = () => {
   const { user } = useAuth();
@@ -23,7 +24,6 @@ export const Wallet = () => {
     isPixModalOpen,
     setIsPixModalOpen,
     isAddCardModalOpen,
-    getPaymentMethodIcon,
     getPaymentMethodLabel,
     setIsAddCardModalOpen,
     toggleBalanceVisibility,

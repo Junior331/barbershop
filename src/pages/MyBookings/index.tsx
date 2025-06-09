@@ -6,7 +6,6 @@ import { useNavigate } from "react-router-dom";
 import { getIcons } from "@/assets/icons";
 import { useOrders } from "@/hooks/useOrders";
 import { Layout } from "@/components/templates";
-import { getServices } from "@/assets/services";
 import { Card, Header, SwipeableCard } from "@/components/organisms";
 import {
   Text,
@@ -15,6 +14,8 @@ import {
   CircleIcon,
   StatusBadge,
 } from "@/components/elements";
+import { ServiceIcons } from "@/components/organisms/SwipeableCard";
+import { StatusType } from "@/components/elements/StatusBadge/@types";
 import { formatCustomDateTime, formatter, getCurrentDate } from "@/utils/utils";
 
 export const MyBookings = () => {
@@ -47,19 +48,13 @@ export const MyBookings = () => {
   );
 
   const handleCancelOrder = async (orderId: string) => {
-    const success = await cancelOrder(orderId);
-    if (success) {
-      // Atualizar a lista ou mostrar feedback
-      fetchOrders();
-    }
+    await cancelOrder(orderId);
+    fetchOrders();
   };
 
   const handleDeleteOrder = async (orderId: string) => {
-    const success = await deleteOrder(orderId);
-    if (success) {
-      // Atualizar a lista ou mostrar feedback
-      fetchOrders();
-    }
+    await deleteOrder(orderId);
+    fetchOrders();
   };
 
   const dotsArray = Array.from({ length: 20 });
@@ -141,33 +136,25 @@ export const MyBookings = () => {
                       <Card
                         style={{
                           padding: 21.5,
-                          paddingLeft: 2,
                           minWidth: "100%",
                           position: "relative",
                           minHeight: "initial",
                         }}
                       >
-                        <div className="flex items-center w-full h-full pl-4">
-                          <CircleIcon className="min-w-[87px] h-[87px] my-auto overflow-hidden">
-                            <img
-                              src={
-                                order.services[0]?.icon ||
-                                getServices("fallback")
-                              }
-                              alt={`Service ${order.services[0]?.name}`}
-                              className="w-[calc(100%-25px)] h-[calc(100%-25px)] object-cover"
-                            />
-                          </CircleIcon>
+                        <div className="flex flex-col items-center w-full h-full">
+                          <ServiceIcons services={order.services} />
                           <div className="flex flex-col justify-start items-start w-full gap-2 flex-grow pl-2 relative">
                             <Title className="font-bold leading-[150%] truncate max-w-[65%]">
-                              {order.services.map((s) => s.name).join(", ")}
+                              {order.services
+                                .map((s) => s.service_name)
+                                .join(", ")}
                             </Title>
 
                             <Text className="font-[300] leading-none">
                               <strong className="font-bold text-[#111827] textarea-sm">
                                 Date:{" "}
                               </strong>
-                              {formatCustomDateTime(order.date || "")}
+                              {formatCustomDateTime(new Date(order.start_time))}
                             </Text>
                             <Text className="font-[300] leading-none">
                               <strong className="font-bold text-[#111827] textarea-sm">
@@ -185,13 +172,14 @@ export const MyBookings = () => {
                                 style: "currency",
                                 minimumFractionDigits: 2,
                                 maximumFractionDigits: 2,
-                              }).format(order.total_price || 0)}
+                              }).format(order.services.reduce((sum, service) => sum + service.service_price, 0) || 0)}
                             </Title>
                           </div>
+                          {/* services.reduce((sum, service) => sum + service.price, 0) */}
 
                           <StatusBadge
                             variant="outline"
-                            status={order.status}
+                            status={order.status as StatusType}
                             className="capitalize p-2.5 absolute top-5 right-5"
                           />
                         </div>

@@ -48,7 +48,6 @@ export interface BarberService {
   image_url: string | null;
   description: string | null;
 }
-
 export interface BarberDetails {
   id: string;
   is_active: boolean;
@@ -59,27 +58,39 @@ export interface BarberDetails {
 
 export interface IBarber {
   id: string;
-  role: "barber" | "admin";
   name: string;
   services: string[];
   email: string | null;
   phone: string | null;
   total_price?: number;
+  role: "barber" | "admin";
   avatar_url: string | null;
   barber_details: BarberDetails;
   services_full: BarberService[];
 }
 
 export interface IOrderState {
+  id: string;
+  total: number;
+  subtotal: number;
+  discount: number;
   date: Date | null;
-  time: string | null;
+  paymentFee: number;
+  barber: User | null;
   services: IService[];
-  barber: IBarber | null;
+  notes: string | null;
   clearOrder: () => void;
+  startTime: string | null;
   clearServices: () => void;
+  calculateTotals: () => void;
+  promotionCode: string | null;
+  paymentMethod: string | null;
+  setBarber: (barber: User) => void;
+  setNotes: (notes: string) => void;
+  setPaymentMethod: (method: string) => void;
   toggleService: (service: IService) => void;
-  setBarber: (barber: IBarber) => void;
-  setDateTime: (date: Date | null, time: string | null) => void;
+  setPromotionCode: (code: string | null) => void;
+  setDateTime: (date: Date, startTime: string) => void;
 }
 
 export interface IUserData extends User {
@@ -120,4 +131,36 @@ export interface UseBarbersResult {
   barbers: IBarber[];
   error: string | null;
   refetch: () => Promise<void>;
+}
+
+export interface IOrder {
+  id: string;
+  date: Date;
+  notes: null;
+  status: string;
+  end_time: string;
+  client_id: string;
+  barber_id: string;
+  start_time: string;
+  created_at: string;
+  updated_at: string;
+  barber_name: string;
+  service_name: string;
+  final_amount: number;
+  promotion_id: string;
+  discount_amount: number;
+  services: [
+    {
+      service_id: string;
+      service_name: string;
+      service_icon: string;
+      service_price: number;
+      service_duration: number;
+    }
+  ];
+  barber: {
+    id: string;
+    name: string;
+  };
+  isCompleted: boolean;
 }

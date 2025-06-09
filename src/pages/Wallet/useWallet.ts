@@ -258,20 +258,7 @@ export const useWallet = (userId: string) => {
     }
   };
 
-  const getPaymentMethodIcon = (methodType: string) => {
-    switch (methodType) {
-      case "pix":
-        return "pix_solid";
-      case "apple_pay":
-        return "apple_solid";
-      case "google_pay":
-        return "apple_solid";
-      case "credit_card":
-        return "card_credit";
-      default:
-        return "card_add";
-    }
-  };
+
 
   const getPaymentMethodLabel = (methodType: string) => {
     switch (methodType) {
@@ -399,7 +386,6 @@ export const useWallet = (userId: string) => {
     setIsPixModalOpen,
     isAddCardModalOpen,
     removePaymentMethod,
-    getPaymentMethodIcon,
     getPaymentMethodLabel,
     setIsAddCardModalOpen,
     toggleBalanceVisibility,

@@ -1,4 +1,4 @@
-import { Order } from "@/utils/types";
+import { IOrder } from "@/utils/types";
 
 export interface IUseSwipeProps {
   onLeftAction: () => void;
@@ -7,7 +7,7 @@ export interface IUseSwipeProps {
   setIsSwipedRight: (value: boolean) => void;
 }
 export interface IProps {
-  item: Order;
+  item: IOrder;
   onCancel: (id: string) => void;
   onDelete: (id: string) => void;
 }

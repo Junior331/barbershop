@@ -97,7 +97,6 @@ export const getCurrentDate = (): {
   const dayOfWeek =
     rawDayOfWeek.charAt(0).toUpperCase() + rawDayOfWeek.slice(1);
 
-  // Capitalizar mês
   const formattedDate = rawFormattedDate.replace(
     /(\d{2}) de (\w+)/,
     (_, day, month) =>
@@ -109,20 +108,22 @@ export const getCurrentDate = (): {
 
 export const formatCustomDateTime = (date: Date | null): string => {
   if (!date) return "";
+  
   const formattedDate = date.toLocaleDateString("pt-BR", {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
   });
 
-  const formattedTime = date.toLocaleTimeString("en-US", {
+  const formattedTime = date.toLocaleTimeString("pt-BR", {
     hour: "2-digit",
     minute: "2-digit",
-    hour12: true,
+    hour12: false,
   });
 
   return `${formattedDate} às ${formattedTime}`;
 };
+
 
 export const formatPercentage = (value: number): string => {
   return new Intl.NumberFormat("pt-BR", {
@@ -170,4 +171,21 @@ export const detectCardBrand = (cardNumber: string): string => {
   if (/^5[1-5]/.test(cardNumber)) return "Mastercard";
   if (/^3[47]/.test(cardNumber)) return "American Express";
   return "Other";
+};
+
+export const getPaymentMethodIcon = (methodType: string) => {
+  switch (methodType) {
+    case "pix":
+      return "pix_solid";
+    case "apple_pay":
+      return "apple_solid";
+    case "google_pay":
+      return "apple_solid";
+    case "credit_card":
+      return "card_credit";
+    case "wallet":
+      return "wallet_active";
+    default:
+      return "card_add";
+  }
 };
