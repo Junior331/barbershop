@@ -1,16 +1,18 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import { useFormik } from "formik";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
 import { schema } from "./schema";
-import { supabase } from "@/lib/supabase";
 
 export const useSignup = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
+  const [isShowPassword, setIsShowPassword] = useState(false);
+  const [isShowConfirmPassword, setIsShowConfirmPassword] = useState(false);
+  
   const formik = useFormik({
     initialValues: {
       name: "",
@@ -29,39 +31,38 @@ export const useSignup = () => {
       setError(null);
 
       try {
-        const { error: signUpError } = await supabase.auth.signUp({
-          email: values.email,
-          password: values.password,
-          options: {
-            data: {
-              name: values.name,
+        // Registrar no backend
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/auth/register`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
             },
-            emailRedirectTo: `${window.location.origin}/signin`,
-          },
-        });
+            body: JSON.stringify({
+              name: values.name,
+              email: values.email,
+              password: values.password,
+              provider: "LOCAL",
+            }),
+          }
+        );
 
-        if (signUpError) throw signUpError;
+        const data = await response.json();
 
-        const { error: rpcError } = await supabase
-          .rpc('register_user_with_role', {
-            name: values.name,
-            email: values.email,
-            password: values.password,
-            role: 'client'
-          });
+        if (response.status === 201) {
+          // Salva o token no cookie
+          document.cookie = `accessToken=${data.accessToken}; path=/; secure; SameSite=Strict`;
 
-        if (rpcError) throw rpcError;
-
-        toast.success("Usuário cadastrado com sucesso! Verifique seu e-mail para confirmação.");
-        navigate("/signin");
-      } catch (error: unknown) {
-        const errorMessage =
-          error instanceof Error
-            ? error.message
-            : "Erro ao realizar o cadastrado.";
-
-        toast.error(errorMessage);
-        setError(errorMessage);
+          toast.success("Usuário cadastrado com sucesso!");
+          navigate("/signin");
+        } else {
+          throw new Error(data.message || "Erro ao registrar usuário");
+        }
+      } catch (error: any) {
+        console.log("error signup :", error);
+        toast.error(error.message || "Erro ao realizar o cadastro.");
+        setError(error.message);
       } finally {
         setLoading(false);
       }
@@ -72,5 +73,9 @@ export const useSignup = () => {
     error,
     formik,
     loading,
+    isShowPassword,
+    setIsShowPassword,
+    isShowConfirmPassword,
+    setIsShowConfirmPassword,
   };
 };

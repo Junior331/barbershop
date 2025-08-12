@@ -1,21 +1,23 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
 import { useSignup } from "./useSignup";
-import { getIcons } from "@/assets/icons";
 import { getImage } from "@/assets/images";
+import { getIcons } from "@/assets/icons";
 import { Loading } from "@/components/elements";
 
 export const Signup = () => {
   const navigate = useNavigate();
-  const { formik, loading } = useSignup();
-  const [isShowPassword, setIsShowPassword] = useState(false);
-  const [isShowConfirmPassword, setIsShowConfirmPassword] = useState(false);
+  const {
+    formik,
+    loading,
+    isShowPassword,
+    isShowConfirmPassword,
+    setIsShowPassword,
+    setIsShowConfirmPassword,
+  } = useSignup();
 
   return (
     <div className="flex gap-5 flex-col justify-center items-center p-5 w-full h-full">
       <img width="258" height="258" src={getImage("logo")} alt="Image logo" />
-
       <form
         onSubmit={formik.handleSubmit}
         className="flex flex-col w-full gap-4"
@@ -132,7 +134,7 @@ export const Signup = () => {
       <div className="flex flex-col items-center w-full gap-4">
         <div className="flex items-center w-full gap-2">
           <div className="flex-1 h-[1px] bg-[#D8D6DE]" />
-          <span className="text-[#6E6B7B] text-base">or</span>
+          <span className="text-[#6E6B7B] text-base">Ou</span>
           <div className="flex-1 h-[1px] bg-[#D8D6DE]" />
         </div>
         <p className="text-[#6E6B7B] text-base">
@@ -146,7 +148,6 @@ export const Signup = () => {
           </button>
         </p>
       </div>
-
       {loading && <Loading />}
     </div>
   );
