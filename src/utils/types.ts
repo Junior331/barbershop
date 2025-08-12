@@ -76,7 +76,7 @@ export interface IOrderState {
   discount: number;
   date: Date | null;
   paymentFee: number;
-  barber: User | null;
+  barber: IBarber | null;
   services: IService[];
   notes: string | null;
   clearOrder: () => void;
@@ -85,7 +85,7 @@ export interface IOrderState {
   calculateTotals: () => void;
   promotionCode: string | null;
   paymentMethod: string | null;
-  setBarber: (barber: User) => void;
+  setBarber: (barber: IBarber) => void;
   setNotes: (notes: string) => void;
   setPaymentMethod: (method: string) => void;
   toggleService: (service: IService) => void;
@@ -163,4 +163,17 @@ export interface IOrder {
     name: string;
   };
   isCompleted: boolean;
+}
+
+export interface ApiError {
+  message: string;
+  status?: number;
+  code?: string;
+  details?: Record<string, unknown>;
+}
+
+export interface ApiResponse<T = unknown> {
+  data: T;
+  message?: string;
+  success: boolean;
 }

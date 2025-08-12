@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import axios from "axios";
+import { ApiError } from "@/utils/types";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
@@ -27,7 +28,10 @@ export const useApi = () => {
     method: string = "GET",
     body: any = null
   ) => {
+    console.log(`chegou ::`)
     const token = getToken();
+
+    console.log(`token ::`, token)
     const config = {
       headers: {
         Authorization: token ? `Bearer ${token}` : "",
@@ -44,9 +48,24 @@ export const useApi = () => {
         ...config,
       });
       return response.data;
-    } catch (error: any) {
-      setError(error.response?.data?.message || error.message);
-      throw error;
+    } catch (error: unknown) {
+      let errorMessage = "Erro na requisição";
+      
+      if (axios.isAxiosError(error)) {
+        errorMessage = error.response?.data?.message || error.message;
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      
+      setError(errorMessage);
+      
+      const apiError: ApiError = {
+        message: errorMessage,
+        status: axios.isAxiosError(error) ? error.response?.status : undefined,
+        code: axios.isAxiosError(error) ? error.code : undefined,
+      };
+      
+      throw apiError;
     } finally {
       setLoading(false);
     }
