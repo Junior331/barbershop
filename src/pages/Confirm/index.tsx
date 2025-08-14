@@ -43,7 +43,7 @@ export const Confirm = () => {
       created_at: "",
       is_active: false,
       description: "",
-      duration_minutes: 0,
+      durationMinutes: 0,
     });
   };
 
@@ -113,7 +113,7 @@ export const Confirm = () => {
       const servicesData = currentOrder.services.map((service) => ({
         id: service.id,
         price: service.price,
-        duration: service.duration_minutes,
+        duration: service.durationMinutes,
       }));
 
       // Converter a data e hora para o formato correto
@@ -226,7 +226,7 @@ export const Confirm = () => {
                         }).format(service.price || 0)}
                       </Title>
                       <Text className="text-sm text-gray-500">
-                        {service.duration_minutes} min
+                        {service.durationMinutes} min
                       </Text>
                     </div>
                   </div>

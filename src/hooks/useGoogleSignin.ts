@@ -45,7 +45,7 @@ export const useGoogleSignin = () => {
             await supabase.from("users").upsert({
               email: user.email,
               name: user.user_metadata?.full_name || "",
-              avatar: user.user_metadata?.avatar_url || "",
+              avatarUrl: user.user_metadata?.avatar_url || "",
               created_at: new Date().toISOString(),
               updated_at: new Date().toISOString(),
               // Outros campos do Google podem ser adicionados aqui

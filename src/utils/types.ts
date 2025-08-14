@@ -1,5 +1,3 @@
-import { User } from "@supabase/supabase-js";
-
 export type formatterProps = {
   type?: string;
   currency?: string;
@@ -32,19 +30,19 @@ export interface IService {
   id: string;
   name: string;
   price: number;
-  discount: number;
-  image_url: string;
-  is_active: boolean;
-  created_at: string;
-  description?: string;
-  duration_minutes: number;
+  imageUrl: string;
+  discount?: number;
+  createdAt: string;
+  updatedAt: string;
+  description: string;
+  barberShopId: string;
+  durationMinutes: number;
 }
-
 export interface BarberService {
   id: string;
   name: string;
   price: number;
-  duration_minutes: number;
+  durationMinutes: number;
   image_url: string | null;
   description: string | null;
 }
@@ -93,25 +91,33 @@ export interface IOrderState {
   setDateTime: (date: Date, startTime: string) => void;
 }
 
-export interface IUserData extends User {
-  role: string;
-  name: string;
+export interface IUserData {
+  // Campos do Supabase Auth
+  id: string;
   city: string;
   state: string;
   email: string;
-  phone: string;
   street: string;
-  auth_id: string;
+  phone?: string;
   country: string;
+  isVerified: true;
   biography: string;
-  is_verified: true;
-  created_at: string;
-  avatar_url: string;
-  birth_date: string;
-  updated_at: string;
-  postal_code: string;
+  birthDate: string;
+  postalCode: string;
   neighborhood: string;
-  password_hash: string;
+  created_at?: string;
+  updated_at?: string;
+  
+  // Campos customizados da tabela users
+  name?: string;
+  role?: string;
+  provider?: string;
+  isActive?: boolean;
+  avatarUrl?: string;
+  providerId?: string;
+  passwordHash?: string;
+  
+  // [key: string]: unknown;
 }
 
 export interface BarberResponse {

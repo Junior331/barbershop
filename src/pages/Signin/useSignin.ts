@@ -5,9 +5,11 @@ import { useNavigate } from "react-router-dom";
 import { schema } from "./schema";
 import { useApi } from "@/hooks/useApi";
 import { ApiError } from "@/utils/types";
+import { useAuth } from "@/context/AuthContext";
 
 export const useSignin = () => {
   const navigate = useNavigate();
+  const { setAuth } = useAuth();
   const { apiCall, setToken, loading, error } = useApi();
 
   const formik = useFormik({
@@ -18,7 +20,6 @@ export const useSignin = () => {
     },
     validationSchema: schema,
     onSubmit: async (values) => {
-      console.log(`values ::`, values)
       try {
         const data = await apiCall("/auth/login", "POST", {
           email: values.email,
@@ -27,8 +28,7 @@ export const useSignin = () => {
 
         if (data.accessToken) {
           setToken(data.accessToken);
-
-          toast.success("Login realizado com sucesso!");
+          setAuth(data.user);
           navigate("/");
         }
       } catch (error: unknown) {

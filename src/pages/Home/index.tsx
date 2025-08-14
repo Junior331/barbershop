@@ -1,13 +1,14 @@
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 
-import { formatter } from "@/utils/utils";
 import { getIcons } from "@/assets/icons";
 import { Card } from "@/components/organisms";
 import { Layout } from "@/components/templates";
 import { useAuth } from "@/context/AuthContext";
+import { capitalizeName, formatter } from "@/utils/utils";
 import { barbers, orders, promotionsWeek } from "./utils";
 import { CircleIcon, Text, Title } from "@/components/elements";
+
 export const Home = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -20,7 +21,7 @@ export const Home = () => {
           <h2 className="font-[300] flex flex-col text-[#283046] max-w-[145px] inter text-[26px] leading-[36px]">
             Olá,
             <Title className="!text-3xl !text-[#566F4C]">
-              {user?.user_metadata?.name.split(" ")[0]}
+              {capitalizeName(user?.name?.split(" ")[0] || user?.email?.split("@")[0] || "Usuário")}
             </Title>
           </h2>
         </div>

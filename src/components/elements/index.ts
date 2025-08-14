@@ -6,6 +6,7 @@ import { Button } from "./Button";
 import { Loading } from "./Loading";
 import { CircleIcon } from "./CircleIcon";
 import { StatusBadge } from "./StatusBadge";
+import { ProtectedRoute } from "./ProtectedRoute";
 
 export {
   Text,
@@ -16,4 +17,5 @@ export {
   Loading,
   CircleIcon,
   StatusBadge,
+  ProtectedRoute,
 };

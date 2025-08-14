@@ -8,12 +8,15 @@ export const Avatar = () => {
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
 
-  const displayName = user?.name || user?.email?.split("@")[0] || "U";
+  const displayName = user?.name || user?.email?.split("@")[0] || "?";
   const avatarUrl = useAvatar(displayName, {
     size: 69,
     rounded: true,
     backgroundColors: ["#FF5733", "#3357FF", "#33FF57"],
   });
+
+  console.log(`user 22 ::`, user)
+
 
   const handleImageLoad = () => {
     setIsLoading(false);
@@ -35,7 +38,7 @@ export const Avatar = () => {
       <img
         className={`size-full object-cover ${isLoading ? 'hidden' : ''}`}
         alt={`Avatar de ${displayName}`}
-        src={user?.avatar_url || avatarUrl}
+        src={user?.avatarUrl || avatarUrl}
         onLoad={handleImageLoad}
         onError={handleImageError}
       />

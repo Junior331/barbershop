@@ -18,9 +18,9 @@ export const useProfile = () => {
       email: "",
       phone: "",
       state: "",
-      avatar: "",
-      country: "",
       street: "",
+      country: "",
+      avatarUrl: "",
       postal_code: "",
       birth_date: "",
     },
@@ -47,7 +47,7 @@ export const useProfile = () => {
             p_postal_code: values.postal_code,
             p_state: values.state,
             p_country: values.country,
-            p_avatar_url: values.avatar || null,
+            p_avatar_url: values.avatarUrl || null,
             updated_at: new Date().toISOString(),
           });
 
@@ -58,7 +58,7 @@ export const useProfile = () => {
         await supabase.auth.updateUser({
           data: {
             name: values.name,
-            avatar: values.avatar,
+            avatarUrl: values.avatarUrl,
           }
         });
 

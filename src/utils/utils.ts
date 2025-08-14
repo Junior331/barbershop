@@ -189,3 +189,8 @@ export const getPaymentMethodIcon = (methodType: string) => {
       return "card_add";
   }
 };
+
+export const capitalizeName = (name: string) => {
+  if (!name) return '';
+  return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+};

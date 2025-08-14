@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from "react";
 import axios from "axios";
+import { useState } from "react";
 import { ApiError } from "@/utils/types";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
@@ -28,10 +28,7 @@ export const useApi = () => {
     method: string = "GET",
     body: any = null
   ) => {
-    console.log(`chegou ::`)
     const token = getToken();
-
-    console.log(`token ::`, token)
     const config = {
       headers: {
         Authorization: token ? `Bearer ${token}` : "",

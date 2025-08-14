@@ -1,72 +1,31 @@
 import { useState, useEffect, useCallback } from "react";
-
-import { supabase } from "@/lib/supabase";
+import { useApi } from "@/hooks/useApi";
 import { IService } from "@/utils/types";
 
 export const useServices = () => {
-  const [loading, setLoading] = useState(true);
+  const { apiCall, loading, error } = useApi();
   const [services, setServices] = useState<IService[]>([]);
-  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const fetchServices = useCallback(async () => {
     try {
-      setLoading(true);
-      const { data, error: supabaseError } = await supabase
-        .from("services")
-        .select("*")
-        .eq("is_active", true)
-        .order("name", { ascending: true });
-
-      if (supabaseError) throw supabaseError;
-
-      setServices(data || []);
+      const data = await apiCall("/services", "GET");
+      setServices(data);
     } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Falha ao carregar serviços";
-      setError(errorMessage);
       console.error("Erro ao buscar serviços:", err);
-    } finally {
-      setLoading(false);
     }
-  }, []);
+  }, [apiCall]);
 
   useEffect(() => {
     fetchServices();
-  }, [fetchServices]);
-
-  const getServiceById = useCallback(async (id: string) => {
-    try {
-      const { data, error: supabaseError } = await supabase
-        .from("services")
-        .select(
-          `
-          id,
-          name,
-          description,
-          duration_minutes,
-          image_url,
-          price,
-          discount,
-          is_active,
-          created_at
-        `
-        )
-        .eq("id", id)
-        .single();
-
-      if (supabaseError) throw supabaseError;
-      return data;
-    } catch (err) {
-      console.error("Erro ao buscar serviço:", err);
-      return null;
-    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {
-    services,
-    loading,
     error,
-    refetch: fetchServices,
-    getServiceById,
+    loading,
+    services,
+    isLoading,
+    setIsLoading,
   };
 };

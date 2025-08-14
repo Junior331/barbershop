@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { getIcons } from "@/assets/icons";
@@ -17,8 +16,7 @@ import {
 
 export const Services = () => {
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(true);
-  const { services, loading, error } = useServices();
+  const { services, loading, error, isLoading, setIsLoading } = useServices();
   const { services: selectedServices, toggleService } = useOrder();
 
   const isServiceSelected = (id: string): boolean =>
@@ -42,19 +40,6 @@ export const Services = () => {
   if (error)
     return (
       <div className="alert alert-error">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="stroke-current shrink-0 h-6 w-6"
-          fill="none"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
         <span>Erro ao carregar serviços: {error}</span>
       </div>
     );
@@ -63,12 +48,10 @@ export const Services = () => {
     <Layout>
       <div className="flex flex-col justify-start items-center h-full w-full">
         <Header title={"Serviços"} backPath={"/"} />
-
         <div className="flex flex-col w-full justify-between items-start gap-2 px-4 pb-2 overflow-auto h-[calc(100vh-0px)]">
           <div className="grid grid-cols-1 gap-4 w-full max-w-full pb-[10px] pr-1">
             {services.map((item) => {
               const checked = isServiceSelected(item.id);
-
               return (
                 <div
                   role="button"
@@ -95,7 +78,6 @@ export const Services = () => {
                           {item.discount}%
                         </div>
                       )}
-
                       <CircleIcon className="!max-w-32 !max-h-32">
                         {isLoading && (
                           <div className="size-full flex items-center justify-center">
@@ -106,8 +88,8 @@ export const Services = () => {
                         <img
                           onLoad={handleImageLoad}
                           alt={`Service ${item.name}`}
-                          src={item.image_url || getIcons("fallback")}
-                          onError={(e) => handleImageError(e, item.image_url)}
+                          src={item.imageUrl || getIcons("fallback")}
+                          onError={(e) => handleImageError(e, item.imageUrl)}
                           className={cn(
                             "w-[calc(100%-15px)] h-[calc(100%-15px)] object-cover",
                             isLoading && "hidden"
@@ -140,7 +122,7 @@ export const Services = () => {
                               checked && "bg-[#111827]"
                             )}
                           />
-                          {item.duration_minutes}min
+                          {item.durationMinutes}min
                         </Text>
 
                         <div className="flex flex-col items-center gap-[5px] absolute right-2 bottom-2">

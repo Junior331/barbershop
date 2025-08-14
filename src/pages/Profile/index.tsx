@@ -11,6 +11,8 @@ export const Profile = () => {
   const { user } = useAuth();
   const { formik, loading } = useProfile();
 
+  console.log(`user ::`, user)
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -19,7 +21,7 @@ export const Profile = () => {
       const reader = new FileReader();
       reader.onloadend = () => {
         if (typeof reader.result === "string") {
-          formik.setFieldValue("avatar", reader.result);
+          formik.setFieldValue("avatarUrl", reader.result);
         }
       };
       reader.readAsDataURL(file);
@@ -32,12 +34,12 @@ export const Profile = () => {
         email: user.email || "",
         phone: user.phone || "",
         name: user?.name || "",
-        state: user.user_metadata?.state || "",
-        avatar: user.user_metadata?.avatar || "",
-        street: user.user_metadata?.street || "",
-        country: user.user_metadata?.country || "",
-        birth_date: user.user_metadata?.birth_date || "",
-        postal_code: user.user_metadata?.postal_code || "",
+        state: user.state || "",
+        street: user.street || "",
+        country: user.country || "",
+        avatarUrl: user.avatarUrl || "",
+        birth_date: user.birthDate || "",
+        postal_code: user.postalCode || "",
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
