@@ -183,3 +183,35 @@ export interface ApiResponse<T = unknown> {
   message?: string;
   success: boolean;
 }
+
+
+export interface IServiceBarber {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  durationMinutes: number;
+  imageUrl: string;
+}
+
+export interface IBarberApiResponse {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  role: string;
+  city: string;
+  state: string;
+  street: string;
+  country: string;
+  biography: string;
+  birthDate: string;
+  postalCode: string;
+  neighborhood: string;
+  avatarUrl: string;
+  isVerified: boolean;
+  createdAt: string;
+  updatedAt: string;
+  serviceBarbers: IServiceBarber[];
+  barberRating?: number; // caso venha algo opcional
+}

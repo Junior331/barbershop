@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import axios from "axios";
 import { useState } from "react";
 import { ApiError } from "@/utils/types";
+import { cookieUtils, COOKIE_NAMES } from "@/utils/cookies";
+import axios, { isAxiosError } from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
@@ -10,17 +11,19 @@ export const useApi = () => {
   const [error, setError] = useState<string | null>(null);
 
   const setToken = (token: string) => {
-    document.cookie = `accessToken=${token}; path=/; secure; SameSite=Strict`; // Salva o token no cookie
+    cookieUtils.set(COOKIE_NAMES.ACCESS_TOKEN, token, {
+      expires: 7, // 7 dias
+      secure: true,
+      sameSite: 'Strict'
+    });
   };
 
   const getToken = (): string | null => {
-    const match = document.cookie.match(new RegExp("(^| )accessToken=([^;]+)"));
-    return match ? match[2] : null;
+    return cookieUtils.get(COOKIE_NAMES.ACCESS_TOKEN);
   };
 
   const removeToken = () => {
-    document.cookie =
-      "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"; // Remove o token
+    cookieUtils.remove(COOKIE_NAMES.ACCESS_TOKEN);
   };
 
   const apiCall = async (
@@ -28,28 +31,37 @@ export const useApi = () => {
     method: string = "GET",
     body: any = null
   ) => {
-    const token = getToken();
-    const config = {
-      headers: {
-        Authorization: token ? `Bearer ${token}` : "",
-        "Content-Type": "application/json",
-      },
-    };
-
     try {
       setLoading(true);
+      setError(null);
+      
+      const token = getToken();
+      const headers: any = {
+        'Content-Type': 'application/json',
+      };
+
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
+      
       const response = await axios({
         url: `${API_URL}${url}`,
-        method: method,
+        method: method.toLowerCase() as any,
         data: body,
-        ...config,
+        headers,
       });
+      
       return response.data;
     } catch (error: unknown) {
       let errorMessage = "Erro na requisição";
       
-      if (axios.isAxiosError(error)) {
+      if (isAxiosError(error)) {
         errorMessage = error.response?.data?.message || error.message;
+        
+        // Se erro 401, remover token inválido
+        if (error.response?.status === 401) {
+          removeToken();
+        }
       } else if (error instanceof Error) {
         errorMessage = error.message;
       }
@@ -58,8 +70,8 @@ export const useApi = () => {
       
       const apiError: ApiError = {
         message: errorMessage,
-        status: axios.isAxiosError(error) ? error.response?.status : undefined,
-        code: axios.isAxiosError(error) ? error.code : undefined,
+        status: isAxiosError(error) ? error.response?.status : undefined,
+        code: isAxiosError(error) ? error.code : undefined,
       };
       
       throw apiError;

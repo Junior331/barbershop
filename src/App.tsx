@@ -1,4 +1,5 @@
 import { BrowserRouter as Router } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 
 import "./index.css";
 import { AppRoutes } from "./routes";
@@ -9,6 +10,16 @@ export default function App() {
     <Router>
       <AuthProvider>
         <AppRoutes />
+        <Toaster 
+          position="top-right"
+          toastOptions={{
+            duration: 4000,
+            style: {
+              background: '#363636',
+              color: '#fff',
+            },
+          }}
+        />
       </AuthProvider>
     </Router>
   );

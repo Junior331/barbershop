@@ -1,87 +1,66 @@
-import { useEffect, useState, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { useApi } from "@/hooks/useApi";
+import { IBarber, IBarberApiResponse, IServiceBarber } from "@/utils/types";
+import { logger } from "@/utils/logger";
 
-import { supabase } from "@/lib/supabase";
-import { IBarber, UseBarbersResult, BarberResponse } from "@/utils/types";
-
-export function useBarbers(serviceIds: string[]): UseBarbersResult {
-  const [state, setState] = useState<{
-    loading: boolean;
-    barbers: IBarber[];
-    error: string | null;
-  }>({
-    barbers: [],
-    error: null,
-    loading: false,
-  });
-
-  const parseBarberResponse = useCallback((data: BarberResponse[]): IBarber[] => {
-    return data.map((item) => ({
-      role: 'barber',
-      id: item.barber_id,
-      name: item.barber_name,
-      email: item.barber_email,
-      phone: item.barber_phone,
-      avatar_url: item.barber_avatar_url,
-      barber_details: {
-        is_active: true,
-        // cuts_completed: 0,
-        id: item.barber_id,
-        barber_rating: item.barber_rating,
-        description: item.barber_description,
-      },
-      services: item.services_info.map(service => service.name),
-      services_full: item.services_info,
-      total_price: item.total_price,
-    }));
-  }, []);
+export const useBarbers = (serviceIds: string[]) => {
+  const { apiCall, loading: apiLoading, error: apiError } = useApi();
+  const [barbers, setBarbers] = useState<IBarber[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const fetchBarbers = useCallback(async () => {
     if (!serviceIds.length) {
-      setState({ barbers: [], loading: false, error: null });
+      setBarbers([]);
       return;
     }
 
-    setState(prev => ({ ...prev, loading: true, error: null }));
+    setIsLoading(true);
 
     try {
-      const { data, error } = await supabase
-        .rpc('get_barbers_by_services', { service_ids: serviceIds })
-        .select('*');
-
-        console.log(`data ::`, data)
-
-      if (error) throw error;
-
-      const barbersData = data as BarberResponse[] | null;
-      
-      if (!barbersData) {
-        setState({ barbers: [], loading: false, error: null });
-        return;
-      }
-
-      setState({
-        barbers: parseBarberResponse(barbersData),
-        loading: false,
-        error: null,
+      const data = await apiCall("/users/barbers/by-services", "POST", {
+        serviceIds,
       });
+
+      const parsedBarbers: IBarber[] = data.map((item:IBarberApiResponse) => ({
+        role: item.role.toLowerCase() as "barber",
+        id: item.id,
+        name: item.name,
+        email: item.email,
+        phone: item.phone,
+        avatar_url: item.avatarUrl,
+        barber_details: {
+          id: item.id,
+          description: item.biography,
+          is_active: item.isVerified,
+          barber_rating: item.barberRating ?? 0,
+        },
+        services: item.serviceBarbers.map((s: IServiceBarber) => s.name),
+        services_full: item.serviceBarbers.map((s: IServiceBarber) => ({
+          ...s,
+          image_url: s.imageUrl,
+          durationMinutes: s.durationMinutes
+        })),
+        total_price: item.serviceBarbers.reduce((sum, s) => sum + s.price, 0),
+      }));
+
+      setBarbers(parsedBarbers);
     } catch (err) {
-      console.error("Failed to fetch barbers:", err);
-      setState({
-        barbers: [],
-        loading: false,
-        error: err instanceof Error ? err.message : "Failed to load barbers",
-      });
+      logger.error("Erro ao buscar barbeiros:", err);
+      setBarbers([]);
+    } finally {
+      setIsLoading(false);
     }
-  }, [serviceIds, parseBarberResponse]);
+  }, [apiCall, serviceIds]);
 
   useEffect(() => {
     fetchBarbers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {
-    barbers: state.barbers,
-    loading: state.loading,
-    error: state.error,
+    barbers,
+    loading: apiLoading || isLoading,
+    error: apiError,
     refetch: fetchBarbers,
   };
-}
+};

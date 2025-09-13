@@ -1,11 +1,13 @@
 import { IUserData } from "@/utils/types";
-import { createContext, useContext, useState, useEffect } from "react";
-import { supabase } from "@/lib/supabase";
+import { createContext, useContext, useState, useEffect, useCallback } from "react";
+import { cookieUtils, COOKIE_NAMES } from "@/utils/cookies";
+import { logger } from "@/utils/logger";
+import toast from "react-hot-toast";
 
 interface AuthContextType {
   user: IUserData | null;
-  setAuth: (user: IUserData | null) => void;
-  logout: () => Promise<void>;
+  setAuth: (user: IUserData | null, token?: string) => void;
+  logout: () => void;
   isLoading: boolean;
 }
 
@@ -16,162 +18,91 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   // Função para fazer logout
-  const logout = async () => {
+  const logout = useCallback(() => {
     try {
-      await supabase.auth.signOut();
       setUser(null);
-      // Limpar dados do localStorage se necessário
-      localStorage.removeItem('user');
+      cookieUtils.remove(COOKIE_NAMES.ACCESS_TOKEN);
+      cookieUtils.remove(COOKIE_NAMES.USER_DATA);
+      toast.success('Logout realizado com sucesso');
+      logger.auth('Logout realizado');
     } catch (error) {
-      console.error('Erro ao fazer logout:', error);
+      logger.error('Erro ao fazer logout:', error);
+      toast.error('Erro ao fazer logout');
     }
-  };
+  }, []);
 
-  // Função para definir autenticação
-  const setAuth = (authUser: IUserData | null) => {
+  // Função para definir autenticação com cookies seguros
+  const setAuth = useCallback((authUser: IUserData | null, token?: string) => {
     setUser(authUser);
-    // Persistir no localStorage
+    
     if (authUser) {
-      localStorage.setItem('user', JSON.stringify(authUser));
+      // Salvar dados do usuário em cookie seguro
+      cookieUtils.set(COOKIE_NAMES.USER_DATA, JSON.stringify(authUser), {
+        expires: 7, // 7 dias
+        secure: true,
+        sameSite: 'Strict'
+      });
+
+      // Salvar token se fornecido
+      if (token) {
+        cookieUtils.set(COOKIE_NAMES.ACCESS_TOKEN, token, {
+          expires: 7, // 7 dias
+          secure: true,
+          sameSite: 'Strict'
+        });
+      }
+
+      logger.auth('Usuário autenticado e salvo em cookies');
     } else {
-      localStorage.removeItem('user');
+      cookieUtils.remove(COOKIE_NAMES.ACCESS_TOKEN);
+      cookieUtils.remove(COOKIE_NAMES.USER_DATA);
+      logger.auth('Dados de autenticação removidos dos cookies');
     }
-  };
+  }, []);
 
-  // Verificar sessão inicial e configurar listener
+  // Verificar sessão inicial
   useEffect(() => {
-    const initializeAuth = async () => {
+    const initializeAuth = () => {
       try {
-        // Verificar sessão atual
-        const { data: { session } } = await supabase.auth.getSession();
-        
-        if (session) {
-          // Verificar se o token não expirou
-          const now = Math.floor(Date.now() / 1000);
-          if (session.expires_at && session.expires_at < now) {
-            // Token expirado, fazer logout
-            await logout();
-            setIsLoading(false);
-            return;
-          }
+        // Verificar se existe token e dados do usuário nos cookies
+        const token = cookieUtils.get(COOKIE_NAMES.ACCESS_TOKEN);
+        const userDataString = cookieUtils.get(COOKIE_NAMES.USER_DATA);
 
-          // Buscar dados do usuário
-          const { data: customUser, error } = await supabase
-            .from("users")
-            .select("*")
-            .eq("id", session.user.id)
-            .single();
-
-          if (error) {
-            console.error("Erro ao buscar dados do usuário:", error.message);
-            // Se não conseguir buscar dados customizados, usar apenas os dados do Supabase
-            setAuth({
-              id: session.user.id,
-              email: session.user.email || '',
-              phone: session.user.phone,
-              created_at: session.user.created_at,
-              updated_at: session.user.updated_at,
-            });
-          } else {
-            setAuth({
-              id: session.user.id,
-              email: session.user.email || '',
-              phone: session.user.phone,
-              created_at: session.user.created_at,
-              updated_at: session.user.updated_at,
-              ...customUser,
-            });
+        if (token && userDataString) {
+          try {
+            const userData = JSON.parse(userDataString);
+            setUser(userData);
+            logger.auth('Usuário restaurado dos cookies');
+          } catch (error) {
+            logger.error('Erro ao parsear dados do usuário dos cookies:', error);
+            // Se dados estão corrompidos, limpar cookies
+            cookieUtils.remove(COOKIE_NAMES.ACCESS_TOKEN);
+            cookieUtils.remove(COOKIE_NAMES.USER_DATA);
+            setUser(null);
           }
         } else {
-          // Tentar recuperar do localStorage
-          const savedUser = localStorage.getItem('user');
-          if (savedUser) {
-            try {
-              const parsedUser = JSON.parse(savedUser);
-              // Verificar se ainda é válido
-              const { data: { session: currentSession } } = await supabase.auth.getSession();
-              if (!currentSession) {
-                localStorage.removeItem('user');
-              } else {
-                setUser(parsedUser);
-              }
-            } catch {
-              localStorage.removeItem('user');
-            }
-          }
+          // Sem token ou dados do usuário
+          setUser(null);
+          logger.auth('Nenhum token ou dados encontrados nos cookies');
         }
       } catch (error) {
-        console.error('Erro ao inicializar autenticação:', error);
+        logger.error('Erro ao inicializar autenticação:', error);
+        setUser(null);
       } finally {
         setIsLoading(false);
       }
     };
 
-    // Configurar listener de mudanças de autenticação
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session) {
-        const { data: customUser, error } = await supabase
-          .from("users")
-          .select("*")
-          .eq("id", session.user.id)
-          .single();
-
-        if (error) {
-          console.error("Erro ao buscar dados do usuário:", error.message);
-          // Se não conseguir buscar dados customizados, usar apenas os dados do Supabase
-          setAuth({
-            id: session.user.id,
-            email: session.user.email || '',
-            phone: session.user.phone,
-            created_at: session.user.created_at,
-            updated_at: session.user.updated_at,
-          });
-        } else {
-          setAuth({
-            id: session.user.id,
-            email: session.user.email || '',
-            phone: session.user.phone,
-            created_at: session.user.created_at,
-            updated_at: session.user.updated_at,
-            ...customUser,
-          });
-        }
-      } else if (event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
-        setAuth(null);
-      }
-    });
-
     initializeAuth();
-
-    return () => subscription.unsubscribe();
   }, []);
 
-  // Verificar periodicamente se o token expirou
-  useEffect(() => {
-    if (!user) return;
-
-    const checkTokenExpiration = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        await logout();
-        return;
-      }
-
-      const now = Math.floor(Date.now() / 1000);
-      if (session.expires_at && session.expires_at < now) {
-        await logout();
-      }
-    };
-
-    // Verificar a cada 5 minutos
-    const interval = setInterval(checkTokenExpiration, 5 * 60 * 1000);
-    
-    return () => clearInterval(interval);
-  }, [user]);
-
   return (
-    <AuthContext.Provider value={{ user, setAuth, logout, isLoading }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      setAuth, 
+      logout, 
+      isLoading 
+    }}>
       {children}
     </AuthContext.Provider>
   );
