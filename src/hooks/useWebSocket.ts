@@ -32,7 +32,7 @@ export const useWebSocket = (): UseWebSocketReturn => {
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const connectSocket = useCallback(() => {
-    if (!token || socket?.connected) return;
+    if (!token || !user || socket?.connected) return;
 
     const newSocket = io(import.meta.env.VITE_API_URL || 'http://localhost:3000', {
       auth: {
@@ -179,7 +179,7 @@ export const useWebSocket = (): UseWebSocketReturn => {
     return () => {
       disconnectSocket();
     };
-  }, [token, user, connectSocket, disconnectSocket]);
+  }, [token, user]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -187,9 +187,11 @@ export const useWebSocket = (): UseWebSocketReturn => {
       if (reconnectTimeoutRef.current) {
         clearTimeout(reconnectTimeoutRef.current);
       }
-      disconnectSocket();
+      if (socket) {
+        socket.disconnect();
+      }
     };
-  }, [disconnectSocket]);
+  }, []);
 
   return {
     socket,

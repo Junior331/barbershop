@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 
 interface AuthContextType {
   user: IUserData | null;
+  token: string | null;
   setAuth: (user: IUserData | null, token?: string) => void;
   logout: () => void;
   isLoading: boolean;
@@ -15,12 +16,15 @@ const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<IUserData | null>(null);
+  const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   // Função para fazer logout
   const logout = useCallback(() => {
     try {
       setUser(null);
+      setToken(null);
       cookieUtils.remove(COOKIE_NAMES.ACCESS_TOKEN);
       cookieUtils.remove(COOKIE_NAMES.USER_DATA);
       toast.success('Logout realizado com sucesso');
@@ -32,9 +36,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   // Função para definir autenticação com cookies seguros
-  const setAuth = useCallback((authUser: IUserData | null, token?: string) => {
+  const setAuth = useCallback((authUser: IUserData | null, authToken?: string) => {
     setUser(authUser);
-    
+    setToken(authToken || null);
+
     if (authUser) {
       // Salvar dados do usuário em cookie seguro
       cookieUtils.set(COOKIE_NAMES.USER_DATA, JSON.stringify(authUser), {
@@ -44,8 +49,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       });
 
       // Salvar token se fornecido
-      if (token) {
-        cookieUtils.set(COOKIE_NAMES.ACCESS_TOKEN, token, {
+      if (authToken) {
+        cookieUtils.set(COOKIE_NAMES.ACCESS_TOKEN, authToken, {
           expires: 7, // 7 dias
           secure: true,
           sameSite: 'Strict'
@@ -62,16 +67,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   // Verificar sessão inicial
   useEffect(() => {
+    if (isInitialized) return;
+
     const initializeAuth = () => {
       try {
         // Verificar se existe token e dados do usuário nos cookies
-        const token = cookieUtils.get(COOKIE_NAMES.ACCESS_TOKEN);
+        const storedToken = cookieUtils.get(COOKIE_NAMES.ACCESS_TOKEN);
         const userDataString = cookieUtils.get(COOKIE_NAMES.USER_DATA);
 
-        if (token && userDataString) {
+        if (storedToken && userDataString) {
           try {
             const userData = JSON.parse(userDataString);
             setUser(userData);
+            setToken(storedToken);
             logger.auth('Usuário restaurado dos cookies');
           } catch (error) {
             logger.error('Erro ao parsear dados do usuário dos cookies:', error);
@@ -79,29 +87,34 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             cookieUtils.remove(COOKIE_NAMES.ACCESS_TOKEN);
             cookieUtils.remove(COOKIE_NAMES.USER_DATA);
             setUser(null);
+            setToken(null);
           }
         } else {
           // Sem token ou dados do usuário
           setUser(null);
+          setToken(null);
           logger.auth('Nenhum token ou dados encontrados nos cookies');
         }
       } catch (error) {
         logger.error('Erro ao inicializar autenticação:', error);
         setUser(null);
+        setToken(null);
       } finally {
         setIsLoading(false);
+        setIsInitialized(true);
       }
     };
 
     initializeAuth();
-  }, []);
+  }, [isInitialized]);
 
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      setAuth, 
-      logout, 
-      isLoading 
+    <AuthContext.Provider value={{
+      user,
+      token,
+      setAuth,
+      logout,
+      isLoading
     }}>
       {children}
     </AuthContext.Provider>

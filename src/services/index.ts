@@ -5,3 +5,6 @@ export * from './services.service';
 export * from './barbers.service';
 export * from './promotions.service';
 export * from './wallet.service';
+export * from './reviews.service';
+export * from './notifications.service';
+export * from './payments.service';

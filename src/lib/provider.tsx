@@ -8,9 +8,9 @@ export const Provider = ({ children }: { children: ReactNode }) => {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <WebSocketProvider>
+        {/* <WebSocketProvider> */}
           {children}
-        </WebSocketProvider>
+        {/* </WebSocketProvider> */}
       </AuthProvider>
     </BrowserRouter>
   );
