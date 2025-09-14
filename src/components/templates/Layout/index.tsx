@@ -1,6 +1,7 @@
 import { IProps } from "./@types";
 import { getIcons } from "@/assets/icons";
 import { Sidebar } from "@/components/organisms";
+import { NotificationBell } from "@/components/elements";
 
 export const Layout = ({ children }: IProps) => {
   return (
@@ -15,6 +16,12 @@ export const Layout = ({ children }: IProps) => {
         src={getIcons("pole_left")}
         className="fixed bottom-[100px] left-[-5px]"
       />
+
+      {/* Notification Bell - Top Right */}
+      <div className="fixed top-4 right-4 z-50">
+        <NotificationBell />
+      </div>
+
       <main className="flex flex-1 justify-center items-start w-full h-full overflow-hidden relative z-10">
         {children}
       </main>
