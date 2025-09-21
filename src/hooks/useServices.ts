@@ -1,24 +1,78 @@
-import { useState, useEffect, useCallback } from "react";
-import { useApi } from "@/hooks/useApi";
-import { IService } from "@/utils/types";
+import { useState, useEffect } from "react";
+import { servicesService } from "@/services/services.service";
+import { logger } from "@/utils/logger";
+import toast from "react-hot-toast";
+
+export interface Service {
+  id: string;
+  name: string;
+  description?: string;
+  price: number;
+  promotionalPrice?: number;
+  durationMinutes: number;
+  imageUrl?: string;
+  isActive: boolean;
+  discount?: number;
+}
 
 export const useServices = () => {
-  const { apiCall, loading, error } = useApi();
-  const [services, setServices] = useState<IService[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [services, setServices] = useState<Service[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const fetchServices = useCallback(async () => {
+  const fetchServices = async () => {
     try {
-      const data = await apiCall("/services", "GET");
-      setServices(data);
+      setLoading(true);
+      setError(null);
+
+      logger.info('Carregando serviços na página Services');
+
+      // Buscar todos os serviços ativos
+      const response = await servicesService.getAll(1, 50); // Limite alto para pegar todos
+
+      // Filtrar apenas serviços ativos
+      const activeServices = response.data?.filter(service => service.isActive) || [];
+
+      // Calcular desconto para serviços com preço promocional
+      const servicesWithDiscount = activeServices.map(service => {
+        let discount = 0;
+        if (service.promotionalPrice && service.promotionalPrice < service.price) {
+          discount = Math.round(((service.price - service.promotionalPrice) / service.price) * 100);
+        }
+
+        return {
+          id: service.id,
+          name: service.name,
+          description: service.description,
+          price: service.promotionalPrice || service.price, // Usar preço promocional se disponível
+          promotionalPrice: service.promotionalPrice,
+          durationMinutes: service.durationMinutes,
+          imageUrl: service.imageUrl,
+          isActive: service.isActive,
+          discount: discount > 0 ? discount : undefined,
+        };
+      });
+
+      setServices(servicesWithDiscount);
+      logger.info(`Carregados ${servicesWithDiscount.length} serviços ativos`);
+
     } catch (err) {
-      console.error("Erro ao buscar serviços:", err);
+      const errorMessage = err instanceof Error ? err.message : 'Erro ao carregar serviços';
+      logger.error('Erro ao carregar serviços:', err);
+      setError(errorMessage);
+      toast.error('Erro ao carregar serviços');
+    } finally {
+      setLoading(false);
     }
-  }, [apiCall]);
+  };
+
+  const refreshServices = async () => {
+    await fetchServices();
+  };
 
   useEffect(() => {
     fetchServices();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {
@@ -27,5 +81,7 @@ export const useServices = () => {
     services,
     isLoading,
     setIsLoading,
+    refreshServices,
+    hasServices: services.length > 0,
   };
 };

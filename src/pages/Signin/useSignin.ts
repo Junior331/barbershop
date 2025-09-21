@@ -1,17 +1,19 @@
 import { useFormik } from "formik";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 import { schema } from "./schema";
-import { useApi } from "@/hooks/useApi";
-import { ApiError } from "@/utils/types";
+import { authService, AuthError } from "@/services/auth.service";
 import { useAuth } from "@/context/AuthContext";
 import { logger } from "@/utils/logger";
+import { cookieUtils, COOKIE_NAMES } from "@/utils/cookies";
 
 export const useSignin = () => {
   const navigate = useNavigate();
   const { setAuth } = useAuth();
-  const { apiCall, loading, error, setToken } = useApi();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const formik = useFormik({
     initialValues: {
@@ -21,34 +23,80 @@ export const useSignin = () => {
     },
     validationSchema: schema,
     onSubmit: async (values) => {
+      setLoading(true);
+      setError(null);
+
       try {
-        const data = await apiCall("/auth/login", "POST", {
+        logger.info('Iniciando processo de login');
+
+        // Fazer login usando o novo serviço
+        const authResponse = await authService.login({
           email: values.email,
           password: values.password,
         });
 
-        if (data.accessToken && data.user) {
-          // Salvar token nos cookies via setToken
-          setToken(data.accessToken);
-          
-          // Definir autenticação (dados do usuário também vão para cookies)
-          setAuth(data.user, data.accessToken);
-          
-          logger.auth('Login realizado com sucesso via API customizada');
-          toast.success("Login realizado com sucesso!");
-          navigate("/");
+        // Salvar tokens nos cookies
+        const cookieOptions = {
+          expires: values.rememberMe ? 30 : 1, // 30 dias ou 1 dia
+          secure: true,
+          sameSite: 'Strict' as const,
+        };
+
+        cookieUtils.set(COOKIE_NAMES.ACCESS_TOKEN, authResponse.accessToken, cookieOptions);
+        cookieUtils.set(COOKIE_NAMES.REFRESH_TOKEN, authResponse.refreshToken, {
+          ...cookieOptions,
+          expires: 7, // Refresh token sempre 7 dias
+        });
+        cookieUtils.set(COOKIE_NAMES.USER_DATA, JSON.stringify(authResponse.user), cookieOptions);
+
+        // Atualizar contexto de autenticação
+        setAuth(authResponse.user, authResponse.accessToken);
+
+        logger.info('Login realizado com sucesso', {
+          userId: authResponse.user.id,
+          role: authResponse.user.role,
+          rememberMe: values.rememberMe,
+        });
+
+        toast.success(`Bem-vindo(a), ${authResponse.user.name}!`);
+
+        // Redirecionar baseado no role do usuário
+        const redirectPath = getRedirectPath(authResponse.user.role);
+        navigate(redirectPath);
+
+      } catch (error) {
+        const authError = error as AuthError;
+
+        logger.error('Erro no processo de login:', authError);
+
+        // Mostrar erro específico baseado no campo
+        if (authError.field === 'email') {
+          formik.setFieldError('email', authError.message);
+        } else if (authError.field === 'password') {
+          formik.setFieldError('password', authError.message);
         } else {
-          toast.error("Resposta da API inválida");
+          setError(authError.message);
+          toast.error(authError.message);
         }
-      } catch (error: unknown) {
-        const apiError = error as ApiError;
-        toast.error(
-          apiError.message || "Erro ao fazer login. Verifique suas credenciais."
-        );
-        logger.error('Erro no processo de login:', error);
+      } finally {
+        setLoading(false);
       }
     },
   });
+
+  // Função para determinar redirecionamento baseado no role
+  const getRedirectPath = (role: string): string => {
+    switch (role) {
+      case 'BARBER':
+        return '/barber';
+      case 'ADMIN':
+      case 'OWNER':
+        return '/admin';
+      case 'CLIENT':
+      default:
+        return '/';
+    }
+  };
 
   return {
     error,

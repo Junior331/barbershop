@@ -16,7 +16,7 @@ import {
 
 export const Services = () => {
   const navigate = useNavigate();
-  const { services, loading, error, isLoading, setIsLoading } = useServices();
+  const { services, loading, error, isLoading, setIsLoading, refreshServices, hasServices } = useServices();
   const { services: selectedServices, toggleService } = useOrder();
 
   const isServiceSelected = (id: string): boolean =>
@@ -39,9 +39,27 @@ export const Services = () => {
 
   if (error)
     return (
-      <div className="alert alert-error">
-        <span>Erro ao carregar serviços: {error}</span>
-      </div>
+      <Layout>
+        <div className="flex flex-col justify-center items-center h-full w-full p-4">
+          <div className="alert alert-error max-w-md">
+            <img
+              src={getIcons("error")}
+              alt="Erro"
+              className="size-6"
+            />
+            <div className="flex flex-col">
+              <span className="font-medium">Erro ao carregar serviços</span>
+              <span className="text-sm opacity-70">{error}</span>
+            </div>
+          </div>
+          <Button
+            className="mt-4"
+            onClick={refreshServices}
+          >
+            Tentar novamente
+          </Button>
+        </div>
+      </Layout>
     );
 
   return (
@@ -49,8 +67,28 @@ export const Services = () => {
       <div className="flex flex-col justify-start items-center h-full w-full">
         <Header title={"Serviços"} backPath={"/"} />
         <div className="flex flex-col w-full justify-between items-start gap-2 px-4 pb-2 overflow-auto h-[calc(100vh-0px)]">
-          <div className="grid grid-cols-1 gap-4 w-full max-w-full pb-[10px] pr-1">
-            {services.map((item) => {
+          {!hasServices ? (
+            <div className="flex flex-col items-center justify-center w-full h-full py-12">
+              <img
+                src={getIcons("services")}
+                alt="Sem serviços"
+                className="size-16 opacity-50 mb-4"
+              />
+              <Title className="text-gray-500 mb-2">Nenhum serviço disponível</Title>
+              <Text className="text-gray-400 text-center mb-6">
+                Não há serviços ativos no momento.
+              </Text>
+              <Button
+                onClick={refreshServices}
+                variant="outline"
+              >
+                Atualizar
+              </Button>
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 gap-4 w-full max-w-full pb-[10px] pr-1">
+                {services.map((item) => {
               const checked = isServiceSelected(item.id);
               return (
                 <div
@@ -126,8 +164,8 @@ export const Services = () => {
                         </Text>
 
                         <div className="flex flex-col items-center gap-[5px] absolute right-2 bottom-2">
-                          {Boolean(item.discount) && (
-                            <Text className="line-through">
+                          {Boolean(item.discount && item.promotionalPrice) && (
+                            <Text className="line-through text-gray-500 text-xs">
                               {formatter({
                                 type: "pt-BR",
                                 currency: "BRL",
@@ -135,7 +173,8 @@ export const Services = () => {
                                 minimumFractionDigits: 2,
                                 maximumFractionDigits: 2,
                               }).format(
-                                item.price / (1 - (item?.discount || 1) / 100)
+                                // Calcular preço original a partir do preço atual e desconto
+                                item.price / (1 - (item?.discount || 0) / 100)
                               )}
                             </Text>
                           )}
@@ -148,6 +187,11 @@ export const Services = () => {
                               maximumFractionDigits: 2,
                             }).format(item.price || 0)}
                           </Title>
+                          {item.discount && (
+                            <span className="text-xs bg-green-100 text-green-800 px-1 rounded">
+                              -{item.discount}%
+                            </span>
+                          )}
                         </div>
                       </div>
 
@@ -165,30 +209,32 @@ export const Services = () => {
                   </Card>
                 </div>
               );
-            })}
-          </div>
+                })}
+              </div>
 
-          <Button
-            type="button"
-            className="bottom-0 sticky max-w-80 m-auto h-14"
-            disabled={!selectedServices.length}
-            onClick={() => navigate("/barbers")}
-          >
-            {selectedServices.length
-              ? `Confirmar • ${formatter({
-                  type: "pt-BR",
-                  currency: "BRL",
-                  style: "currency",
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                }).format(
-                  selectedServices.reduce(
-                    (total, service) => total + service.price,
-                    0
-                  )
-                )}`
-              : "Confirmar"}
-          </Button>
+              <Button
+                type="button"
+                className="bottom-0 sticky max-w-80 m-auto h-14"
+                disabled={!selectedServices.length}
+                onClick={() => navigate("/barbers")}
+              >
+                {selectedServices.length
+                  ? `Confirmar • ${formatter({
+                      type: "pt-BR",
+                      currency: "BRL",
+                      style: "currency",
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }).format(
+                      selectedServices.reduce(
+                        (total, service) => total + service.price,
+                        0
+                      )
+                    )}`
+                  : "Confirmar"}
+              </Button>
+            </>
+          )}
         </div>
       </div>
     </Layout>

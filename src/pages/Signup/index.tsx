@@ -120,14 +120,65 @@ export const Signup = () => {
           ) : null}
         </div>
 
+        {/* Campo de Telefone (Opcional) */}
+        <div className="flex flex-col w-full gap-1">
+          <label className="text-[#6E6B7B] text-base font-normal leading-[18px]">
+            Telefone (Opcional)
+          </label>
+          <input
+            type="tel"
+            name="phone"
+            onBlur={formik.handleBlur}
+            value={formik.values.phone}
+            placeholder="(11) 99999-9999"
+            onChange={formik.handleChange}
+            className="w-full h-[48px] px-[10px] rounded-[5px] border border-[#D8D6DE]"
+          />
+          {formik.touched.phone && formik.errors.phone ? (
+            <div className="text-red-500 text-sm">{formik.errors.phone}</div>
+          ) : null}
+        </div>
+
+        {/* Aceitar Termos */}
+        <label className="flex fieldset-label items-start gap-2 text-[#6E6B7B] text-sm font-normal">
+          <input
+            type="checkbox"
+            name="acceptTerms"
+            onChange={formik.handleChange}
+            checked={formik.values.acceptTerms}
+            className="checkbox custom_before w-4 h-4 border border-[#6E6B7B] rounded p-[3px] mt-0.5"
+          />
+          <span>
+            Eu aceito os{" "}
+            <button
+              type="button"
+              className="text-[#7367f0] underline hover:no-underline"
+              onClick={() => window.open('/terms', '_blank')}
+            >
+              Termos de Uso
+            </button>{" "}
+            e{" "}
+            <button
+              type="button"
+              className="text-[#7367f0] underline hover:no-underline"
+              onClick={() => window.open('/privacy', '_blank')}
+            >
+              Política de Privacidade
+            </button>
+          </span>
+        </label>
+        {formik.touched.acceptTerms && formik.errors.acceptTerms ? (
+          <div className="text-red-500 text-sm">{formik.errors.acceptTerms}</div>
+        ) : null}
+
         <button
           type="submit"
-          disabled={loading}
+          disabled={loading || !formik.values.acceptTerms}
           className={`btn max-w-full border-none rounded text-[14px] text-white py-[10px] font-[500] tracking-[0.4px] ${
-            loading ? "bg-gray-400 cursor-not-allowed" : "bg-[#6C8762]"
+            loading || !formik.values.acceptTerms ? "bg-gray-400 cursor-not-allowed" : "bg-[#6C8762]"
           }`}
         >
-          {loading ? "Registrando..." : "Registrar"}
+          {loading ? "Criando conta..." : "Criar conta"}
         </button>
       </form>
 

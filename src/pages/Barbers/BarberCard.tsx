@@ -1,12 +1,13 @@
 import { cn } from "@/utils/utils";
-import { IBarber } from "@/utils/types";
+import { AdaptedBarber } from "@/hooks/useBarbers";
 import { Card } from "@/components/organisms";
 import { CircleIcon, Text, Title } from "@/components/elements";
+import { getIcons } from "@/assets/icons";
 
 interface BarberCardProps {
-  barber: IBarber;
+  barber: AdaptedBarber;
   isSelected: boolean;
-  onSelect: (barber: IBarber) => void;
+  onSelect: (barber: AdaptedBarber) => void;
 }
 
 export const BarberCard = ({
@@ -20,7 +21,8 @@ export const BarberCard = ({
     }
   };
 
-  console.log(`barber ::`, barber);
+  const totalAppointments = barber.barber_details.barber_rating > 0 ?
+    Math.floor(barber.barber_details.barber_rating * 20) : 0; // Estimativa baseada no rating
 
   return (
     <div
@@ -42,7 +44,13 @@ export const BarberCard = ({
               loading="lazy"
               alt={`Barber ${barber.name}`}
               className="w-full h-full object-cover"
-              src={barber.avatar_url || "/default-avatar.png"}
+              src={
+                barber.avatar_url ||
+                `https://ui-avatars.com/api/?name=${encodeURIComponent(barber.name)}&background=6C8762&color=fff&size=96`
+              }
+              onError={(e) => {
+                e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(barber.name)}&background=6C8762&color=fff&size=96`;
+              }}
             />
           </CircleIcon>
 
@@ -51,29 +59,52 @@ export const BarberCard = ({
               {barber.name}
             </Title>
 
-            <Text className={cn("text-xs", isSelected && "text-[#111827]")}>
-              {barber.barber_details.description}
-            </Text>
+            <div className="flex items-center gap-2 mb-1">
+              <Text
+                className={cn(
+                  "flex items-center text-yellow-500 text-sm",
+                  isSelected && "text-[#111827]"
+                )}
+              >
+                <img
+                  src={getIcons("star_solid_green")}
+                  alt="Rating"
+                  className="size-4 mr-1"
+                />
+                {barber.barber_details.barber_rating?.toFixed(1) ?? "0.0"}
+              </Text>
+              <div className="h-3 w-px bg-gray-300" />
+              <Text
+                className={cn(
+                  "text-xs text-gray-500",
+                  isSelected && "text-[#111827]"
+                )}
+              >
+                {totalAppointments} cortes
+              </Text>
+            </div>
 
             {barber.services.length > 0 && (
               <div
                 className={cn(
-                  "text-xs text-gray-400 mt-1 line-clamp-1",
+                  "text-xs text-gray-400 mt-1 line-clamp-2",
                   isSelected && "text-[#111827]"
                 )}
               >
-                Oferece: {barber.services.map((service) => service).join(", ")}
+                <span className="font-medium">Serviços:</span> {barber.services.join(", ")}
               </div>
             )}
 
-            <Text
-              className={cn(
-                "flex items-center text-yellow-500 text-sm",
-                isSelected && "text-[#111827]"
-              )}
-            >
-              ★ {barber.barber_details.barber_rating?.toFixed(1) ?? "0.0"}
-            </Text>
+            {barber.total_price > 0 && (
+              <div
+                className={cn(
+                  "text-sm font-medium text-green-600 mt-1",
+                  isSelected && "text-[#111827]"
+                )}
+              >
+                Total: R$ {barber.total_price.toFixed(2)}
+              </div>
+            )}
           </div>
 
           <input

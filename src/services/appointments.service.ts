@@ -1,4 +1,6 @@
-import { api } from './api';
+import { api, ApiUtils, PaginatedResponse as BasePaginatedResponse } from './api';
+import { AxiosError } from 'axios';
+import { logger } from '@/utils/logger';
 
 export interface CreateAppointmentData {
   barberId: string;
@@ -54,72 +56,201 @@ export interface Appointment {
   };
 }
 
-export interface PaginatedResponse<T> {
-  data: T[];
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-    hasNext: boolean;
-    hasPrevious: boolean;
-  };
-}
+// Usar o tipo base de paginação da API
+export type PaginatedResponse<T> = BasePaginatedResponse<T>;
 
 export const appointmentsService = {
   // Criar agendamento
   async create(data: CreateAppointmentData): Promise<Appointment> {
-    const response = await api.post('/appointments', data);
-    return response.data;
+    try {
+      logger.info('Criando agendamento:', {
+        barberId: data.barberId,
+        serviceId: data.serviceId,
+        scheduledTo: data.scheduledTo,
+        totalPrice: data.totalPrice,
+      });
+
+      const response = await api.post('/appointments', data);
+
+      logger.info('Agendamento criado com sucesso:', { appointmentId: response.data.id });
+
+      return response.data;
+    } catch (error) {
+      ApiUtils.logError(error as AxiosError, 'appointmentsService.create');
+      throw error;
+    }
   },
 
   // Histórico do cliente
   async getMyHistory(page = 1, limit = 10): Promise<PaginatedResponse<Appointment>> {
-    const response = await api.get('/appointments/my-history', {
-      params: { page, limit }
-    });
-    return response.data;
+    try {
+      logger.info('Buscando histórico de agendamentos:', { page, limit });
+
+      const response = await api.get('/appointments/my-history', {
+        params: { page, limit }
+      });
+
+      logger.info(`Encontrados ${response.data.data?.length || 0} agendamentos no histórico`);
+
+      return response.data;
+    } catch (error) {
+      ApiUtils.logError(error as AxiosError, 'appointmentsService.getMyHistory');
+      throw error;
+    }
   },
 
   // Agendamentos ativos do cliente
   async getMyActiveAppointments(): Promise<Appointment[]> {
-    const response = await api.get('/appointments/my-appointments');
-    return response.data;
+    try {
+      logger.info('Buscando agendamentos ativos');
+
+      const response = await api.get('/appointments/my-appointments');
+
+      logger.info(`Encontrados ${response.data.length} agendamentos ativos`);
+
+      return response.data;
+    } catch (error) {
+      ApiUtils.logError(error as AxiosError, 'appointmentsService.getMyActiveAppointments');
+      throw error;
+    }
+  },
+
+  // Obter agendamento específico
+  async getById(id: string): Promise<Appointment> {
+    try {
+      logger.info('Buscando agendamento por ID:', { id });
+
+      const response = await api.get(`/appointments/${id}`);
+
+      logger.info('Agendamento encontrado:', { appointmentId: response.data.id });
+
+      return response.data;
+    } catch (error) {
+      ApiUtils.logError(error as AxiosError, 'appointmentsService.getById');
+      throw error;
+    }
   },
 
   // Editar agendamento (apenas PENDING)
   async update(id: string, data: { scheduledTo?: string; scheduledTime?: string }): Promise<Appointment> {
-    const response = await api.patch(`/appointments/${id}`, data);
-    return response.data;
+    try {
+      logger.info('Atualizando agendamento:', { id, data });
+
+      const response = await api.patch(`/appointments/${id}`, data);
+
+      logger.info('Agendamento atualizado com sucesso:', { appointmentId: response.data.id });
+
+      return response.data;
+    } catch (error) {
+      ApiUtils.logError(error as AxiosError, 'appointmentsService.update');
+      throw error;
+    }
   },
 
   // Cancelar agendamento
   async cancel(id: string): Promise<{ message: string; cancellationFee: number; canCancelFree: boolean }> {
-    const response = await api.delete(`/appointments/${id}`);
-    return response.data;
+    try {
+      logger.info('Cancelando agendamento:', { id });
+
+      const response = await api.delete(`/appointments/${id}`);
+
+      logger.info('Agendamento cancelado:', {
+        appointmentId: id,
+        fee: response.data.cancellationFee,
+        canCancelFree: response.data.canCancelFree,
+      });
+
+      return response.data;
+    } catch (error) {
+      ApiUtils.logError(error as AxiosError, 'appointmentsService.cancel');
+      throw error;
+    }
   },
 
   // Agendamentos do barbeiro
   async getBarberAppointments(): Promise<Appointment[]> {
-    const response = await api.get('/appointments/barber/my-appointments');
-    return response.data;
+    try {
+      logger.info('Buscando agendamentos do barbeiro');
+
+      const response = await api.get('/appointments/barber/my-appointments');
+
+      logger.info(`Barbeiro tem ${response.data.length} agendamentos`);
+
+      return response.data;
+    } catch (error) {
+      ApiUtils.logError(error as AxiosError, 'appointmentsService.getBarberAppointments');
+      throw error;
+    }
   },
 
   // Confirmar agendamento (barbeiro)
   async confirm(id: string): Promise<Appointment> {
-    const response = await api.patch(`/appointments/${id}/confirm`);
-    return response.data;
+    try {
+      logger.info('Confirmando agendamento:', { id });
+
+      const response = await api.patch(`/appointments/${id}/confirm`);
+
+      logger.info('Agendamento confirmado:', { appointmentId: response.data.id });
+
+      return response.data;
+    } catch (error) {
+      ApiUtils.logError(error as AxiosError, 'appointmentsService.confirm');
+      throw error;
+    }
   },
 
   // Recusar agendamento (barbeiro)
   async reject(id: string, reason?: string): Promise<{ message: string }> {
-    const response = await api.patch(`/appointments/${id}/reject`, { reason });
-    return response.data;
+    try {
+      logger.info('Recusando agendamento:', { id, reason });
+
+      const response = await api.patch(`/appointments/${id}/reject`, { reason });
+
+      logger.info('Agendamento recusado:', { appointmentId: id });
+
+      return response.data;
+    } catch (error) {
+      ApiUtils.logError(error as AxiosError, 'appointmentsService.reject');
+      throw error;
+    }
   },
 
   // Completar agendamento (barbeiro)
   async complete(id: string): Promise<Appointment> {
-    const response = await api.patch(`/appointments/${id}/complete`);
-    return response.data;
+    try {
+      logger.info('Completando agendamento:', { id });
+
+      const response = await api.patch(`/appointments/${id}/complete`);
+
+      logger.info('Agendamento completado:', { appointmentId: response.data.id });
+
+      return response.data;
+    } catch (error) {
+      ApiUtils.logError(error as AxiosError, 'appointmentsService.complete');
+      throw error;
+    }
+  },
+
+  // Função utilitária para formatar status
+  getStatusDisplay(status: string): { label: string; color: string; bgColor: string } {
+    const statusMap = {
+      PENDING: { label: 'Pendente', color: 'text-yellow-700', bgColor: 'bg-yellow-100' },
+      CONFIRMED: { label: 'Confirmado', color: 'text-blue-700', bgColor: 'bg-blue-100' },
+      COMPLETED: { label: 'Concluído', color: 'text-green-700', bgColor: 'bg-green-100' },
+      CANCELLED: { label: 'Cancelado', color: 'text-red-700', bgColor: 'bg-red-100' },
+      EXPIRED: { label: 'Expirado', color: 'text-gray-700', bgColor: 'bg-gray-100' },
+    };
+
+    return statusMap[status as keyof typeof statusMap] || statusMap.PENDING;
+  },
+
+  // Verificar se agendamento pode ser cancelado
+  canCancel(appointment: Appointment): boolean {
+    return ['PENDING', 'CONFIRMED'].includes(appointment.status);
+  },
+
+  // Verificar se agendamento pode ser editado
+  canEdit(appointment: Appointment): boolean {
+    return appointment.status === 'PENDING';
   },
 };
