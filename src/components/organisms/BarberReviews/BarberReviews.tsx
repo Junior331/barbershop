@@ -101,7 +101,7 @@ export const BarberReviews = ({
                 {[1, 2, 3, 4, 5].map((star) => (
                   <img
                     key={star}
-                    src={getIcons(star <= Math.round(stats.averageRating) ? "star_solid_green" : "star_outlined_green")}
+                    src={getIcons("star_solid_green")}
                     alt="Estrela"
                     className="w-4 h-4"
                   />
@@ -147,7 +147,7 @@ export const BarberReviews = ({
       {reviews.length === 0 ? (
         <div className="text-center py-8">
           <img
-            src={getIcons("star_outlined_green")}
+            src={getIcons("star_solid_green")}
             alt="Sem avaliações"
             className="w-16 h-16 opacity-50 mx-auto mb-4"
           />
@@ -188,7 +188,7 @@ export const BarberReviews = ({
                   {[1, 2, 3, 4, 5].map((star) => (
                     <img
                       key={star}
-                      src={getIcons(star <= review.rating ? "star_solid_green" : "star_outlined_green")}
+                      src={getIcons("star_solid_green")}
                       alt="Estrela"
                       className="w-4 h-4"
                     />

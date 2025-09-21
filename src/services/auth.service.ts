@@ -67,7 +67,7 @@ export const authService = {
 
       return response.data;
     } catch (error) {
-      const errorInfo = ApiUtils.logError(error as AxiosError, 'authService.login');
+      ApiUtils.logError(error as AxiosError, 'authService.login');
       throw this.formatAuthError(error as AxiosError);
     }
   },
@@ -96,7 +96,7 @@ export const authService = {
 
       return response.data;
     } catch (error) {
-      const errorInfo = ApiUtils.logError(error as AxiosError, 'authService.register');
+      ApiUtils.logError(error as AxiosError, 'authService.register');
       throw this.formatAuthError(error as AxiosError);
     }
   },
@@ -118,7 +118,7 @@ export const authService = {
 
       return response.data;
     } catch (error) {
-      const errorInfo = ApiUtils.logError(error as AxiosError, 'authService.socialAuth');
+      ApiUtils.logError(error as AxiosError, 'authService.socialAuth');
       throw this.formatAuthError(error as AxiosError);
     }
   },
@@ -134,7 +134,7 @@ export const authService = {
 
       return response.data;
     } catch (error) {
-      const errorInfo = ApiUtils.logError(error as AxiosError, 'authService.refreshToken');
+      ApiUtils.logError(error as AxiosError, 'authService.refreshToken');
 
       // Para refresh token, não vamos formatar o erro, deixamos o interceptor lidar
       throw error;
@@ -156,7 +156,7 @@ export const authService = {
       // A API retorna o usuário diretamente, não em um objeto wrapper
       return response.data;
     } catch (error) {
-      const errorInfo = ApiUtils.logError(error as AxiosError, 'authService.me');
+      ApiUtils.logError(error as AxiosError, 'authService.me');
       throw this.formatAuthError(error as AxiosError);
     }
   },

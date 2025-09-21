@@ -1,10 +1,10 @@
-export * from './api';
+export { api, ApiUtils } from './api';
+export type { PaginatedResponse } from './api';
 export * from './auth.service';
 export * from './appointments.service';
-export * from './services.service';
-export * from './barbers.service';
-export * from './promotions.service';
-export * from './wallet.service';
-export * from './reviews.service';
-export * from './notifications.service';
-export * from './payments.service';
+export { servicesService } from './services.service';
+export type { Service } from './services.service';
+export { barbersService } from './barbers.service';
+export type { Barber, BarberWithServices } from './barbers.service';
+export { paymentsService } from './payments.service';
+export type { Payment, PaymentMethod } from './payments.service';

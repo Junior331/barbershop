@@ -32,10 +32,11 @@ export const useServices = () => {
       const response = await servicesService.getAll(1, 50); // Limite alto para pegar todos
 
       // Filtrar apenas serviços ativos
-      const activeServices = response.data?.filter(service => service.isActive) || [];
+      const responseData = 'data' in response ? response.data : response;
+      const activeServices = responseData?.filter((service: any) => service.isActive) || [];
 
       // Calcular desconto para serviços com preço promocional
-      const servicesWithDiscount = activeServices.map(service => {
+      const servicesWithDiscount = activeServices.map((service: any) => {
         let discount = 0;
         if (service.promotionalPrice && service.promotionalPrice < service.price) {
           discount = Math.round(((service.price - service.promotionalPrice) / service.price) * 100);

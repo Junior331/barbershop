@@ -27,11 +27,11 @@ export const RoleBasedRoute = ({
   }
 
   // Verificar se o usuário tem um dos papéis permitidos
-  const hasPermission = allowedRoles.includes(user.role);
+  const hasPermission = allowedRoles.includes(user.role!);
 
   if (!hasPermission) {
     // Redirecionar baseado no papel do usuário
-    const roleBasedRedirect = getRoleBasedRedirect(user.role);
+    const roleBasedRedirect = getRoleBasedRedirect(user.role!);
     return <Navigate to={roleBasedRedirect || fallbackPath} replace />;
   }
 

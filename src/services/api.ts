@@ -82,8 +82,8 @@ api.interceptors.response.use(
     });
 
     // Token expirado - tentar refresh automaticamente
-    if (response?.status === 401 && !config?._retry && config?.url !== '/auth/refresh') {
-      config._retry = true;
+    if (response?.status === 401 && !(config as any)?._retry && config?.url !== '/auth/refresh') {
+      (config as any)._retry = true;
 
       try {
         const refreshToken = cookieUtils.get(COOKIE_NAMES.REFRESH_TOKEN);
@@ -122,12 +122,12 @@ api.interceptors.response.use(
         }
 
         // Repetir requisição original com novo token
-        if (config.headers) {
+        if (config && config.headers) {
           config.headers.Authorization = `Bearer ${accessToken}`;
         }
 
         logger.info('Token refreshed successfully, retrying original request');
-        return api(config);
+        return api(config!);
 
       } catch (refreshError) {
         // Refresh falhou - limpar dados e redirecionar
@@ -151,7 +151,7 @@ api.interceptors.response.use(
     }
 
     // Tratar outros tipos de erro
-    const errorMessage = response?.data?.message || error.message || 'Erro na requisição';
+    const errorMessage = (response?.data as any)?.message || error.message || 'Erro na requisição';
     const status = response?.status;
 
     // Não mostrar toast para alguns erros específicos

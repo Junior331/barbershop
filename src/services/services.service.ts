@@ -41,6 +41,7 @@ export interface Promotion {
   startDate: string;
   endDate: string;
   isActive: boolean;
+  serviceId?: string;
 }
 
 export interface CreateServiceData {

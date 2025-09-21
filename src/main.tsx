@@ -5,7 +5,8 @@ import { Toaster } from "react-hot-toast";
 import "../i18n.tsx";
 import "./index.css";
 import App from "./App.tsx";
-import { Provider } from "./lib/provider.tsx";
+import { BrowserRouter } from "react-router-dom";
+import { AuthProvider } from "@/context/AuthContext";
 
 // Suprimir erros conhecidos de extensões do Chrome
 window.addEventListener('error', (event) => {
@@ -26,18 +27,20 @@ window.addEventListener('unhandledrejection', (event) => {
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <Provider>
-      <App />
-      <Toaster
-        position="top-right"
-        toastOptions={{
-          duration: 4000,
-          style: {
-            background: '#363636',
-            color: '#fff',
-          },
-        }}
-      />
-    </Provider>
+    <BrowserRouter>
+      <AuthProvider>
+        <App />
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            duration: 4000,
+            style: {
+              background: '#363636',
+              color: '#fff',
+            },
+          }}
+        />
+      </AuthProvider>
+    </BrowserRouter>
   </React.StrictMode>
 );

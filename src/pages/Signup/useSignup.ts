@@ -77,8 +77,30 @@ export const useSignup = () => {
         cookieUtils.set(COOKIE_NAMES.REFRESH_TOKEN, authResponse.refreshToken, cookieOptions);
         cookieUtils.set(COOKIE_NAMES.USER_DATA, JSON.stringify(authResponse.user), cookieOptions);
 
+        // Adaptar User para IUserData
+        const adaptedUser = {
+          id: authResponse.user.id,
+          name: authResponse.user.name,
+          email: authResponse.user.email,
+          role: authResponse.user.role,
+          phone: authResponse.user.phone || '',
+          city: '',
+          state: '',
+          street: '',
+          country: '',
+          avatar_url: authResponse.user.avatarUrl || '',
+          postal_code: '',
+          house_number: '',
+          complement: '',
+          isVerified: authResponse.user.isVerified,
+          biography: '',
+          birthDate: '',
+          postalCode: '',
+          neighborhood: ''
+        };
+
         // Atualizar contexto de autenticação
-        setAuth(authResponse.user, authResponse.accessToken);
+        setAuth(adaptedUser, authResponse.accessToken);
 
         logger.info('Registro realizado com sucesso', {
           userId: authResponse.user.id,

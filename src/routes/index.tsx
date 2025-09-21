@@ -2,18 +2,15 @@ import { Suspense } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 
 import {
-  Home,
   HomeImproved,
   Wallet,
   Signin,
   Signup,
-  Barbers,
   BarbersImproved,
   Account,
   Confirm,
   Profile,
   Calendar,
-  Services,
   ServicesImproved,
   ScheduleImproved,
   PaymentImproved,

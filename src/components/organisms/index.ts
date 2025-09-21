@@ -5,7 +5,7 @@ import { PixModal } from "./PixModal";
 import { AddCardModal } from "./AddCardModal";
 import { SwipeableCard } from "./SwipeableCard";
 import { QRCodeGenerator } from "./QRCodeGenerator";
-import { NotificationCenter } from "./NotificationCenter";
+// import { NotificationCenter } from "./NotificationCenter";
 import { BarberReviews } from "./BarberReviews";
 
 export {
@@ -16,6 +16,6 @@ export {
   AddCardModal,
   SwipeableCard,
   QRCodeGenerator,
-  NotificationCenter,
+  // NotificationCenter,
   BarberReviews,
 };

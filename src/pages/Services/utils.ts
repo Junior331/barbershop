@@ -1,7 +1,7 @@
 import { getServices } from "@/assets/services";
-import { Service } from "@/utils/types";
+import { IService } from "@/utils/types";
 
-export const services: Service[] = [
+export const services: IService[] = [
   {
     id: 1,
     time: 40,
