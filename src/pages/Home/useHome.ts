@@ -29,17 +29,18 @@ export const useHome = () => {
       logger.info('Carregando promoções da semana na Home');
 
       // Buscar serviços com promoção (limit 6 para não sobrecarregar)
-      const services = await servicesService.getAll(1, 6);
+      const services = await servicesService.getAll();
 
       // Filtrar serviços que têm desconto ou marcar como promoção
-      const promotions = services.data?.filter(service =>
+      const responseData = 'data' in services ? services.data : services;
+      const promotions = responseData?.filter((service: any) =>
         service.promotionalPrice && service.promotionalPrice < service.price
       ) || [];
 
       // Se não houver promoções específicas, pegar os serviços mais populares
       const promotionData = promotions.length > 0
         ? promotions
-        : services.data?.slice(0, 6) || [];
+        : responseData?.slice(0, 6) || [];
 
       setData(prev => ({ ...prev, promotions: promotionData }));
       logger.info(`Carregadas ${promotionData.length} promoções`);

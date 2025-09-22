@@ -8,18 +8,17 @@ import { Card } from "@/components/organisms";
 import { Layout } from "@/components/templates";
 import { CircleIcon, Text, Title, Loading } from "@/components/elements";
 import { useAuth } from "@/context/AuthContext";
-import { capitalizeName, formatter } from "@/utils/utils";
+import { capitalizeName } from "@/utils/utils";
 
 // Services
-import { promotionsService, barbersService, appointmentsService } from "@/services";
-import type { Promotion, Barber, Appointment } from "@/services";
+import { barbersService, appointmentsService } from "@/services";
+import type { Barber, Appointment } from "@/services";
 
 export const HomeImproved = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
   // Estados
-  const [promotions, setPromotions] = useState<Promotion[]>([]);
   const [barbers, setBarbers] = useState<Barber[]>([]);
   const [recentOrders, setRecentOrders] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -31,13 +30,11 @@ export const HomeImproved = () => {
         setLoading(true);
 
         // Carregar dados em paralelo
-        const [promotionsData, barbersData, ordersData] = await Promise.all([
-          promotionsService.getWeekPromotions(),
+        const [barbersData, ordersData] = await Promise.all([
           barbersService.getForHome(8),
           appointmentsService.getMyHistory(1, 3) // Últimos 3 pedidos
         ]);
 
-        setPromotions(promotionsData);
         setBarbers(barbersData);
         setRecentOrders(ordersData.data);
 
@@ -109,70 +106,6 @@ export const HomeImproved = () => {
         </div>
 
         <div className="flex flex-1 flex-col w-full h-full items-start justify-start overflow-y-auto pb-20 z-10">
-
-          {/* Seção de Promoções da Semana */}
-          <div className="flex flex-col items-center w-full pr-2">
-            <div className="flex items-center justify-between w-full gap-1 mb-2">
-              <label className="text-[#000] inter textarea-lg font-bold leading-[150%]">
-                Promoções da semana
-              </label>
-            </div>
-
-            <div className="flex items-center justify-start w-full overflow-auto max-w-full gap-[10px] pb-[10px]">
-              {promotions.length === 0 ? (
-                <div className="w-full text-center py-8">
-                  <Text className="text-gray-500">Nenhuma promoção disponível</Text>
-                </div>
-              ) : (
-                promotions.map((promotion) => (
-                  <Card
-                    key={promotion.id}
-                    style={{
-                      minWidth: 110,
-                      minHeight: 120,
-                      paddingLeft: 8,
-                    }}
-                  >
-                    <CircleIcon>
-                      <img
-                        src={promotion.service?.imageUrl || "/placeholder-service.jpg"}
-                        alt={`Service ${promotion.service?.name}`}
-                        className="w-[calc(100%-15px)] h-[calc(100%-15px)] object-cover"
-                      />
-                    </CircleIcon>
-                    <div className="flex-1 flex flex-col justify-end w-full h-full gap-2 mt-2">
-                      <div className="flex items-center gap-1">
-                        <Title className="textarea-sm line-through text-gray-400">
-                          {formatter({
-                            type: "pt-BR",
-                            currency: "BRL",
-                            style: "currency",
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          }).format(promotion.service?.price || 0)}
-                        </Title>
-                        <span className="bg-red-500 text-white px-1 py-0.5 rounded text-xs">
-                          -{promotion.discountPercentage}%
-                        </span>
-                      </div>
-                      <Title className="textarea-md text-green-600">
-                        {formatter({
-                          type: "pt-BR",
-                          currency: "BRL",
-                          style: "currency",
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        }).format((promotion.service?.price || 0) * (1 - promotion.discountPercentage / 100))}
-                      </Title>
-                      <Text className="truncate max-w-[calc(100%-5px)] text-xs">
-                        {promotion.service?.name || promotion.title}
-                      </Text>
-                    </div>
-                  </Card>
-                ))
-              )}
-            </div>
-          </div>
 
           {/* Seção de Seus Pedidos */}
           <div className="flex flex-col items-center w-full mt-5 pr-2">

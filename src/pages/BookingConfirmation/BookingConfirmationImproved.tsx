@@ -128,7 +128,7 @@ export const BookingConfirmationImproved = () => {
     if (!confirm) return;
 
     try {
-      await appointmentsService.cancelByClient(appointment.id, 'Cancelado pelo cliente');
+      await appointmentsService.cancelByClient(appointment.id);
       toast.success('Agendamento cancelado com sucesso');
       setAppointment(prev => prev ? { ...prev, status: 'CANCELLED' } : null);
     } catch (error) {
@@ -159,7 +159,7 @@ export const BookingConfirmationImproved = () => {
           >
             <div className="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto">
               <img
-                src={getIcons("check")}
+                src={getIcons("fallback")}
                 alt="Success"
                 className="w-8 h-8"
               />
@@ -198,7 +198,7 @@ export const BookingConfirmationImproved = () => {
               {/* Data e Horário */}
               <div className="flex items-center gap-3 p-3 bg-[#6C8762] bg-opacity-10 rounded-lg">
                 <img
-                  src={getIcons("calendar_outlined_green")}
+                  src={getIcons("calendar")}
                   alt="Calendar"
                   className="w-6 h-6"
                 />
@@ -228,7 +228,7 @@ export const BookingConfirmationImproved = () => {
               <div className="flex items-center gap-3 mb-4">
                 <CircleIcon className="!w-12 !h-12">
                   <img
-                    src={appointment.service.imageUrl || getIcons("fallback")}
+                    src={getIcons("fallback")}
                     alt={appointment.service.name}
                     className="w-full h-full object-cover"
                   />
@@ -261,14 +261,14 @@ export const BookingConfirmationImproved = () => {
                 </CircleIcon>
                 <div className="flex-1">
                   <Text className="font-medium">{appointment.barber.name}</Text>
-                  <Text className="text-sm text-gray-600">{appointment.barber.role}</Text>
+                  <Text className="text-sm text-gray-600">Barbeiro</Text>
                 </div>
               </div>
 
               {/* Localização */}
               <div className="flex items-center gap-3">
                 <img
-                  src={getIcons("location_outlined_green")}
+                  src={getIcons("fallback")}
                   alt="Location"
                   className="w-6 h-6"
                 />
@@ -323,7 +323,7 @@ export const BookingConfirmationImproved = () => {
           <div className="w-full bg-blue-50 border border-blue-200 rounded-lg p-4">
             <div className="flex items-start gap-2">
               <img
-                src={getIcons("info")}
+                src={getIcons("fallback")}
                 alt="Info"
                 className="w-5 h-5 mt-0.5"
               />
@@ -356,7 +356,7 @@ export const BookingConfirmationImproved = () => {
             <div className="w-full bg-yellow-50 border border-yellow-200 rounded-lg p-4">
               <div className="flex items-start gap-2">
                 <img
-                  src={getIcons("warning")}
+                  src={getIcons("fallback")}
                   alt="Warning"
                   className="w-5 h-5 mt-0.5"
                 />

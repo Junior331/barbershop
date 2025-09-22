@@ -147,6 +147,26 @@ export const appointmentsService = {
     }
   },
 
+  // Cancelar agendamento pelo cliente
+  async cancelByClient(id: string): Promise<{ message: string; cancellationFee: number; canCancelFree: boolean }> {
+    try {
+      logger.info('Cancelando agendamento pelo cliente:', { id });
+
+      const response = await api.delete(`/appointments/${id}/cancel-by-client`);
+
+      logger.info('Agendamento cancelado pelo cliente:', {
+        appointmentId: id,
+        fee: response.data.cancellationFee,
+        canCancelFree: response.data.canCancelFree,
+      });
+
+      return response.data;
+    } catch (error) {
+      ApiUtils.logError(error as AxiosError, 'appointmentsService.cancelByClient');
+      throw error;
+    }
+  },
+
   // Cancelar agendamento
   async cancel(id: string): Promise<{ message: string; cancellationFee: number; canCancelFree: boolean }> {
     try {

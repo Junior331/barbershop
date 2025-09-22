@@ -43,7 +43,7 @@ export const Services = () => {
         <div className="flex flex-col justify-center items-center h-full w-full p-4">
           <div className="alert alert-error max-w-md">
             <img
-              src={getIcons("error")}
+              src={getIcons("fallback")}
               alt="Erro"
               className="size-6"
             />
@@ -70,7 +70,7 @@ export const Services = () => {
           {!hasServices ? (
             <div className="flex flex-col items-center justify-center w-full h-full py-12">
               <img
-                src={getIcons("services")}
+                src={getIcons("fallback")}
                 alt="Sem serviços"
                 className="size-16 opacity-50 mb-4"
               />

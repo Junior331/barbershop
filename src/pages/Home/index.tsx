@@ -41,7 +41,7 @@ export const Home = () => {
               title="Atualizar dados"
             >
               <img
-                src={getIcons("refresh")}
+                src={getIcons("fallback")}
                 alt="Atualizar"
                 className={`size-6 ${isLoading ? 'animate-spin' : ''}`}
               />

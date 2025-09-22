@@ -1,6 +1,6 @@
 import { getImage } from "@/assets/images";
 import { getServices } from "@/assets/services";
-import { BarberSchedule, BarberType } from "@/utils/types";
+// import { BarberSchedule, BarberType } from "@/utils/types";
 
 export const promotionsWeek = [
   {
@@ -134,7 +134,7 @@ export const orders = [
   },
 ];
 
-const defaultSchedule: BarberSchedule[] = [
+const defaultSchedule: any[] = [
   { weekday: 1, startTime: "08:00", endTime: "18:00" }, // segunda
   { weekday: 2, startTime: "08:00", endTime: "18:00" },
   { weekday: 3, startTime: "08:00", endTime: "18:00" },
@@ -143,7 +143,7 @@ const defaultSchedule: BarberSchedule[] = [
   { weekday: 6, startTime: "08:00", endTime: "14:00" }, // sábado
 ];
 
-export const barbers: BarberType[] = [
+export const barbers: any[] = [
   {
     id: "1",
     cuts: 1872,

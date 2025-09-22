@@ -29,7 +29,7 @@ export const useServices = () => {
       logger.info('Carregando serviços na página Services');
 
       // Buscar todos os serviços ativos
-      const response = await servicesService.getAll(1, 50); // Limite alto para pegar todos
+      const response = await servicesService.getAll(); // Buscar todos os serviços
 
       // Filtrar apenas serviços ativos
       const responseData = 'data' in response ? response.data : response;

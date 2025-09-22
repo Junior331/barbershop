@@ -39,9 +39,10 @@ export const Confirm = () => {
       name: "",
       price: 0,
       discount: 0,
-      image_url: "",
-      created_at: "",
-      is_active: false,
+      imageUrl: "",
+      createdAt: "",
+      updatedAt: "",
+      barberShopId: "",
       description: "",
       durationMinutes: 0,
     });
@@ -182,7 +183,7 @@ export const Confirm = () => {
                 <div className="flex flex-col py-3 px-4 justify-between items-center self-stretch rounded-md bg-white shadow-lg relative">
                   <CircleIcon className="min-w-32 h-32 my-auto overflow-hidden">
                     <img
-                      src={service.image_url || getIcons("fallback")}
+                      src={service.imageUrl || getIcons("fallback")}
                       alt={`Service ${service.name}`}
                       className="w-[calc(100%-15px)] h-[calc(100%-15px)] object-cover"
                     />

@@ -18,10 +18,23 @@ export const Barbers = () => {
     (selectedBarber: AdaptedBarber) => {
       setBarber({
         ...selectedBarber,
+        email: selectedBarber.email || null,
+        phone: selectedBarber.phone || null,
+        avatar_url: selectedBarber.avatar_url || null,
         barber_details: {
           ...selectedBarber.barber_details,
+          description: selectedBarber.barber_details.description || null,
         },
-      });
+        services_full: selectedBarber.services_full.map(service => ({
+          ...service,
+          description: (service as any).description || '',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          barberShopId: '',
+          isActive: true,
+          imageUrl: service.image_url
+        })),
+      } as any);
     },
     [setBarber]
   );
@@ -41,7 +54,7 @@ export const Barbers = () => {
           <div className="flex flex-col items-center justify-center w-full h-full p-4">
             <div className="flex flex-col items-center text-center max-w-md">
               <img
-                src={getIcons("error")}
+                src={getIcons("fallback")}
                 alt="Erro"
                 className="size-16 opacity-50 mb-4"
               />
