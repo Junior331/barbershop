@@ -2,7 +2,6 @@ import { Suspense } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 
 import {
-  HomeImproved,
   Wallet,
   Signin,
   Signup,
@@ -10,6 +9,7 @@ import {
   Account,
   Confirm,
   Profile,
+  Home,
   Calendar,
   ServicesImproved,
   BookingConfirmationImproved,
@@ -22,7 +22,7 @@ export const AppRoutes = () => {
   return (
     <Suspense fallback={<Loading />}>
       <Routes>
-        <Route index element={<RoleBasedRoute allowedRoles={['CLIENT']}><HomeImproved /></RoleBasedRoute>} />
+        <Route index element={<RoleBasedRoute allowedRoles={['CLIENT']}><Home /></RoleBasedRoute>} />
         <Route path="/signin" element={<Signin />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/wallet" element={<ProtectedRoute><Wallet /></ProtectedRoute>} />
