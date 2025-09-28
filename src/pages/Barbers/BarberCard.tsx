@@ -1,13 +1,13 @@
 import { cn } from "@/utils/utils";
-import { AdaptedBarber } from "@/hooks/useBarbers";
-import { Card } from "@/components/organisms";
-import { CircleIcon, Text, Title } from "@/components/elements";
 import { getIcons } from "@/assets/icons";
+import { Card } from "@/components/organisms";
+import { BarberWithServices } from "@/services";
+import { CircleIcon, Text, Title } from "@/components/elements";
 
 interface BarberCardProps {
-  barber: AdaptedBarber;
+  barber: BarberWithServices;
   isSelected: boolean;
-  onSelect: (barber: AdaptedBarber) => void;
+  onSelect: (barber: BarberWithServices) => void;
 }
 
 export const BarberCard = ({
@@ -21,8 +21,8 @@ export const BarberCard = ({
     }
   };
 
-  const totalAppointments = barber.barber_details.barber_rating > 0 ?
-    Math.floor(barber.barber_details.barber_rating * 20) : 0; // Estimativa baseada no rating
+  const totalPrice = barber.serviceBarbers.reduce((sum, service) => sum + service.service.price, 0);
+
 
   return (
     <div
@@ -45,7 +45,7 @@ export const BarberCard = ({
               alt={`Barber ${barber.name}`}
               className="w-full h-full object-cover"
               src={
-                barber.avatar_url ||
+                barber.avatarUrl ||
                 `https://ui-avatars.com/api/?name=${encodeURIComponent(barber.name)}&background=6C8762&color=fff&size=96`
               }
               onError={(e) => {
@@ -71,7 +71,7 @@ export const BarberCard = ({
                   alt="Rating"
                   className="size-4 mr-1"
                 />
-                {barber.barber_details.barber_rating?.toFixed(1) ?? "0.0"}
+                {barber.averageRating?.toFixed(1) ?? "0.0"}
               </Text>
               <div className="h-3 w-px bg-gray-300" />
               <Text
@@ -80,29 +80,29 @@ export const BarberCard = ({
                   isSelected && "text-[#111827]"
                 )}
               >
-                {totalAppointments} cortes
+                {0} cortes
               </Text>
             </div>
 
-            {barber.services.length > 0 && (
+            {barber.serviceBarbers.length > 0 && (
               <div
                 className={cn(
                   "text-xs text-gray-400 mt-1 line-clamp-2",
                   isSelected && "text-[#111827]"
                 )}
               >
-                <span className="font-medium">Serviços:</span> {barber.services.join(", ")}
+                <span className="font-medium">Serviços:</span> {barber.serviceBarbers.map(sb => sb.service).map(service => service.name).join(" + ")}
               </div>
             )}
 
-            {barber.total_price > 0 && (
+            {totalPrice > 0 && (
               <div
                 className={cn(
                   "text-sm font-medium text-green-600 mt-1",
                   isSelected && "text-[#111827]"
                 )}
               >
-                Total: R$ {barber.total_price.toFixed(2)}
+                Total: R$ {totalPrice.toFixed(2)}
               </div>
             )}
           </div>

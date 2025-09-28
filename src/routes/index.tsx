@@ -11,7 +11,7 @@ import {
   Profile,
   Home,
   Calendar,
-  ServicesImproved,
+  Services,
   BookingConfirmationImproved,
   MyBookings,
   DetailsOrder,
@@ -30,7 +30,7 @@ export const AppRoutes = () => {
         <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
         <Route path="/confirm" element={<ProtectedRoute><Confirm /></ProtectedRoute>} />
         <Route path="/calendar" element={<ProtectedRoute><Calendar /></ProtectedRoute>} />
-        <Route path="/services" element={<ProtectedRoute><ServicesImproved /></ProtectedRoute>} />
+        <Route path="/services" element={<ProtectedRoute><Services /></ProtectedRoute>} />
         {/* <Route path="/schedule" element={<ProtectedRoute><ScheduleImproved /></ProtectedRoute>} /> */}
         {/* <Route path="/payment" element={<ProtectedRoute><PaymentImproved /></ProtectedRoute>} /> */}
         <Route path="/booking-confirmation/:appointmentId" element={<ProtectedRoute><BookingConfirmationImproved /></ProtectedRoute>} />

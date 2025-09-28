@@ -11,8 +11,6 @@ export const Profile = () => {
   const { user } = useAuth();
   const { formik, loading } = useProfile();
 
-  console.log(`user ::`, user)
-
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {

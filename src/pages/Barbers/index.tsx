@@ -2,11 +2,12 @@ import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "@/components/templates";
 import { Header } from "@/components/organisms";
-import { Loading, Button, Text, Title } from "@/components/elements";
 import { useOrder } from "@/store/useOrderStore";
-import { useBarbers, AdaptedBarber } from "@/hooks/useBarbers";
+import { Loading, Button, Text, Title } from "@/components/elements";
+import { useBarbers } from "@/hooks/useBarbers";
 import { BarberCard } from "./BarberCard";
 import { getIcons } from "@/assets/icons";
+import { BarberWithServices } from "@/services";
 
 export const Barbers = () => {
   const navigate = useNavigate();
@@ -15,26 +16,11 @@ export const Barbers = () => {
   const { barbers, loading, error, refetch, hasBarbers } = useBarbers(serviceIds);
 
   const handleSelectBarber = useCallback(
-    (selectedBarber: AdaptedBarber) => {
-      setBarber({
-        ...selectedBarber,
-        email: selectedBarber.email || null,
-        phone: selectedBarber.phone || null,
-        avatar_url: selectedBarber.avatar_url || null,
-        barber_details: {
-          ...selectedBarber.barber_details,
-          description: selectedBarber.barber_details.description || null,
-        },
-        services_full: selectedBarber.services_full.map(service => ({
-          ...service,
-          description: (service as any).description || '',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          barberShopId: '',
-          isActive: true,
-          imageUrl: service.image_url
-        })),
-      } as any);
+    (selectedBarber: BarberWithServices) => {
+      console.log("Barbeiro selecionado ::", selectedBarber);
+      setBarber(
+        selectedBarber
+      );
     },
     [setBarber]
   );
@@ -73,15 +59,12 @@ export const Barbers = () => {
   return (
     <Layout>
       <div className="flex flex-col h-full w-full">
-        <Header title="Barbeiros" backPath="/services" />
+        <Header title="Barbeiros" backPath={"/services"} />
 
         <main className="flex flex-col w-full justify-between items-start gap-2 px-4 pb-2 overflow-auto h-[calc(100vh-0px)]">
           {hasBarbers ? (
             <>
               <div className="flex flex-col w-full gap-4">
-                <div className="text-sm text-gray-600 mb-2">
-                  {barbers.length} barbeiro{barbers.length !== 1 ? 's' : ''} disponível{barbers.length !== 1 ? 'eis' : ''} para os serviços selecionados
-                </div>
                 {barbers.map((barberItem) => (
                   <BarberCard
                     key={barberItem.id}

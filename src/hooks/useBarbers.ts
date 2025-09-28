@@ -29,7 +29,7 @@ export interface AdaptedBarber {
 }
 
 export const useBarbers = (serviceIds: string[]) => {
-  const [barbers, setBarbers] = useState<AdaptedBarber[]>([]);
+  const [barbers, setBarbers] = useState<BarberWithServices[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -43,43 +43,9 @@ export const useBarbers = (serviceIds: string[]) => {
     setError(null);
 
     try {
-      logger.info('Buscando barbeiros por serviços:', { serviceIds });
-
-      // Usar o novo serviço da API
       const response = await barbersService.getByServices(serviceIds, 1, 50);
-
-      // Adaptar os dados para a interface existente
-      const adaptedBarbers: AdaptedBarber[] = response.data?.map((barber: BarberWithServices) => {
-        const services = barber.serviceBarbers.map(sb => sb.service);
-        const totalPrice = services.reduce((sum, service) => sum + service.price, 0);
-
-        return {
-          role: "barber" as const,
-          id: barber.id,
-          name: barber.name,
-          email: undefined, // Não disponível no novo formato
-          phone: undefined, // Não disponível no novo formato
-          avatar_url: barber.avatarUrl,
-          barber_details: {
-            id: barber.id,
-            description: undefined, // Não disponível no novo formato
-            is_active: true, // Assumindo que barbeiros retornados estão ativos
-            barber_rating: barber.averageRating || 0,
-          },
-          services: services.map(service => service.name),
-          services_full: services.map(service => ({
-            id: service.id,
-            name: service.name,
-            price: service.price,
-            durationMinutes: service.durationMinutes,
-            image_url: service.imageUrl,
-          })),
-          total_price: totalPrice,
-        };
-      }) || [];
-
-      setBarbers(adaptedBarbers);
-      logger.info(`Encontrados ${adaptedBarbers.length} barbeiros que fazem os serviços selecionados`);
+      const barbeiros = response.data || [];
+      setBarbers(barbeiros);
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro ao buscar barbeiros';
@@ -90,7 +56,8 @@ export const useBarbers = (serviceIds: string[]) => {
     } finally {
       setLoading(false);
     }
-  }, [serviceIds]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     fetchBarbers();

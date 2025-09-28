@@ -1,3 +1,5 @@
+import { BarberWithServices } from "@/services";
+
 export type formatterProps = {
   type?: string;
   currency?: string;
@@ -57,14 +59,32 @@ export interface BarberDetails {
 export interface IBarber {
   id: string;
   name: string;
-  services: string[];
-  email: string | null;
-  phone: string | null;
-  total_price?: number;
-  role: "barber" | "admin";
-  avatar_url: string | null;
-  barber_details: BarberDetails;
-  services_full: BarberService[];
+  avatarUrl: string;
+  city: string;
+  state: string;
+  biography: string;
+  isVerified: boolean;
+  phone: null;
+  serviceBarbers: [
+    {
+      service: {
+        id: string;
+        name: string;
+        price: number;
+        durationMinutes: number;
+      };
+    },
+    {
+      service: {
+        id: string;
+        name: string;
+        price: number;
+        durationMinutes: number;
+      };
+    }
+  ];
+  averageRating: number;
+  totalReviews: number;
 }
 
 export interface IOrderState {
@@ -74,7 +94,7 @@ export interface IOrderState {
   discount: number;
   date: Date | null;
   paymentFee: number;
-  barber: IBarber | null;
+  barber: BarberWithServices | null;
   services: IService[];
   notes: string | null;
   clearOrder: () => void;
@@ -83,7 +103,7 @@ export interface IOrderState {
   calculateTotals: () => void;
   promotionCode: string | null;
   paymentMethod: string | null;
-  setBarber: (barber: IBarber) => void;
+  setBarber: (barber: BarberWithServices) => void;
   setNotes: (notes: string) => void;
   setPaymentMethod: (method: string) => void;
   toggleService: (service: IService) => void;
@@ -107,7 +127,7 @@ export interface IUserData {
   neighborhood: string;
   created_at?: string;
   updated_at?: string;
-  
+
   // Campos customizados da tabela users
   name?: string;
   role?: string;
@@ -116,7 +136,7 @@ export interface IUserData {
   avatarUrl?: string;
   providerId?: string;
   passwordHash?: string;
-  
+
   // [key: string]: unknown;
 }
 
@@ -183,7 +203,6 @@ export interface ApiResponse<T = unknown> {
   message?: string;
   success: boolean;
 }
-
 
 export interface IServiceBarber {
   id: string;
