@@ -8,6 +8,7 @@ import { capitalizeName, cn, formatter } from "@/utils/utils";
 import { useHome } from "./useHome";
 import { Text, Title, Loading, CircleIcon } from "@/components/elements";
 import { getServices } from "@/assets/services";
+import { Card } from "@/components/organisms";
 
 export const Home = () => {
   const navigate = useNavigate();
@@ -28,7 +29,7 @@ export const Home = () => {
           </h2>
         </div>
 
-        <div className="flex flex-1 flex-col w-full h-full items-start justify-start overflow-y-auto pb-20 z-10">
+        <div className="flex flex-1 flex-col w-full h-full items-start justify-start overflow-y-auto pb-20 z-1">
           {/* Promoções da semana */}
           <div className="flex flex-col mb-6 w-full">
             <div className="flex items-center justify-between mb-3">
@@ -75,18 +76,20 @@ export const Home = () => {
                           )}
                         />
                       </CircleIcon>
-                      <Text className="text-xs font-bold text-center mb-1">
-                        {formatter({
-                          type: "pt-BR",
-                          currency: "BRL",
-                          style: "currency",
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        }).format(displayPrice || 0)}
-                      </Text>
-                      <Text className="text-xs text-gray-600 text-center truncate w-full">
-                        {service.name}
-                      </Text>
+                      <div className="flex-1 flex flex-col justify-end w-full h-full gap-2 mt-2">
+                        <Text className="text-xs !font-bold">
+                          {formatter({
+                            type: "pt-BR",
+                            currency: "BRL",
+                            style: "currency",
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          }).format(displayPrice || 0)}
+                        </Text>
+                        <Text className="text-xs text-gray-600 truncate w-full">
+                          {service.name}
+                        </Text>
+                      </div>
                     </div>
                   );
                 })
@@ -116,7 +119,7 @@ export const Home = () => {
                   <Loading />
                 </div>
               ) : hasAppointments ? (
-                data.appointments.slice(0, 2).map((appointment) => (
+                data.appointments.slice(0, 5).map((appointment) => (
                   <div
                     key={appointment.id}
                     className="bg-white rounded-lg shadow-sm border border-gray-100 p-3 flex items-center space-x-3 cursor-pointer"
@@ -182,88 +185,98 @@ export const Home = () => {
           <div className="flex flex-col mb-6 w-full">
             <div className="flex items-center justify-between mb-3">
               <Title className="text-lg font-bold text-black">Barbeiros</Title>
-              <button
-                onClick={() => navigate("/barbers")}
-                className="text-sm text-gray-600"
-              >
-                Ver mais
-              </button>
             </div>
 
-            <div className="grid grid-cols-1 gap-3">
+            <div className="space-y-3 px-0.5">
               {loading.barbers ? (
-                <div className="col-span-2 flex items-center justify-center w-full py-8">
+                <div className="flex items-center justify-center w-full py-8">
                   <Loading />
                 </div>
               ) : hasBarbers ? (
                 data.barbers.slice(0, 6).map((barber) => (
                   <div
                     key={barber.id}
-                    className="bg-white rounded-lg shadow-sm border border-gray-100 p-3 flex items-center space-x-3 cursor-pointer"
-                    onClick={() => navigate(`/barber/${barber.id}`)}
+                    className="btn w-full h-auto bg-transparent border-0 shadow-none p-0"
                   >
-                    <div className="w-12 h-12 rounded-full overflow-hidden">
-                      <img
-                        src={barber.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(barber.name)}&background=6C8762&color=fff&size=48`}
-                        alt={barber.name}
-                        className="w-12 h-12 object-cover"
-                        onError={(e) => {
-                          e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(barber.name)}&background=6C8762&color=fff&size=48`;
-                        }}
-                      />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <Title className="text-sm font-bold text-black truncate">
-                        {barber.name}
-                      </Title>
-                      <Text className="text-xs text-gray-600">
-                        {barber.role === 'BARBER' ? 'Barbeiro' : barber.role}
-                      </Text>
-                      <div className="flex items-center space-x-1 mt-1">
-                        <img
-                          src={getIcons("location_outlined_green")}
-                          alt="Location"
-                          className="w-3 h-3"
-                        />
-                        <Text className="text-xs text-gray-500 truncate">
-                          {barber.barberShop?.name || 'Barbearia'}
-                        </Text>
+                    <Card
+                      style={{
+                        padding: 0,
+                        minHeight: 130,
+                        minWidth: "100%",
+                        overflow: "hidden",
+                      }}
+                    >
+                      <div className="flex items-center w-full h-full px-3 min-h-28 my-auto">
+                        <CircleIcon className="min-w-24 h-24 my-auto overflow-hidden">
+                          <img
+                            src={barber.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(barber.name)}&background=6C8762&color=fff&size=48`}
+                            alt={barber.name}
+                            className="w-24 h-24 object-cover"
+                          />
+                        </CircleIcon>
+
+                        <div className="flex flex-col justify-start items-start w-full gap-2 flex-grow pl-2">
+                          <p className="w-full text-start text-[#6b7280] inter textarea-lg font-bold leading-[150%] border-b border-gray-100 truncate">
+                            {barber.name}
+                          </p>
+                          <p className="text-[#6b7280] font-roboto textarea-md font-normal leading-none">
+                            {barber.role === 'BARBER' ? 'Barbeiro' : barber.role}
+
+                          </p>
+                          <p className="flex items-center gap-[1.5px] text-[#6b7280] inter textarea-md font-normal">
+                            <img
+                              alt="Icon location"
+                              src={getIcons("location_outlined_green")}
+                              className="size-4"
+                            />
+                            {barber.barberShop?.name || ''}
+                          </p>
+                          <div className="flex items-center gap-[3px]">
+                            <img
+                              alt="Icon star"
+                              src={getIcons("star_solid_green")}
+                              className="size-4 relative top-[-1px]"
+                            />
+                            <p className="flex items-center gap-[2.5px] text-[#6b7280] inter textarea-md font-normal">
+                              {barber.averageRating > 0 ? barber.averageRating.toFixed(1) : '0.0'}
+                            </p>
+                            <div className="h-[7px] w-[0.5px] bg-[#6C8762]" />
+                            <p className="flex items-center gap-[2.5px] text-[#6b7280] inter textarea-md font-normal">
+                              {barber.totalAppointments || 1372} Cortes
+                            </p>
+                          </div>
+                        </div>
                       </div>
-                      <div className="flex items-center space-x-1 mt-1">
-                        <img
-                          src={getIcons("star_solid_green")}
-                          alt="Star"
-                          className="w-3 h-3"
-                        />
-                        <Text className="text-xs text-gray-500">
-                          {barber.averageRating > 0 ? barber.averageRating.toFixed(1) : '4.0'}
-                        </Text>
-                        <Text className="text-xs text-gray-400">|</Text>
-                        <Text className="text-xs text-gray-500">
-                          {barber.totalAppointments || 1372} Cortes
-                        </Text>
-                      </div>
-                    </div>
+                    </Card>
                   </div>
                 ))
               ) : (
-                <div className="col-span-2 flex items-center justify-center py-8">
+                <div className="flex items-center justify-center py-8">
                   <Text className="text-gray-500">Nenhum barbeiro disponível</Text>
                 </div>
               )}
             </div>
           </div>
-
-        </div>
-        {/* Botão Agendar fixo */}
-        <div className="absolute bottom-0 right-0 p-4 w-full max-w-40">
-          <motion.button
-            className="w-full py-3 bg-[#7B9A7C] text-white rounded-lg font-medium text-lg"
-            whileTap={{ scale: 0.98 }}
-            onClick={() => navigate("/services")}
-          >
-            Agendar
-          </motion.button>
+        <motion.button
+          className="fixed bottom-24 right-2 flex items-center justify-center border border-white px-6 py-3 font-medium text-white rounded-lg shadow-lg bg-gradient-to-r bg-[#6C8762] focus:outline-none focus:ring-2 focus:ring-offset-2 cursor-pointer z-2"
+          initial={{ boxShadow: "0 0 0 0 rgba(156,163,175, 0.7)" }}
+          animate={{
+            boxShadow: [
+              "0 0 0 0 rgba(156,163,175, 0.7)",
+              "0 0 0 10px rgba(156,163,175, 0)",
+              "0 0 0 0 rgba(156,163,175, 0)",
+            ],
+          }}
+          transition={{
+            duration: 2,
+            ease: "easeOut",
+            repeat: Infinity,
+            repeatType: "loop",
+          }}
+          onClick={() => navigate("/services")}
+        >
+          Agendar
+        </motion.button>
         </div>
       </div>
     </Layout>

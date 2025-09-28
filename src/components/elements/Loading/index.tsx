@@ -3,7 +3,7 @@ import { getIcons } from "@/assets/icons";
 import { dots, dotVariants } from "./utils";
 
 export const Loading = () => (
-  <div className="flex flex-col gap-3 items-center justify-center w-screen h-screen fixed top-0 left-0 bg-[#f7f8fdcc]">
+  <div className="flex flex-col gap-3 items-center justify-center w-screen h-screen fixed top-0 left-0 bg-[#f7f8fdcc] z-50">
     <motion.img
       className="w-32 h-40"
       src={getIcons("pole")}

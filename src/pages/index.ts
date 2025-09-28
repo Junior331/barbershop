@@ -1,5 +1,4 @@
 import { Home } from "./Home";
-import { HomeImproved } from "./Home/HomeImproved";
 import { Signin } from "./Signin";
 import { Wallet } from "./Wallet";
 import { Signup } from "./Signup";
@@ -21,7 +20,6 @@ import { DetailsOrder } from "./DetailsOrder";
 
 export {
   Home,
-  HomeImproved,
   Signin,
   Wallet,
   Signup,
