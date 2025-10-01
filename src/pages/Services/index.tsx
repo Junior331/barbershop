@@ -182,7 +182,7 @@ export const Services = () => {
                           {/* Descrição (se disponível) */}
                           {service.description && (
                             <Text className={cn(
-                              "text-sm text-gray-600 truncate max-w-[calc(100% - 25px)]",
+                              "text-sm text-gray-600 truncate max-w-[75%]",
                               checked && "text-[#111827]"
                             )}>
                               {service.description}

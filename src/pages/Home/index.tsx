@@ -258,7 +258,7 @@ export const Home = () => {
             </div>
           </div>
         <motion.button
-          className="fixed bottom-24 right-2 flex items-center justify-center border border-white px-6 py-3 font-medium text-white rounded-lg shadow-lg bg-gradient-to-r bg-[#6C8762] focus:outline-none focus:ring-2 focus:ring-offset-2 cursor-pointer z-2"
+          className="fixed bottom-20 right-2 flex items-center justify-center border border-white px-6 py-3 font-medium text-white rounded-lg shadow-lg bg-gradient-to-r bg-[#6C8762] focus:outline-none focus:ring-2 focus:ring-offset-2 cursor-pointer z-2"
           initial={{ boxShadow: "0 0 0 0 rgba(156,163,175, 0.7)" }}
           animate={{
             boxShadow: [
