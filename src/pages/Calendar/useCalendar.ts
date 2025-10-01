@@ -4,7 +4,7 @@ import { useOrder } from "@/store/useOrderStore";
 import { getCurrentDate } from "@/utils/utils";
 import { appointmentsService, Appointment } from "@/services/appointments.service";
 import { useAuth } from "@/context/AuthContext";
-import { workingHoursService, AvailableTimeSlot } from "@/services/working-hours.service";
+import { workingHoursService } from "@/services/working-hours.service";
 
 export const useCalendar = () => {
   const navigate = useNavigate();
@@ -94,7 +94,7 @@ export const useCalendar = () => {
 
         // Extrair apenas os horários disponíveis e futuros
         const availableTimes = availableTimeSlots
-          .filter(slot => {
+          .filter((slot: any) => {
             if (!slot.available) return false;
 
             // Se não for hoje, todos os horários disponíveis são válidos
@@ -107,7 +107,7 @@ export const useCalendar = () => {
 
             return slotTime > now;
           })
-          .map(slot => slot.time);
+          .map((slot: any) => slot.time);
 
         console.log("Horários disponíveis:", availableTimes);
         setAvailableSlots(availableTimes);

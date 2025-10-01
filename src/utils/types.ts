@@ -39,6 +39,14 @@ export interface IService {
   description: string;
   barberShopId: string;
   durationMinutes: number;
+  pricing?: {
+    finalPrice: number;
+    discount?: number;
+  };
+  barberShop?: {
+    id: string;
+    name?: string;
+  };
 }
 export interface BarberService {
   id: string;
@@ -120,7 +128,7 @@ export interface IUserData {
   street: string;
   phone?: string;
   country: string;
-  isVerified: true;
+  isVerified: boolean;
   biography: string;
   birthDate: string;
   postalCode: string;

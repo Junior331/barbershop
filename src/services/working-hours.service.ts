@@ -162,7 +162,7 @@ export const workingHoursService = {
   },
 
   // Buscar horários disponíveis para um barbeiro em uma data específica
-  async getAvailableTimes(barberId: string, date: string): Promise<AvailableTimeSlot[]> {
+  async getAvailableTimes(barberId: string, date: string): Promise<AvailableSlotsResponse> {
     try {
       logger.info('Buscando horários disponíveis:', { barberId, date });
 
@@ -170,7 +170,7 @@ export const workingHoursService = {
         params: { date }
       });
 
-      logger.info(`Encontrados ${response.data.length} horários disponíveis`);
+      logger.info(`Encontrados ${response.data.times?.length || 0} horários disponíveis`);
 
       return response.data;
     } catch (error) {

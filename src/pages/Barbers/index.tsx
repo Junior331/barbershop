@@ -81,7 +81,7 @@ export const Barbers = () => {
                 onClick={handleConfirm}
                 className="w-full max-w-full border-none bg-[#6C8762] disabled:!bg-[#e5e5e5] rounded text-[14px] text-[#FFF] py-[10px] font-[500] tracking-[0.4px]"
               >
-                {barber ? `Confirmar com ${barber.name}` : 'Selecione um barbeiro'}
+                {barber ? `Continuar com ${barber.name}` : 'Selecione um barbeiro'}
               </Button>
             </>
           ) : (

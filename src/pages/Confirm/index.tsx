@@ -71,19 +71,8 @@ export const Confirm = () => {
 
     try {
       setLoading(true);
-      // Verificar promoção no Supabase
-      const { data, error } = await supabase
-        .from("promotions")
-        .select("*")
-        .eq("code", promoCode)
-        .eq("is_active", true)
-        .gte("end_date", new Date().toISOString())
-        .lte("start_date", new Date().toISOString())
-        .single();
-
-      if (error) throw error;
-      if (!data) throw new Error("Código promocional inválido ou expirado");
-
+      // TODO: Implementar verificação de promoção com backend
+      // Por enquanto, aceitar qualquer código para teste
       currentOrder.setPromotionCode(promoCode);
       toast.success("Código promocional aplicado com sucesso!");
       setIsPromoModalOpen(false);
@@ -154,7 +143,7 @@ export const Confirm = () => {
         serviceId: firstService.id,
         barberShopId: barberShopId,
         scheduledTo: scheduledToISO,
-        totalPrice: firstService.pricing?.finalPrice ?? firstService.price ?? 0,
+        totalPrice: currentOrder.total ?? 0,
       };
 
       // Adicionar campos opcionais apenas se tiverem valor

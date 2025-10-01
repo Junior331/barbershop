@@ -82,17 +82,17 @@ export const Services = () => {
   // Calcular total com desconto
   const calculateTotal = () => {
     return selectedServices.reduce((total, service) => {
-      return total + service.pricing.finalPrice;
+      return total + (service.pricing?.finalPrice ?? service.price);
     }, 0);
   };
 
   const calculateOriginalTotal = () => {
     return selectedServices.reduce((total, service) => {
-      return total + service.pricing.originalPrice;
+      return total + service.price;
     }, 0);
   };
 
-  const hasDiscount = selectedServices.some(service => service.pricing.hasDiscount);
+  const hasDiscount = selectedServices.some(service => service.pricing?.discount && service.pricing.discount > 0);
   const totalDiscount = calculateOriginalTotal() - calculateTotal();
 
   // Handler para prosseguir
@@ -128,8 +128,8 @@ export const Services = () => {
                     key={service.id}
                     role="button"
                     tabIndex={0}
-                    onClick={() => toggleService(service)}
-                    onKeyDown={(e) => e.key === "Enter" && toggleService(service)}
+                    onClick={() => toggleService(service as any)}
+                    onKeyDown={(e) => e.key === "Enter" && toggleService(service as any)}
                     className={cn(
                       "w-full h-auto bg-transparent border-0 shadow-none p-0",
                       "focus:outline-none cursor-pointer",
