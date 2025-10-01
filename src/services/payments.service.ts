@@ -41,13 +41,16 @@ export interface MercadoPagoPaymentResponse {
   currency: string;
   method: string;
   gateway: string;
+  paymentUrl?: string;
   qrCode?: string;
   qrCodeBase64?: string;
+  qrCodeData?: string;
   fees: {
     amount: number;
     percentage: number;
   };
   createdAt: string;
+  metadata?: Record<string, any>;
 }
 
 export interface PaymentStatusResponse {
@@ -57,7 +60,34 @@ export interface PaymentStatusResponse {
 }
 
 export const paymentsService = {
-  // Criar pagamento real com Mercado Pago
+  // Criar preferência de pagamento MercadoPago (Checkout Pro)
+  async createPreference(data: CreatePaymentData): Promise<MercadoPagoPaymentResponse> {
+    try {
+      logger.info('Criando preferência de pagamento MercadoPago:', {
+        appointmentId: data.appointmentId,
+        method: data.method,
+        amount: data.amount,
+      });
+
+      const response = await api.post('/payments/create-preference', {
+        ...data,
+        currency: data.currency || 'BRL',
+      });
+
+      logger.info('Preferência criada com sucesso:', {
+        paymentId: response.data.id,
+        paymentUrl: response.data.paymentUrl,
+        preferenceId: response.data.gatewayPaymentId,
+      });
+
+      return response.data;
+    } catch (error) {
+      ApiUtils.logError(error as AxiosError, 'paymentsService.createPreference');
+      throw error;
+    }
+  },
+
+  // Criar pagamento real com Mercado Pago (legacy - direct payment API)
   async createRealPayment(data: CreatePaymentData): Promise<MercadoPagoPaymentResponse> {
     try {
       logger.info('Criando pagamento real com Mercado Pago:', {
@@ -181,6 +211,26 @@ export const paymentsService = {
       return response.data;
     } catch (error) {
       ApiUtils.logError(error as AxiosError, 'paymentsService.getByAppointment');
+      throw error;
+    }
+  },
+
+  // Obter pagamento mais recente de um agendamento
+  async getByAppointmentId(appointmentId: string): Promise<any> {
+    try {
+      logger.info('Buscando pagamento por appointmentId:', { appointmentId });
+
+      const response = await api.get(`/payments/appointment/${appointmentId}`);
+
+      logger.info('Pagamento encontrado:', {
+        paymentId: response.data.id,
+        status: response.data.status,
+        amount: response.data.amount,
+      });
+
+      return response.data;
+    } catch (error) {
+      ApiUtils.logError(error as AxiosError, 'paymentsService.getByAppointmentId');
       throw error;
     }
   },

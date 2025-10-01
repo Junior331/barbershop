@@ -15,6 +15,9 @@ import {
   BookingConfirmationImproved,
   MyBookings,
   DetailsOrder,
+  PaymentSuccess,
+  PaymentError,
+  PaymentPending,
 } from "@/pages";
 import { Loading, ProtectedRoute, RoleBasedRoute } from "@/components/elements";
 
@@ -38,6 +41,11 @@ export const AppRoutes = () => {
         <Route path="/mybookings" element={<ProtectedRoute><MyBookings /></ProtectedRoute>} />
         <Route path="/account/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         <Route path="/detailsorder/:id" element={<ProtectedRoute><DetailsOrder /></ProtectedRoute>} />
+
+        {/* Payment Result Routes */}
+        <Route path="/payment/success" element={<ProtectedRoute><PaymentSuccess /></ProtectedRoute>} />
+        <Route path="/payment/error" element={<ProtectedRoute><PaymentError /></ProtectedRoute>} />
+        <Route path="/payment/pending" element={<ProtectedRoute><PaymentPending /></ProtectedRoute>} />
 
         {/* Rotas do Barbeiro */}
         {/* <Route path="/barber" element={<RoleBasedRoute allowedRoles={['BARBER', 'ADMIN']}><BarberDashboard /></RoleBasedRoute>} />

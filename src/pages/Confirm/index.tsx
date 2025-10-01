@@ -156,14 +156,11 @@ export const Confirm = () => {
 
       const appointment = await appointmentsService.create(appointmentData);
 
-      // TESTE: Usar R$ 1,00 para pagamento de teste
-      const testAmount = 100; // 100 centavos = R$ 1,00
-
-      // Criar pagamento com Mercado Pago
-      const payment = await paymentsService.createRealPayment({
+      // Criar preferência de pagamento com Mercado Pago (Checkout Pro)
+      const paymentPreference = await paymentsService.createPreference({
         appointmentId: appointment.id,
         method: currentOrder.paymentMethod as 'CREDIT' | 'DEBIT' | 'PIX' | 'WALLET',
-        amount: testAmount, // Usando valor de teste
+        amount: currentOrder.total ?? 0,
         currency: 'BRL',
         description: `Agendamento de ${currentOrder.services.map(s => s.name).join(', ')}`,
         metadata: {
@@ -172,25 +169,23 @@ export const Confirm = () => {
           serviceNames: currentOrder.services.map(s => s.name).join(', '),
           scheduledTo: startDateTime.toISOString(),
           promotionCode: currentOrder.promotionCode,
-          originalAmount: currentOrder.total,
         }
       });
 
-      logger.info('Pagamento criado:', payment);
-
-      // Se for PIX, mostrar QR Code
-      if (currentOrder.paymentMethod === 'PIX' && payment.qrCode) {
-        toast.success('Pagamento PIX criado! Escaneie o QR Code para pagar.');
-        // TODO: Mostrar modal com QR Code
-      } else {
-        toast.success('Pagamento criado com sucesso!');
-      }
+      logger.info('Preferência de pagamento criada:', paymentPreference);
 
       // Limpar o pedido após sucesso
       currentOrder.clearOrder();
 
-      // Redirecionar para a página de confirmação
-      navigate(`/booking-confirmation/${appointment.id}`);
+      // Redirecionar para o MercadoPago para pagamento
+      if (paymentPreference.paymentUrl) {
+        toast.success('Redirecionando para pagamento...');
+        window.location.href = paymentPreference.paymentUrl;
+      } else {
+        // Fallback: redirecionar para página de confirmação se não houver URL de pagamento
+        toast.success('Agendamento criado com sucesso!');
+        navigate(`/booking-confirmation/${appointment.id}`);
+      }
     } catch (error: any) {
       console.error('Erro ao confirmar agendamento:', error);
       toast.error(error.response?.data?.message || error.message || "Erro ao confirmar agendamento");
