@@ -63,10 +63,8 @@ export const useOrder = create<IOrderState>((set, get) => ({
     const paymentMethods = [
       { id: "PIX", fee: 0.01 },
       { id: "pix", fee: 0.01 },
-      { id: "DEBIT", fee: 0.03 }, // Compatibilidade com Confirm page
       { id: "DEBIT_CARD", fee: 0.03 },
       { id: "debit_card", fee: 0.03 },
-      { id: "CREDIT", fee: 0.084 }, // Compatibilidade com Confirm page
       { id: "CREDIT_CARD", fee: 0.084 },
       { id: "credit_card", fee: 0.084 },
       { id: "WALLET", fee: 0 },

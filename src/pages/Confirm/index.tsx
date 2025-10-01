@@ -52,13 +52,13 @@ export const Confirm = () => {
   const paymentMethods = [
     { id: "PIX", name: "Pix", fee: 0.01, icon: "pix" },
     {
-      id: "DEBIT",
+      id: "DEBIT_CARD",
       name: "Cartão de Débito",
       fee: 0.03,
       icon: "debit_card",
     },
     {
-      id: "CREDIT",
+      id: "CREDIT_CARD",
       name: "Cartão de Crédito",
       fee: 0.084,
       icon: "credit_card",
@@ -167,7 +167,7 @@ export const Confirm = () => {
       // Criar preferência de pagamento (SEM criar appointment ainda)
       const paymentPreference = await paymentsService.createPreference({
         appointmentId: tempAppointmentId, // ID temporário
-        method: currentOrder.paymentMethod as 'CREDIT' | 'DEBIT' | 'PIX' | 'WALLET',
+        method: currentOrder.paymentMethod as 'CREDIT_CARD' | 'DEBIT_CARD' | 'PIX' | 'WALLET',
         amount: currentOrder.total ?? 0,
         currency: 'BRL',
         description: `Agendamento de ${currentOrder.services.map(s => s.name).join(', ')}`,
