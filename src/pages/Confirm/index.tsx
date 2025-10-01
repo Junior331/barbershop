@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import toast from "react-hot-toast";
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { getIcons } from "@/assets/icons";
@@ -21,7 +20,6 @@ import { logger } from "@/utils/logger";
 
 export const Confirm = () => {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const currentOrder = useOrder();
   const [loading, setLoading] = useState(false);
   const [promoCode, setPromoCode] = useState("");

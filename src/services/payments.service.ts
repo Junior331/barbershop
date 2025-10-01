@@ -26,7 +26,7 @@ export interface Payment {
 
 export interface CreatePaymentData {
   appointmentId: string;
-  method: 'CREDIT' | 'DEBIT' | 'PIX' | 'WALLET';
+  method: 'CREDIT_CARD' | 'DEBIT_CARD' | 'PIX' | 'WALLET';
   amount: number;
   currency?: string;
   description?: string;
