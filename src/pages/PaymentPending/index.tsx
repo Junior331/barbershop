@@ -106,7 +106,7 @@ export const PaymentPending = () => {
         toast.error('Pagamento não aprovado');
         navigate(`/payment/error?appointmentId=${appointmentId}`);
       } else {
-        toast.info('Pagamento ainda pendente. Continue tentando...');
+        toast('Pagamento ainda pendente. Continue tentando...', { icon: '⏳' });
       }
     } catch (error) {
       console.error('Error checking status:', error);
@@ -137,7 +137,7 @@ export const PaymentPending = () => {
         {/* Pending Icon */}
         <div className="w-24 h-24 rounded-full bg-yellow-100 flex items-center justify-center mb-6 mt-8">
           <img
-            src={getIcons("pending")}
+            src={getIcons("clock_outlined")}
             alt="Pending"
             className="w-16 h-16 animate-pulse"
           />
@@ -253,7 +253,7 @@ export const PaymentPending = () => {
           <div className="p-4">
             <div className="flex items-start gap-2">
               <img
-                src={getIcons("info")}
+                src={getIcons("notification")}
                 alt="Info"
                 className="w-5 h-5 mt-0.5"
               />

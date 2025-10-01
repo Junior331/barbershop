@@ -101,7 +101,7 @@ export const PaymentSuccess = () => {
         {/* Success Icon */}
         <div className="w-24 h-24 rounded-full bg-green-100 flex items-center justify-center mb-6 mt-8">
           <img
-            src={getIcons("check_circle")}
+            src={getIcons("calendar_tick")}
             alt="Success"
             className="w-16 h-16"
           />
@@ -123,7 +123,7 @@ export const PaymentSuccess = () => {
             {/* Date and Time */}
             <div className="flex items-center gap-3 mb-4 p-3 bg-green-50 rounded-lg">
               <img
-                src={getIcons("calendar_outlined_green")}
+                src={getIcons("calendar_solid_green")}
                 alt="Calendar"
                 className="w-6 h-6"
               />
@@ -167,7 +167,7 @@ export const PaymentSuccess = () => {
             <div className="mb-4 p-3 bg-green-50 rounded-lg">
               <div className="flex items-center gap-2">
                 <img
-                  src={getIcons("check_circle")}
+                  src={getIcons("calendar_tick")}
                   alt="Paid"
                   className="w-5 h-5"
                 />
@@ -202,7 +202,7 @@ export const PaymentSuccess = () => {
           <div className="p-4">
             <div className="flex items-start gap-2">
               <img
-                src={getIcons("info")}
+                src={getIcons("notification")}
                 alt="Info"
                 className="w-5 h-5 mt-0.5"
               />

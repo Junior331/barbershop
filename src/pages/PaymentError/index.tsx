@@ -99,7 +99,7 @@ export const PaymentError = () => {
         {/* Error Icon */}
         <div className="w-24 h-24 rounded-full bg-red-100 flex items-center justify-center mb-6 mt-8">
           <img
-            src={getIcons("error_outline")}
+            src={getIcons("trash_red")}
             alt="Error"
             className="w-16 h-16"
           />
@@ -163,7 +163,7 @@ export const PaymentError = () => {
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
               <div className="flex items-start gap-2">
                 <img
-                  src={getIcons("info")}
+                  src={getIcons("notification")}
                   alt="Info"
                   className="w-5 h-5 mt-0.5"
                 />
