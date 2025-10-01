@@ -1,18 +1,23 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/lib/supabase";
 import { useOrder } from "@/store/useOrderStore";
 import { getCurrentDate } from "@/utils/utils";
+import { appointmentsService, Appointment } from "@/services/appointments.service";
+import { useAuth } from "@/context/AuthContext";
+import { workingHoursService, AvailableTimeSlot } from "@/services/working-hours.service";
 
 export const useCalendar = () => {
   const navigate = useNavigate();
   const { formattedDate } = getCurrentDate();
-  const { barber, date, setDateTime } = useOrder();
+  const { barber, date, services, setDateTime } = useOrder();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [availableSlots, setAvailableSlots] = useState<string[]>([]);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [loadingAppointments, setLoadingAppointments] = useState(false);
 
   const monthNames = useMemo(
     () => [
@@ -63,60 +68,76 @@ export const useCalendar = () => {
         const year = selectedDate.getFullYear();
         const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
         const day = String(selectedDate.getDate()).padStart(2, '0');
-        
-        // Usar formato ISO date (YYYY-MM-DD) ao invés de timestamp completo
         const dateString = `${year}-${month}-${day}`;
-        
-        // Para buscar apenas um dia específico, usar a mesma data para start e end
-        const { data, error } = await supabase.rpc("get_available_time_slots", {
-          barber_id: barberId,
-          start_date: dateString,
-          end_date: dateString,
+
+        console.log("Buscando horários disponíveis:", {
+          barberId,
+          date: dateString
         });
 
-        if (error) {
-          console.error("Erro na RPC:", error);
-          throw error;
-        }
-
-        console.log("Dados retornados da RPC:", data);
-
-        // Filtrar e remover duplicatas dos horários
-        const uniqueTimes = new Set<string>();
-        const filteredData = data?.filter((slot: { available_time: string; formatted_time: string }) => {
-          // Verificar se o slot é realmente para a data selecionada
-          const slotDate = new Date(slot.available_time);
-          const slotDateString = slotDate.toISOString().split('T')[0];
-          
-          // Só incluir se for exatamente a data selecionada e se não for duplicata
-          if (slotDateString === dateString && !uniqueTimes.has(slot.formatted_time)) {
-            uniqueTimes.add(slot.formatted_time);
-            return true;
-          }
-          return false;
-        }) || [];
-
-        console.log("Dados filtrados:", filteredData);
-
-        const times = filteredData.map(
-          (slot: { available_time: string; formatted_time: string }) =>
-            slot.formatted_time
+        // Usar o service de working hours para buscar horários disponíveis
+        const response = await workingHoursService.getAvailableTimes(
+          barberId,
+          dateString
         );
 
-        // Ordenar os horários para garantir ordem cronológica
-        times.sort((a: string, b: string) => {
-          const timeA = a.split(':').map(Number);
-          const timeB = b.split(':').map(Number);
-          return timeA[0] * 60 + timeA[1] - (timeB[0] * 60 + timeB[1]);
-        });
+        console.log("Resposta da API:", response);
 
-        console.log("Horários finais:", times);
-        setAvailableSlots(times);
+        // A API retorna um objeto com { times: [...] }
+        const availableTimeSlots = response.times || [];
+
+        // Verificar se é hoje para filtrar horários que já passaram
+        const now = new Date();
+        const isToday = selectedDate.getDate() === now.getDate() &&
+                       selectedDate.getMonth() === now.getMonth() &&
+                       selectedDate.getFullYear() === now.getFullYear();
+
+        // Extrair apenas os horários disponíveis e futuros
+        const availableTimes = availableTimeSlots
+          .filter(slot => {
+            if (!slot.available) return false;
+
+            // Se não for hoje, todos os horários disponíveis são válidos
+            if (!isToday) return true;
+
+            // Se for hoje, verificar se o horário ainda não passou
+            const [hours, minutes] = slot.time.split(':').map(Number);
+            const slotTime = new Date(selectedDate);
+            slotTime.setHours(hours, minutes, 0, 0);
+
+            return slotTime > now;
+          })
+          .map(slot => slot.time);
+
+        console.log("Horários disponíveis:", availableTimes);
+        setAvailableSlots(availableTimes);
       } catch (error) {
         console.error("Erro ao buscar disponibilidade:", error);
         setAvailableSlots([]);
       } finally {
         setLoading(false);
+      }
+    },
+    [services]
+  );
+
+  // Função para buscar agendamentos do barbeiro por data
+  const fetchBarberAppointments = useCallback(
+    async (barberId: string, selectedDate: Date) => {
+      setLoadingAppointments(true);
+      try {
+        const year = selectedDate.getFullYear();
+        const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+        const day = String(selectedDate.getDate()).padStart(2, '0');
+        const dateString = `${year}-${month}-${day}`;
+
+        const appointmentData = await appointmentsService.getBarberAppointmentsByDate(barberId, dateString);
+        setAppointments(appointmentData);
+      } catch (error) {
+        console.error("Erro ao buscar agendamentos:", error);
+        setAppointments([]);
+      } finally {
+        setLoadingAppointments(false);
       }
     },
     []
@@ -128,11 +149,16 @@ export const useCalendar = () => {
       // Adicionar um pequeno delay para evitar múltiplas chamadas rápidas
       const timeoutId = setTimeout(() => {
         fetchBarberAvailability(barber.id, selectedDate);
+
+        // Buscar agendamentos apenas se o usuário for um barbeiro
+        if (user?.role === 'BARBER') {
+          fetchBarberAppointments(user.id, selectedDate);
+        }
       }, 100);
 
       return () => clearTimeout(timeoutId);
     }
-  }, [barber?.id, selectedDate, fetchBarberAvailability]);
+  }, [barber?.id, selectedDate, services, user?.id, user?.role, fetchBarberAvailability, fetchBarberAppointments]);
 
   // Funções de navegação para o mês
   const handlePrevMonth = () => {
@@ -150,10 +176,12 @@ export const useCalendar = () => {
       currentDate.getMonth(),
       day
     );
-    
+
     // Resetar horário selecionado quando mudar de data
     setSelectedTime(null);
     setSelectedDate(clickedDate);
+    // Limpar agendamentos anteriores
+    setAppointments([]);
   };
 
   // Função para selecionar o horário
@@ -206,6 +234,8 @@ export const useCalendar = () => {
     formattedDate,
     setCurrentDate,
     availableSlots,
+    appointments,
+    loadingAppointments,
     handleDayClick,
     handlePrevMonth,
     isDateSelectable,

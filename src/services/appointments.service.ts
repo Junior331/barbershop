@@ -3,13 +3,16 @@ import { AxiosError } from 'axios';
 import { logger } from '@/utils/logger';
 
 export interface CreateAppointmentData {
+  clientId?: string; // Opcional, o backend pode pegar do token
   barberId: string;
   serviceId: string;
   barberShopId: string;
   scheduledTo: string; // ISO date
-  scheduledTime: string; // "09:00"
   totalPrice: number;
-  paymentMethod: 'CREDIT' | 'DEBIT' | 'PIX' | 'WALLET';
+  paymentMethod?: 'CREDIT' | 'DEBIT' | 'PIX' | 'WALLET';
+  paymentStatus?: 'PENDING' | 'COMPLETED' | 'FAILED' | 'REFUNDED';
+  status?: 'PENDING' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED' | 'EXPIRED';
+  notes?: string;
 }
 
 export interface Appointment {
@@ -199,6 +202,31 @@ export const appointmentsService = {
       return response.data;
     } catch (error) {
       ApiUtils.logError(error as AxiosError, 'appointmentsService.getBarberAppointments');
+      throw error;
+    }
+  },
+
+  // Buscar agendamentos por barbeiro e data específica
+  async getBarberAppointmentsByDate(barberId: string, date: string): Promise<Appointment[]> {
+    try {
+      logger.info('Buscando agendamentos do barbeiro por data:', { barberId, date });
+
+      const response = await api.get('/appointments/barber/my-appointments', {
+        params: { date }
+      });
+
+      // Filtrar agendamentos para a data específica
+      const appointments = response.data.filter((appointment: Appointment) => {
+        const appointmentDate = new Date(appointment.scheduledTo);
+        const targetDate = new Date(date);
+        return appointmentDate.toDateString() === targetDate.toDateString();
+      });
+
+      logger.info(`Encontrados ${appointments.length} agendamentos para ${date}`);
+
+      return appointments;
+    } catch (error) {
+      ApiUtils.logError(error as AxiosError, 'appointmentsService.getBarberAppointmentsByDate');
       throw error;
     }
   },

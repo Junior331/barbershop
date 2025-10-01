@@ -26,8 +26,28 @@ export interface Payment {
 
 export interface CreatePaymentData {
   appointmentId: string;
-  method: 'CREDIT' | 'DEBIT' | 'PIX' | 'WALLET';
+  method: 'CREDIT_CARD' | 'DEBIT_CARD' | 'PIX' | 'WALLET';
   amount: number;
+  currency?: string;
+  description?: string;
+  metadata?: Record<string, any>;
+}
+
+export interface MercadoPagoPaymentResponse {
+  id: string;
+  gatewayPaymentId: string;
+  status: string;
+  amount: number;
+  currency: string;
+  method: string;
+  gateway: string;
+  qrCode?: string;
+  qrCodeBase64?: string;
+  fees: {
+    amount: number;
+    percentage: number;
+  };
+  createdAt: string;
 }
 
 export interface PaymentStatusResponse {
@@ -37,18 +57,86 @@ export interface PaymentStatusResponse {
 }
 
 export const paymentsService = {
-  // Processar pagamento
-  async create(data: CreatePaymentData): Promise<Payment> {
+  // Criar pagamento real com Mercado Pago
+  async createRealPayment(data: CreatePaymentData): Promise<MercadoPagoPaymentResponse> {
     try {
-      logger.info('Processando pagamento:', {
+      logger.info('Criando pagamento real com Mercado Pago:', {
         appointmentId: data.appointmentId,
         method: data.method,
         amount: data.amount,
       });
 
-      const response = await api.post('/payments', data);
+      const response = await api.post('/payments/create', {
+        ...data,
+        currency: data.currency || 'BRL',
+      });
 
-      logger.info('Pagamento processado:', {
+      logger.info('Pagamento Mercado Pago criado:', {
+        paymentId: response.data.id,
+        status: response.data.status,
+        method: response.data.method,
+        gateway: response.data.gateway,
+      });
+
+      return response.data;
+    } catch (error) {
+      ApiUtils.logError(error as AxiosError, 'paymentsService.createRealPayment');
+      throw error;
+    }
+  },
+
+  // Confirmar pagamento (para cartões)
+  async confirmPayment(paymentId: string, confirmationData?: any): Promise<any> {
+    try {
+      logger.info('Confirmando pagamento:', { paymentId });
+
+      const response = await api.patch(`/payments/${paymentId}/confirm`, confirmationData || {});
+
+      logger.info('Pagamento confirmado:', {
+        paymentId: response.data.id,
+        status: response.data.status,
+      });
+
+      return response.data;
+    } catch (error) {
+      ApiUtils.logError(error as AxiosError, 'paymentsService.confirmPayment');
+      throw error;
+    }
+  },
+
+  // Cancelar pagamento
+  async cancelPayment(paymentId: string, reason?: string): Promise<any> {
+    try {
+      logger.info('Cancelando pagamento:', { paymentId, reason });
+
+      const response = await api.delete(`/payments/${paymentId}/cancel`, {
+        data: { reason }
+      });
+
+      logger.info('Pagamento cancelado:', {
+        paymentId: response.data.id,
+        status: response.data.status,
+      });
+
+      return response.data;
+    } catch (error) {
+      ApiUtils.logError(error as AxiosError, 'paymentsService.cancelPayment');
+      throw error;
+    }
+  },
+
+  // Processar pagamento (legacy - mock)
+  async create(data: CreatePaymentData): Promise<Payment> {
+    try {
+      logger.info('Processando pagamento mock:', {
+        appointmentId: data.appointmentId,
+        method: data.method,
+        amount: data.amount,
+      });
+
+      const response = await api.post('/payments/mock', data);
+
+      logger.info('Pagamento mock processado:', {
         paymentId: response.data.id,
         status: response.data.status,
         method: response.data.method,

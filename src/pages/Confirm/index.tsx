@@ -14,9 +14,10 @@ import {
   formatCustomDateTime,
   getPaymentMethodIcon,
 } from "@/utils/utils";
-import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/context/AuthContext";
 import { CircleIcon, Loading, Text, Title } from "@/components/elements";
+import { appointmentsService, paymentsService } from "@/services";
+import { logger } from "@/utils/logger";
 
 export const Confirm = () => {
   const { user } = useAuth();
@@ -49,20 +50,20 @@ export const Confirm = () => {
   };
 
   const paymentMethods = [
-    { id: "pix", name: "Pix", fee: 0.01, icon: "pix" },
+    { id: "PIX", name: "Pix", fee: 0.01, icon: "pix" },
     {
-      id: "debit_card",
+      id: "DEBIT_CARD",
       name: "Cartão de Débito",
       fee: 0.03,
       icon: "debit_card",
     },
     {
-      id: "credit_card",
+      id: "CREDIT_CARD",
       name: "Cartão de Crédito",
       fee: 0.084,
       icon: "credit_card",
     },
-    { id: "wallet", name: "Carteira", fee: 0, icon: "wallet" },
+    { id: "WALLET", name: "Carteira", fee: 0, icon: "wallet" },
   ];
 
   const handleApplyPromoCode = async () => {
@@ -110,41 +111,100 @@ export const Confirm = () => {
         throw new Error("Dados incompletos para o agendamento");
       }
 
-      // Preparar dados para a RPC
-      const servicesData = currentOrder.services.map((service) => ({
-        id: service.id,
-        price: service.price,
-        duration: service.durationMinutes,
-      }));
-
       // Converter a data e hora para o formato correto
       const startDateTime = new Date(currentOrder.date);
       const [hours, minutes] = currentOrder.startTime.split(":").map(Number);
       startDateTime.setHours(hours, minutes, 0, 0);
 
-      // Chamar a função RPC
-      const { error } = await supabase.rpc("create_appointment_with_services", {
-        client_id: user.id,
-        notes: currentOrder.notes,
-        services_data: servicesData,
-        final_amount: currentOrder.total,
-        barber_id: currentOrder.barber.id,
-        start_time: startDateTime.toISOString(),
-        payment_method: currentOrder.paymentMethod,
-        promotion_code: currentOrder.promotionCode,
-        appointment_date: currentOrder.date.toISOString().split("T")[0],
+      // Garantir que a data está no futuro
+      const now = new Date();
+      if (startDateTime <= now) {
+        throw new Error("A data e hora selecionadas devem estar no futuro");
+      }
+
+      // Criar agendamento com o primeiro serviço (o backend atual espera um serviço por vez)
+      const firstService = currentOrder.services[0];
+
+      // Obter barberShopId - pode vir do barbeiro ou do serviço
+      let barberShopId = currentOrder.barber.barberShop?.id;
+
+      // Se não tiver no barbeiro, pegar do serviço (todos os serviços são da mesma barbearia)
+      if (!barberShopId && firstService.barberShop?.id) {
+        barberShopId = firstService.barberShop.id;
+      }
+
+      if (!barberShopId) {
+        throw new Error("Não foi possível identificar a barbearia. Por favor, tente novamente.");
+      }
+
+      // Formatar data no formato ISO-8601 correto
+      const scheduledToISO = startDateTime.toISOString();
+
+      // Log para debug
+      logger.info('Criando agendamento:', {
+        scheduledTo: scheduledToISO,
+        barberId: currentOrder.barber.id,
+        serviceId: firstService.id,
+        barberShopId: barberShopId,
       });
 
-      if (error) throw error;
+      const appointmentData: any = {
+        clientId: user.id,
+        barberId: currentOrder.barber.id,
+        serviceId: firstService.id,
+        barberShopId: barberShopId,
+        scheduledTo: scheduledToISO,
+        totalPrice: firstService.pricing?.finalPrice ?? firstService.price ?? 0,
+      };
+
+      // Adicionar campos opcionais apenas se tiverem valor
+      if (currentOrder.paymentMethod) {
+        appointmentData.paymentMethod = currentOrder.paymentMethod;
+      }
+      if (currentOrder.notes) {
+        appointmentData.notes = currentOrder.notes;
+      }
+
+      const appointment = await appointmentsService.create(appointmentData);
+
+      // TESTE: Usar R$ 1,00 para pagamento de teste
+      const testAmount = 100; // 100 centavos = R$ 1,00
+
+      // Criar pagamento com Mercado Pago
+      const payment = await paymentsService.createRealPayment({
+        appointmentId: appointment.id,
+        method: currentOrder.paymentMethod as 'CREDIT_CARD' | 'DEBIT_CARD' | 'PIX' | 'WALLET',
+        amount: testAmount, // Usando valor de teste
+        currency: 'BRL',
+        description: `Agendamento de ${currentOrder.services.map(s => s.name).join(', ')}`,
+        metadata: {
+          barberId: currentOrder.barber.id,
+          barberName: currentOrder.barber.name,
+          serviceNames: currentOrder.services.map(s => s.name).join(', '),
+          scheduledTo: startDateTime.toISOString(),
+          promotionCode: currentOrder.promotionCode,
+          originalAmount: currentOrder.total,
+        }
+      });
+
+      logger.info('Pagamento criado:', payment);
+
+      // Se for PIX, mostrar QR Code
+      if (currentOrder.paymentMethod === 'PIX' && payment.qrCode) {
+        toast.success('Pagamento PIX criado! Escaneie o QR Code para pagar.');
+        // TODO: Mostrar modal com QR Code
+      } else {
+        toast.success('Pagamento criado com sucesso!');
+      }
 
       // Limpar o pedido após sucesso
       currentOrder.clearOrder();
 
-      // Redirecionar com mensagem de sucesso
-      toast.success("Agendamento confirmado com sucesso!");
-      navigate("/mybookings");
+      // Redirecionar para a página de confirmação
+      navigate(`/booking-confirmation/${appointment.id}`);
     } catch (error: any) {
-      toast.error(error.message || "Erro ao confirmar agendamento");
+      console.error('Erro ao confirmar agendamento:', error);
+      toast.error(error.response?.data?.message || error.message || "Erro ao confirmar agendamento");
     } finally {
       setLoading(false);
     }
@@ -224,7 +284,7 @@ export const Confirm = () => {
                           style: "currency",
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,
-                        }).format(service.price || 0)}
+                        }).format(service.pricing?.finalPrice ?? service.price ?? 0)}
                       </Title>
                       <Text className="text-sm text-gray-500">
                         {service.durationMinutes} min

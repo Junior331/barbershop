@@ -45,28 +45,38 @@ export const useOrder = create<IOrderState>((set, get) => ({
 
   calculateTotals: () => {
     const { services, promotionCode, paymentMethod } = get();
-    const subtotal = services.reduce((sum, service) => sum + service.price, 0);
+
+    // Usar pricing.finalPrice se disponível, caso contrário usar price
+    const subtotal = services.reduce((sum, service) => {
+      const price = service.pricing?.finalPrice ?? service.price ?? 0;
+      return sum + price;
+    }, 0);
+
     let discount = 0;
-  
+
     // Cálculo do desconto (mantendo sua lógica atual)
     if (promotionCode) {
       discount = subtotal * 0.1; // 10% de desconto como exemplo
     }
-  
+
     // Encontrar o método de pagamento selecionado e sua taxa
     const paymentMethods = [
-      { id: "pix", fee: 0.01 },
-      { id: "debit_card", fee: 0.03 },
-      { id: "credit_card", fee: 0.084 },
-      { id: "wallet", fee: 0 },
+      { id: "PIX", fee: 0.01 },
+      { id: "pix", fee: 0.01 }, // Compatibilidade
+      { id: "DEBIT_CARD", fee: 0.03 },
+      { id: "debit_card", fee: 0.03 }, // Compatibilidade
+      { id: "CREDIT_CARD", fee: 0.084 },
+      { id: "credit_card", fee: 0.084 }, // Compatibilidade
+      { id: "WALLET", fee: 0 },
+      { id: "wallet", fee: 0 }, // Compatibilidade
     ];
-    
+
     const selectedMethod = paymentMethods.find(m => m.id === paymentMethod);
     const feeRate = selectedMethod ? selectedMethod.fee : 0;
     const feeAmount = (subtotal - discount) * feeRate;
-  
+
     const total = subtotal - discount + feeAmount;
-  
+
     set({ subtotal, discount, total, paymentFee: feeAmount });
   },
 

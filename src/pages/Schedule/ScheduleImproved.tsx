@@ -14,8 +14,8 @@ import {
   CircleIcon,
 } from "@/components/elements";
 
-import { barbersService } from "@/services";
-import type { Barber, Service, TimeSlot } from "@/services";
+import { barbersService, workingHoursService } from "@/services";
+import type { Barber, Service, AvailableTimeSlot } from "@/services";
 
 interface SelectedService extends Service {
   selectedBarbers?: string[];
@@ -34,7 +34,7 @@ export const ScheduleImproved = () => {
   const [barbers, setBarbers] = useState<Barber[]>([]);
   const [selectedDate, setSelectedDate] = useState<string>("");
   const [selectedTime, setSelectedTime] = useState<string>("");
-  const [availableSlots, setAvailableSlots] = useState<TimeSlot[]>([]);
+  const [availableSlots, setAvailableSlots] = useState<AvailableTimeSlot[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingSlots, setLoadingSlots] = useState(false);
 
@@ -113,13 +113,14 @@ export const ScheduleImproved = () => {
       setSelectedTime("");
 
       const serviceIds = bookingData.selectedServices.map(s => s.id);
-      const slots = await barbersService.getAvailableSlots({
+      const response = await workingHoursService.getAvailableSlots({
         date: selectedDate,
         barberIds: bookingData.selectedBarbers,
         serviceIds
       });
 
-      setAvailableSlots(slots);
+      // A API retorna um objeto com { times: [...] }, então pegamos apenas o array times
+      setAvailableSlots(response.times || []);
     } catch (error) {
       console.error('Erro ao carregar horários:', error);
       toast.error('Erro ao carregar horários disponíveis');

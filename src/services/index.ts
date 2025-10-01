@@ -8,3 +8,5 @@ export { barbersService } from './barbers.service';
 export type { Barber, BarberWithServices } from './barbers.service';
 export { paymentsService } from './payments.service';
 export type { Payment, PaymentMethod } from './payments.service';
+export { workingHoursService } from './working-hours.service';
+export type { WorkingHour, AvailableTimeSlot, AvailableSlotsResponse, CreateWorkingHourData, AvailableTimesParams } from './working-hours.service';

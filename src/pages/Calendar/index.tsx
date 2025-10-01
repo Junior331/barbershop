@@ -4,11 +4,15 @@ import { getIcons } from "@/assets/icons";
 import { useCalendar } from "./useCalendar";
 import { Layout } from "@/components/templates";
 import { Header } from "@/components/organisms";
+import { AppointmentsList } from "@/components/organisms/AppointmentsList";
+import { useAuth } from "@/context/AuthContext";
 
 export const Calendar = () => {
+  const { user } = useAuth();
   const {
     days,
     date,
+    loading,
     navigate,
     monthNames,
     daysOfWeek,
@@ -20,6 +24,8 @@ export const Calendar = () => {
     setCurrentDate,
     handleDayClick,
     availableSlots,
+    appointments,
+    loadingAppointments,
     handlePrevMonth,
     handleNextMonth,
     isTimeAvailable,
@@ -130,7 +136,11 @@ export const Calendar = () => {
               Horários
             </h2>
 
-            {availableSlots.length ? (
+            {loading ? (
+              <div className="flex justify-center items-center py-8">
+                <div className="loading loading-spinner text-[#6C8762]"></div>
+              </div>
+            ) : availableSlots.length ? (
               <div className="w-full grid grid-cols-3 gap-3">
                 {availableSlots.map((timeSlot) => {
                   const isAvailable = isTimeAvailable(timeSlot);
@@ -179,6 +189,23 @@ export const Calendar = () => {
               <p className="text-center text-gray-400">
                 Nenhum horário disponível.
               </p>
+            )}
+
+            {/* Seção de Agendamentos - apenas para barbeiros */}
+            {selectedDate && user?.role === 'BARBER' && (
+              <>
+                <h2 className="text-black inter text-[24px] font-medium leading-normal tracking-[1.2px] m-[25px_0px]">
+                  Agendamentos do Dia
+                </h2>
+
+                <AppointmentsList
+                  appointments={appointments}
+                  loading={loadingAppointments}
+                  onAppointmentClick={(appointment) => {
+                    console.log('Agendamento clicado:', appointment);
+                  }}
+                />
+              </>
             )}
 
             <button
