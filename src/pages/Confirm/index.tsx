@@ -52,13 +52,13 @@ export const Confirm = () => {
   const paymentMethods = [
     { id: "PIX", name: "Pix", fee: 0.01, icon: "pix" },
     {
-      id: "DEBIT_CARD",
+      id: "DEBIT",
       name: "Cartão de Débito",
       fee: 0.03,
       icon: "debit_card",
     },
     {
-      id: "CREDIT_CARD",
+      id: "CREDIT",
       name: "Cartão de Crédito",
       fee: 0.084,
       icon: "credit_card",
@@ -173,7 +173,7 @@ export const Confirm = () => {
       // Criar pagamento com Mercado Pago
       const payment = await paymentsService.createRealPayment({
         appointmentId: appointment.id,
-        method: currentOrder.paymentMethod as 'CREDIT_CARD' | 'DEBIT_CARD' | 'PIX' | 'WALLET',
+        method: currentOrder.paymentMethod as 'CREDIT' | 'DEBIT' | 'PIX' | 'WALLET',
         amount: testAmount, // Usando valor de teste
         currency: 'BRL',
         description: `Agendamento de ${currentOrder.services.map(s => s.name).join(', ')}`,
