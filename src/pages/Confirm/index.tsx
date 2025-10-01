@@ -172,17 +172,15 @@ export const Confirm = () => {
         currency: 'BRL',
         description: `Agendamento de ${currentOrder.services.map(s => s.name).join(', ')}`,
         metadata: {
-          // Salvar TODOS os dados necessários para criar appointment depois
+          // Dados básicos para o MercadoPago (appointmentData está no localStorage)
           barberId: currentOrder.barber.id,
           barberName: currentOrder.barber.name,
           serviceNames: currentOrder.services.map(s => s.name).join(', '),
           scheduledTo: startDateTime.toISOString(),
-          promotionCode: currentOrder.promotionCode,
+          promotionCode: currentOrder.promotionCode || null,
           clientId: user.id,
           clientEmail: user.email,
           clientName: user.name,
-          // Incluir dados completos do appointment
-          appointmentData: appointmentData,
         }
       });
 
