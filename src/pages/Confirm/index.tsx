@@ -154,26 +154,25 @@ export const Confirm = () => {
         appointmentData.notes = currentOrder.notes;
       }
 
-      // Criar appointment com paymentStatus = PENDING (aguardando pagamento)
-      // O appointment só será confirmado após pagamento bem-sucedido
-      const appointment = await appointmentsService.create({
-        ...appointmentData,
-        paymentStatus: 'PENDING', // Importante: marcar como pendente
-      });
+      // FLUXO CORRETO: Criar preferência PRIMEIRO, appointment DEPOIS do pagamento
 
-      logger.info('Appointment criado (aguardando pagamento):', appointment);
+      // Salvar dados do appointment no localStorage para criar APÓS pagamento
+      localStorage.setItem('pendingBookingData', JSON.stringify(appointmentData));
 
-      // Salvar appointment ID para usar após pagamento
-      localStorage.setItem('pendingAppointmentId', appointment.id);
+      logger.info('Dados do appointment salvos, criando preferência de pagamento...');
 
-      // Criar preferência de pagamento
+      // Gerar ID temporário para a preferência
+      const tempAppointmentId = `temp_${Date.now()}_${user.id}`;
+
+      // Criar preferência de pagamento (SEM criar appointment ainda)
       const paymentPreference = await paymentsService.createPreference({
-        appointmentId: appointment.id,
+        appointmentId: tempAppointmentId, // ID temporário
         method: currentOrder.paymentMethod as 'CREDIT' | 'DEBIT' | 'PIX' | 'WALLET',
         amount: currentOrder.total ?? 0,
         currency: 'BRL',
         description: `Agendamento de ${currentOrder.services.map(s => s.name).join(', ')}`,
         metadata: {
+          // Salvar TODOS os dados necessários para criar appointment depois
           barberId: currentOrder.barber.id,
           barberName: currentOrder.barber.name,
           serviceNames: currentOrder.services.map(s => s.name).join(', '),
@@ -182,14 +181,19 @@ export const Confirm = () => {
           clientId: user.id,
           clientEmail: user.email,
           clientName: user.name,
+          // Incluir dados completos do appointment
+          appointmentData: appointmentData,
         }
       });
 
-      logger.info('Preferência de pagamento criada:', paymentPreference);
+      logger.info('Preferência criada:', paymentPreference);
 
-      // NÃO limpar o pedido ainda - será limpo após pagamento
+      // Salvar payment ID para associar ao appointment depois
+      localStorage.setItem('pendingPaymentId', paymentPreference.id);
 
-      // Redirecionar para o MercadoPago para pagamento
+      // NÃO limpar o pedido - será limpo após criação do appointment
+
+      // Redirecionar para MercadoPago
       if (paymentPreference.paymentUrl) {
         toast.success('Redirecionando para pagamento...');
         window.location.href = paymentPreference.paymentUrl;

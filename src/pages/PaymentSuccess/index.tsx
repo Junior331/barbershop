@@ -34,9 +34,10 @@ export const PaymentSuccess = () => {
   const [paymentDetails, setPaymentDetails] = useState<any>(null);
 
   useEffect(() => {
-    const fetchAppointmentDetails = async () => {
+    const createAppointmentAndFetchDetails = async () => {
+      // appointmentId aqui é o tempAppointmentId (temp_xxx)
       if (!appointmentId) {
-        toast.error('ID do agendamento não encontrado');
+        toast.error('ID da preferência não encontrado');
         navigate('/');
         return;
       }
@@ -44,32 +45,59 @@ export const PaymentSuccess = () => {
       try {
         setLoading(true);
 
-        // Fetch appointment details
-        const appointmentData = await appointmentsService.getById(appointmentId);
-        setAppointment(appointmentData);
+        // Pegar dados salvos do localStorage
+        const pendingBookingDataStr = localStorage.getItem('pendingBookingData');
+        const pendingPaymentId = localStorage.getItem('pendingPaymentId');
 
-        // Fetch payment details
-        try {
-          const payment = await paymentsService.getByAppointmentId(appointmentId);
-          setPaymentDetails(payment);
-        } catch (error) {
-          console.warn('Payment details not found, but appointment exists');
+        if (!pendingBookingDataStr) {
+          toast.error('Dados do agendamento não encontrados');
+          navigate('/');
+          return;
         }
 
-        // Clear localStorage
+        const bookingData = JSON.parse(pendingBookingDataStr);
+
+        // CRIAR O APPOINTMENT AGORA (após pagamento confirmado)
+        console.log('Criando appointment após pagamento confirmado:', bookingData);
+        const createdAppointment = await appointmentsService.create({
+          ...bookingData,
+          paymentStatus: 'COMPLETED', // Pagamento já foi confirmado
+        });
+
+        setAppointment(createdAppointment);
+
+        // Buscar detalhes do pagamento pelo ID salvo
+        if (pendingPaymentId) {
+          try {
+            const payment = await paymentsService.getById(pendingPaymentId);
+            setPaymentDetails(payment);
+
+            // TODO: Atualizar o payment no backend para associar ao appointmentId real
+            // (Isso pode ser feito via um endpoint PATCH /payments/:id)
+          } catch (error) {
+            console.warn('Payment details not found:', error);
+          }
+        }
+
+        // Limpar localStorage
         localStorage.removeItem('selectedServices');
         localStorage.removeItem('bookingData');
         localStorage.removeItem('finalBookingData');
+        localStorage.removeItem('pendingBookingData');
+        localStorage.removeItem('pendingPaymentId');
 
-      } catch (error) {
-        console.error('Error fetching appointment:', error);
-        toast.error('Erro ao carregar detalhes do agendamento');
+        toast.success('Agendamento criado com sucesso!');
+
+      } catch (error: any) {
+        console.error('Error creating appointment:', error);
+        toast.error(error.response?.data?.message || 'Erro ao criar agendamento');
+        navigate('/');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchAppointmentDetails();
+    createAppointmentAndFetchDetails();
   }, [appointmentId, navigate]);
 
   if (loading) {
