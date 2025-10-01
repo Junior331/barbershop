@@ -154,9 +154,19 @@ export const Confirm = () => {
         appointmentData.notes = currentOrder.notes;
       }
 
-      const appointment = await appointmentsService.create(appointmentData);
+      // Criar appointment com paymentStatus = PENDING (aguardando pagamento)
+      // O appointment só será confirmado após pagamento bem-sucedido
+      const appointment = await appointmentsService.create({
+        ...appointmentData,
+        paymentStatus: 'PENDING', // Importante: marcar como pendente
+      });
 
-      // Criar preferência de pagamento com Mercado Pago (Checkout Pro)
+      logger.info('Appointment criado (aguardando pagamento):', appointment);
+
+      // Salvar appointment ID para usar após pagamento
+      localStorage.setItem('pendingAppointmentId', appointment.id);
+
+      // Criar preferência de pagamento
       const paymentPreference = await paymentsService.createPreference({
         appointmentId: appointment.id,
         method: currentOrder.paymentMethod as 'CREDIT' | 'DEBIT' | 'PIX' | 'WALLET',
@@ -169,22 +179,22 @@ export const Confirm = () => {
           serviceNames: currentOrder.services.map(s => s.name).join(', '),
           scheduledTo: startDateTime.toISOString(),
           promotionCode: currentOrder.promotionCode,
+          clientId: user.id,
+          clientEmail: user.email,
+          clientName: user.name,
         }
       });
 
       logger.info('Preferência de pagamento criada:', paymentPreference);
 
-      // Limpar o pedido após sucesso
-      currentOrder.clearOrder();
+      // NÃO limpar o pedido ainda - será limpo após pagamento
 
       // Redirecionar para o MercadoPago para pagamento
       if (paymentPreference.paymentUrl) {
         toast.success('Redirecionando para pagamento...');
         window.location.href = paymentPreference.paymentUrl;
       } else {
-        // Fallback: redirecionar para página de confirmação se não houver URL de pagamento
-        toast.success('Agendamento criado com sucesso!');
-        navigate(`/booking-confirmation/${appointment.id}`);
+        toast.error('Erro ao gerar link de pagamento');
       }
     } catch (error: any) {
       console.error('Erro ao confirmar agendamento:', error);
