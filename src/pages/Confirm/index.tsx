@@ -154,25 +154,28 @@ export const Confirm = () => {
         appointmentData.notes = currentOrder.notes;
       }
 
-      // FLUXO CORRETO: Criar preferência PRIMEIRO, appointment DEPOIS do pagamento
+      // NOVO FLUXO: Criar appointment PRIMEIRO com status PENDING
 
-      // Salvar dados do appointment no localStorage para criar APÓS pagamento
-      localStorage.setItem('pendingBookingData', JSON.stringify(appointmentData));
+      logger.info('Criando appointment com status PENDING...');
 
-      logger.info('Dados do appointment salvos, criando preferência de pagamento...');
+      // Criar appointment com status PENDING
+      const createdAppointment = await appointmentsService.create({
+        ...appointmentData,
+        status: 'PENDING',
+        paymentStatus: 'PENDING',
+      });
 
-      // Gerar ID temporário para a preferência
-      const tempAppointmentId = `temp_${Date.now()}_${user.id}`;
+      logger.info('Appointment criado:', createdAppointment);
 
-      // Criar preferência de pagamento (SEM criar appointment ainda)
+      // Criar preferência de pagamento com ID real do appointment
       const paymentPreference = await paymentsService.createPreference({
-        appointmentId: tempAppointmentId, // ID temporário
+        appointmentId: createdAppointment.id, // ID real do appointment
         method: currentOrder.paymentMethod as 'CREDIT_CARD' | 'DEBIT_CARD' | 'PIX' | 'WALLET',
         amount: currentOrder.total ?? 0,
         currency: 'BRL',
         description: `Agendamento de ${currentOrder.services.map(s => s.name).join(', ')}`,
         metadata: {
-          // Dados básicos para o MercadoPago (appointmentData está no localStorage)
+          appointmentId: createdAppointment.id, // CRÍTICO: passar appointmentId no metadata para webhook
           barberId: currentOrder.barber.id,
           barberName: currentOrder.barber.name,
           serviceNames: currentOrder.services.map(s => s.name).join(', '),
@@ -186,10 +189,8 @@ export const Confirm = () => {
 
       logger.info('Preferência criada:', paymentPreference);
 
-      // Salvar payment ID para associar ao appointment depois
-      localStorage.setItem('pendingPaymentId', paymentPreference.id);
-
-      // NÃO limpar o pedido - será limpo após criação do appointment
+      // Limpar pedido - appointment já criado
+      currentOrder.clearOrder();
 
       // Redirecionar para MercadoPago
       if (paymentPreference.paymentUrl) {
