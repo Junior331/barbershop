@@ -117,10 +117,11 @@ export const Signin = () => {
             />
           </button>
           <button
+            disabled
             type="button"
-            disabled={loading}
             onClick={signInWithGoogle}
-            className="cursor-pointer w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
+            className="opacity-50 contrast-75 cursor-not-allowed w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
+            // className="cursor-pointer w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
           >
             <img
               src={getIcons("social_google")}

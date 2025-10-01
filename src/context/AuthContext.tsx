@@ -1,22 +1,121 @@
-import { User } from "@supabase/supabase-js";
-import { createContext, useContext, useState } from "react";
+import { IUserData } from "@/utils/types";
+import { createContext, useContext, useState, useEffect, useCallback } from "react";
+import { cookieUtils, COOKIE_NAMES } from "@/utils/cookies";
+import { logger } from "@/utils/logger";
+import toast from "react-hot-toast";
 
 interface AuthContextType {
-  user: User | null;
-  setAuth: (user: User | null) => void;
+  user: IUserData | null;
+  token: string | null;
+  setAuth: (user: IUserData | null, token?: string) => void;
+  logout: () => void;
+  isLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<IUserData | null>(null);
+  const [token, setToken] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isInitialized, setIsInitialized] = useState(false);
 
-  const setAuth = (authUser: User | null) => {
+  // Função para fazer logout
+  const logout = useCallback(() => {
+    try {
+      setUser(null);
+      setToken(null);
+      cookieUtils.remove(COOKIE_NAMES.ACCESS_TOKEN);
+      cookieUtils.remove(COOKIE_NAMES.USER_DATA);
+      toast.success('Logout realizado com sucesso');
+      logger.auth('Logout realizado');
+    } catch (error) {
+      logger.error('Erro ao fazer logout:', error);
+      toast.error('Erro ao fazer logout');
+    }
+  }, []);
+
+  // Função para definir autenticação com cookies seguros
+  const setAuth = useCallback((authUser: IUserData | null, authToken?: string) => {
     setUser(authUser);
-  };
+    setToken(authToken || null);
+
+    if (authUser) {
+      // Salvar dados do usuário em cookie seguro
+      cookieUtils.set(COOKIE_NAMES.USER_DATA, JSON.stringify(authUser), {
+        expires: 7, // 7 dias
+        secure: true,
+        sameSite: 'Strict'
+      });
+
+      // Salvar token se fornecido
+      if (authToken) {
+        cookieUtils.set(COOKIE_NAMES.ACCESS_TOKEN, authToken, {
+          expires: 7, // 7 dias
+          secure: true,
+          sameSite: 'Strict'
+        });
+      }
+
+      logger.auth('Usuário autenticado e salvo em cookies');
+    } else {
+      cookieUtils.remove(COOKIE_NAMES.ACCESS_TOKEN);
+      cookieUtils.remove(COOKIE_NAMES.USER_DATA);
+      logger.auth('Dados de autenticação removidos dos cookies');
+    }
+  }, []);
+
+  // Verificar sessão inicial
+  useEffect(() => {
+    if (isInitialized) return;
+
+    const initializeAuth = () => {
+      try {
+        // Verificar se existe token e dados do usuário nos cookies
+        const storedToken = cookieUtils.get(COOKIE_NAMES.ACCESS_TOKEN);
+        const userDataString = cookieUtils.get(COOKIE_NAMES.USER_DATA);
+
+        if (storedToken && userDataString) {
+          try {
+            const userData = JSON.parse(userDataString);
+            setUser(userData);
+            setToken(storedToken);
+            logger.auth('Usuário restaurado dos cookies');
+          } catch (error) {
+            logger.error('Erro ao parsear dados do usuário dos cookies:', error);
+            // Se dados estão corrompidos, limpar cookies
+            cookieUtils.remove(COOKIE_NAMES.ACCESS_TOKEN);
+            cookieUtils.remove(COOKIE_NAMES.USER_DATA);
+            setUser(null);
+            setToken(null);
+          }
+        } else {
+          // Sem token ou dados do usuário
+          setUser(null);
+          setToken(null);
+          logger.auth('Nenhum token ou dados encontrados nos cookies');
+        }
+      } catch (error) {
+        logger.error('Erro ao inicializar autenticação:', error);
+        setUser(null);
+        setToken(null);
+      } finally {
+        setIsLoading(false);
+        setIsInitialized(true);
+      }
+    };
+
+    initializeAuth();
+  }, [isInitialized]);
 
   return (
-    <AuthContext.Provider value={{ user, setAuth }}>
+    <AuthContext.Provider value={{
+      user,
+      token,
+      setAuth,
+      logout,
+      isLoading
+    }}>
       {children}
     </AuthContext.Provider>
   );

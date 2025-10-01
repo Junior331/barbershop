@@ -1,11 +1,11 @@
 import { useFormik } from "formik";
 import { toast } from "react-hot-toast";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { schema } from "./schema";
 import { supabase } from "@/lib/supabase";
 import { formatDateForSupabase } from "@/utils/utils";
+import { schema } from "./schema";
 
 export const useProfile = () => {
   const navigate = useNavigate();
@@ -18,44 +18,50 @@ export const useProfile = () => {
       email: "",
       phone: "",
       state: "",
-      avatar: "",
+      street: "",
       country: "",
-      address: "",
-      zip_code: "",
-      birthday: "",
+      avatarUrl: "",
+      postal_code: "",
+      birth_date: "",
     },
     validationSchema: schema,
+    
     onSubmit: async (values) => {
       setLoading(true);
-      const birthdayDate = formatDateForSupabase(values.birthday);
+      const birthdayDate = formatDateForSupabase(values.birth_date);
 
       try {
-        // 1. Atualiza os dados na tabela 'users'
-        const { error: userError } = await supabase
-          .from('users')
-          .update({
-            name: values.name,
-            phone: values.phone,
-            birthday: birthdayDate,
-            zip_code: values.zip_code,
-            address: values.address,
-            state: values.state,
-            country: values.country,
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (!user) throw new Error("Usuário não autenticado");
+
+        // Chama a função RPC
+        const { data, error } = await supabase
+          .rpc('update_user_profile', {
+            p_user_id: user.id,
+            p_name: values.name,
+            p_email: values.email,
+            p_phone: values.phone,
+            p_birth_date: birthdayDate,
+            p_street: values.street,
+            p_postal_code: values.postal_code,
+            p_state: values.state,
+            p_country: values.country,
+            p_avatar_url: values.avatarUrl || null,
             updated_at: new Date().toISOString(),
-          })
-          .eq('email', values.email);
+          });
 
-        if (userError) throw userError;
+        if (error) throw error;
+        if (data && !data.success) throw new Error(data.message);
 
-        // 2. Atualiza os metadados do usuário no Auth (opcional)
-        const { error: authError } = await supabase.auth.updateUser({
+        // Atualiza os metadados locais
+        await supabase.auth.updateUser({
           data: {
             name: values.name,
-            avatar: values.avatar,
+            avatarUrl: values.avatarUrl,
           }
         });
 
-        if (authError) throw authError;
 
         toast.success("Perfil atualizado com sucesso!");
         navigate("/account");
@@ -77,7 +83,7 @@ export const useProfile = () => {
       const data = await response.json();
 
       if (!data.erro) {
-        formik.setFieldValue("address", data.logradouro);
+        formik.setFieldValue("street", data.logradouro);
         formik.setFieldValue("state", data.uf);
         formik.setFieldValue("country", "Brasil");
       }
@@ -87,12 +93,12 @@ export const useProfile = () => {
   };
 
   useEffect(() => {
-    const cep = formik.values.zip_code.replace(/\D/g, "");
+    const cep = formik.values.postal_code.replace(/\D/g, "");
     if (cep.length === 8) {
       fetchAddress(cep);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formik.values.zip_code]);
+  }, [formik.values.postal_code]);
 
   return { formik, loading, cepLoading };
 };

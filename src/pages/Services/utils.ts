@@ -1,95 +1,148 @@
 import { getServices } from "@/assets/services";
-import { Service } from "@/utils/types";
 
-export const services: Service[] = [
+export const services: any[] = [
   {
-    id: 1,
+    id: "1",
     time: 40,
     price: 40,
     discount: 0,
     public: true,
     name: "Barba e Cabelo",
     icon: getServices("beard_hair"),
-    created_at: ""
+    created_at: "",
+    createdAt: "",
+    updatedAt: "",
+    imageUrl: getServices("beard_hair"),
+    description: "Corte de cabelo e barba completo",
+    barberShopId: "",
+    durationMinutes: 40
   },
   {
-    id: 2,
+    id: "2",
     time: 40,
     price: 35,
     discount: 0,
     public: true,
     name: "Barba",
     icon: getServices("beard"),
-    created_at: ""
+    created_at: "",
+    createdAt: "",
+    updatedAt: "",
+    imageUrl: getServices("beard"),
+    description: "Barba completa",
+    barberShopId: "",
+    durationMinutes: 40
   },
   {
-    id: 3,
+    id: "3",
     time: 40,
     price: 25,
     discount: 0,
     public: true,
     name: "Corte com Máquina",
     icon: getServices("electric_razor_cut"),
-    created_at: ""
+    created_at: "",
+    createdAt: "",
+    updatedAt: "",
+    imageUrl: getServices("electric_razor_cut"),
+    description: "Corte de cabelo com máquina",
+    barberShopId: "",
+    durationMinutes: 40
   },
   {
-    id: 4,
+    id: "4",
     time: 40,
     price: 28,
     discount: 0,
     public: true,
     name: "Corte com Tesoura",
     icon: getServices("scissor_cut"),
-    created_at: ""
+    created_at: "",
+    createdAt: "",
+    updatedAt: "",
+    imageUrl: getServices("scissor_cut"),
+    description: "Corte de cabelo com tesoura",
+    barberShopId: "",
+    durationMinutes: 40
   },
   {
-    id: 5,
+    id: "5",
     time: 40,
     price: 35,
     discount: 0,
     public: true,
     name: "Reflexo",
     icon: getServices("reflex"),
-    created_at: ""
+    created_at: "",
+    createdAt: "",
+    updatedAt: "",
+    imageUrl: getServices("reflex"),
+    description: "Reflexo",
+    barberShopId: "",
+    durationMinutes: 40
   },
   {
-    id: 6,
+    id: "6",
     time: 40,
     price: 40,
     discount: 0,
     public: true,
     name: "Pigmentação",
     icon: getServices("pigmentation"),
-    created_at: ""
+    created_at: "",
+    createdAt: "",
+    updatedAt: "",
+    imageUrl: getServices("pigmentation"),
+    description: "Pigmentação",
+    barberShopId: "",
+    durationMinutes: 40
   },
   {
-    id: 7,
+    id: "7",
     time: 40,
     price: 40,
     discount: 0,
     public: true,
     name: "Cortes Infantis",
     icon: getServices("kids_cuts"),
-    created_at: ""
+    created_at: "",
+    createdAt: "",
+    updatedAt: "",
+    imageUrl: getServices("kids_cuts"),
+    description: "Cortes para crianças",
+    barberShopId: "",
+    durationMinutes: 40
   },
   {
-    id: 8,
+    id: "8",
     time: 40,
     price: 8,
     discount: 0,
     public: true,
     name: "Cortes de Cabelo",
     icon: getServices("haircuts"),
-    created_at: ""
+    created_at: "",
+    createdAt: "",
+    updatedAt: "",
+    imageUrl: getServices("haircuts"),
+    description: "Cortes de cabelo",
+    barberShopId: "",
+    durationMinutes: 40
   },
   {
-    id: 9,
+    id: "9",
     time: 40,
     price: 8,
     discount: 0,
     public: true,
     name: "Sobrancelha",
     icon: getServices("eyebrow"),
-    created_at: ""
+    created_at: "",
+    createdAt: "",
+    updatedAt: "",
+    imageUrl: getServices("eyebrow"),
+    description: "Design de sobrancelha",
+    barberShopId: "",
+    durationMinutes: 40
   },
 ];

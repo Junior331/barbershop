@@ -8,6 +8,7 @@ import { Barbers } from "./Barbers";
 import { Account } from "./Account";
 import { Calendar } from "./Calendar";
 import { Services } from "./Services";
+import { BookingConfirmationImproved } from "./BookingConfirmation/BookingConfirmationImproved";
 import { MyBookings } from "./MyBookings";
 import { DetailsOrder } from "./DetailsOrder";
 
@@ -22,6 +23,7 @@ export {
   Account,
   Calendar,
   Services,
+  BookingConfirmationImproved,
   MyBookings,
   DetailsOrder,
 };

@@ -1,147 +1,200 @@
-import { useState, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-
-import { supabase } from "@/lib/supabase";
+import { useOrder } from "@/store/useOrderStore";
 import { getCurrentDate } from "@/utils/utils";
-import { useBarberSchedules } from "@/hooks/useBarberSchedules";
-import { useOrder, useOrderActions } from "@/store/useOrderStore";
+import { appointmentsService, Appointment } from "@/services/appointments.service";
+import { useAuth } from "@/context/AuthContext";
+import { workingHoursService } from "@/services/working-hours.service";
 
 export const useCalendar = () => {
-  const order = useOrder();
   const navigate = useNavigate();
-  const { setDate } = useOrderActions();
+  const { formattedDate } = getCurrentDate();
+  const { barber, date, services, setDateTime } = useOrder();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
-  const { dayOfWeek, formattedDate } = getCurrentDate();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const { schedules, fetchSchedules } = useBarberSchedules(order.barber?.id);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
-  const isCurrentMonth = currentDate.getMonth() === new Date().getMonth();
-  const [availableSlots, setAvailableSlots] = useState<
-    Record<string, string[]>
-  >({});
+  const [availableSlots, setAvailableSlots] = useState<string[]>([]);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [loadingAppointments, setLoadingAppointments] = useState(false);
 
-  const monthNames = [
-    "Janeiro",
-    "Fevereiro",
-    "Março",
-    "Abril",
-    "Maio",
-    "Junho",
-    "Julho",
-    "Agosto",
-    "Setembro",
-    "Outubro",
-    "Novembro",
-    "Dezembro",
-  ];
+  const monthNames = useMemo(
+    () => [
+      "Janeiro",
+      "Fevereiro",
+      "Março",
+      "Abril",
+      "Maio",
+      "Junho",
+      "Julho",
+      "Agosto",
+      "Setembro",
+      "Outubro",
+      "Novembro",
+      "Dezembro",
+    ],
+    []
+  );
 
-  const daysOfWeek = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+  const daysOfWeek = useMemo(
+    () => ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"],
+    []
+  );
 
-  const getDaysInMonth = (date: Date) => {
+  const getDaysInMonth = useCallback((date: Date) => {
     const year = date.getFullYear();
     const month = date.getMonth();
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
-
     const startDayOfWeek = firstDay.getDay();
     const daysInMonth = lastDay.getDate();
 
-    // Cria array com dias do mês alinhados corretamente
     return Array.from({ length: daysInMonth + startDayOfWeek }, (_, i) => {
       const day = i - startDayOfWeek + 1;
-      return day > 0 ? day : null;
+      return day > 0 ? day : 0;
     });
-  };
+  }, []);
 
-  const fetchBarberAvailability = async (barberId: string, date: Date) => {
-    setLoading(true);
-    try {
-      // Aqui você faria a chamada ao Supabase para pegar os horários ocupados
-      // Este é um exemplo - ajuste conforme sua estrutura real no Supabase
-      const { data, error } = await supabase
-        .from("schedules")
-        .select("date_time")
-        .eq("barber_id", barberId)
-        .gte("date_time", new Date(date.setHours(0, 0, 0, 0)).toISOString())
-        .lte(
-          "date_time",
-          new Date(date.setHours(23, 59, 59, 999)).toISOString()
+  // Função de fetch para buscar a disponibilidade do barbeiro
+  const fetchBarberAvailability = useCallback(
+    async (barberId: string, selectedDate: Date) => {
+      setLoading(true);
+      try {
+        // Limpar os slots disponíveis antes de buscar novos
+        setAvailableSlots([]);
+
+        // Formatação correta da data para evitar problemas de timezone
+        const year = selectedDate.getFullYear();
+        const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+        const day = String(selectedDate.getDate()).padStart(2, '0');
+        const dateString = `${year}-${month}-${day}`;
+
+        console.log("Buscando horários disponíveis:", {
+          barberId,
+          date: dateString
+        });
+
+        // Usar o service de working hours para buscar horários disponíveis
+        const response = await workingHoursService.getAvailableTimes(
+          barberId,
+          dateString
         );
 
-      if (error) throw error;
+        console.log("Resposta da API:", response);
 
-      // Converter os horários ocupados para um formato mais fácil de trabalhar
-      const occupiedSlots =
-        data?.map((item) => {
-          const d = new Date(item.date_time);
-          return `${d.getHours()}:${d
-            .getMinutes()
-            .toString()
-            .padStart(2, "0")}`;
-        }) || [];
+        // A API retorna um objeto com { times: [...] }
+        const availableTimeSlots = response.times || [];
 
-      // Gerar todos os slots possíveis (exemplo: das 9h às 18h, a cada 30 minutos)
-      const allSlots = [];
-      for (let hour = 9; hour < 18; hour++) {
-        allSlots.push(`${hour}:00`);
-        allSlots.push(`${hour}:30`);
+        // Verificar se é hoje para filtrar horários que já passaram
+        const now = new Date();
+        const isToday = selectedDate.getDate() === now.getDate() &&
+                       selectedDate.getMonth() === now.getMonth() &&
+                       selectedDate.getFullYear() === now.getFullYear();
+
+        // Extrair apenas os horários disponíveis e futuros
+        const availableTimes = availableTimeSlots
+          .filter((slot: any) => {
+            if (!slot.available) return false;
+
+            // Se não for hoje, todos os horários disponíveis são válidos
+            if (!isToday) return true;
+
+            // Se for hoje, verificar se o horário ainda não passou
+            const [hours, minutes] = slot.time.split(':').map(Number);
+            const slotTime = new Date(selectedDate);
+            slotTime.setHours(hours, minutes, 0, 0);
+
+            return slotTime > now;
+          })
+          .map((slot: any) => slot.time);
+
+        console.log("Horários disponíveis:", availableTimes);
+        setAvailableSlots(availableTimes);
+      } catch (error) {
+        console.error("Erro ao buscar disponibilidade:", error);
+        setAvailableSlots([]);
+      } finally {
+        setLoading(false);
       }
+    },
+    [services]
+  );
 
-      // Filtrar os slots disponíveis
-      const available = allSlots.filter(
-        (slot) => !occupiedSlots.includes(slot)
-      );
+  // Função para buscar agendamentos do barbeiro por data
+  const fetchBarberAppointments = useCallback(
+    async (barberId: string, selectedDate: Date) => {
+      setLoadingAppointments(true);
+      try {
+        const year = selectedDate.getFullYear();
+        const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+        const day = String(selectedDate.getDate()).padStart(2, '0');
+        const dateString = `${year}-${month}-${day}`;
 
-      // Armazenar por dia (no formato YYYY-MM-DD)
-      const dateKey = date.toISOString().split("T")[0];
-      setAvailableSlots((prev) => ({
-        ...prev,
-        [dateKey]: available,
-      }));
-    } catch (error) {
-      console.error("Error fetching barber availability:", error);
-    } finally {
-      setLoading(false);
+        const appointmentData = await appointmentsService.getBarberAppointmentsByDate(barberId, dateString);
+        setAppointments(appointmentData);
+      } catch (error) {
+        console.error("Erro ao buscar agendamentos:", error);
+        setAppointments([]);
+      } finally {
+        setLoadingAppointments(false);
+      }
+    },
+    []
+  );
+
+  // UseEffect para pegar os horários disponíveis assim que a data do barbeiro mudar
+  useEffect(() => {
+    if (barber?.id && selectedDate) {
+      // Adicionar um pequeno delay para evitar múltiplas chamadas rápidas
+      const timeoutId = setTimeout(() => {
+        fetchBarberAvailability(barber.id, selectedDate);
+
+        // Buscar agendamentos apenas se o usuário for um barbeiro
+        if (user?.role === 'BARBER') {
+          fetchBarberAppointments(user.id, selectedDate);
+        }
+      }, 100);
+
+      return () => clearTimeout(timeoutId);
     }
-  };
+  }, [barber?.id, selectedDate, services, user?.id, user?.role, fetchBarberAvailability, fetchBarberAppointments]);
 
-  const isTimeAvailable = (time: string) => {
-    if (!selectedDate) return true;
-    
-    const [hours, minutes] = time.split(':');
-    const slotStart = new Date(selectedDate);
-    slotStart.setHours(parseInt(hours), parseInt(minutes));
-    
-    const slotEnd = new Date(slotStart);
-    slotEnd.setMinutes(slotStart.getMinutes() + 30); // Assumindo 30min por serviço
-    
-    // Verificar se há conflito com agendamentos existentes
-    return !schedules.some(schedule => {
-      const scheduleStart = new Date(schedule.date_time);
-      const scheduleEnd = new Date(scheduleStart);
-      scheduleEnd.setMinutes(scheduleStart.getMinutes() + schedule.duration);
-      
-      return (slotStart < scheduleEnd && slotEnd > scheduleStart);
-    });
-  };
-
-
-  const days = useMemo(() => getDaysInMonth(currentDate), [currentDate]);
-
+  // Funções de navegação para o mês
   const handlePrevMonth = () => {
-    setCurrentDate(
-      new Date(currentDate.getFullYear(), currentDate.getMonth() - 1)
-    );
+    setCurrentDate((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1));
   };
 
   const handleNextMonth = () => {
-    setCurrentDate(
-      new Date(currentDate.getFullYear(), currentDate.getMonth() + 1)
-    );
+    setCurrentDate((prev) => new Date(prev.getFullYear(), prev.getMonth() + 1));
   };
 
+  // Função para selecionar o dia
+  const handleDayClick = (day: number) => {
+    const clickedDate = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth(),
+      day
+    );
+
+    // Resetar horário selecionado quando mudar de data
+    setSelectedTime(null);
+    setSelectedDate(clickedDate);
+    // Limpar agendamentos anteriores
+    setAppointments([]);
+  };
+
+  // Função para selecionar o horário
+  const handleTimeSelection = (time: string) => {
+    setSelectedTime(time);
+    if (selectedDate) {
+      setDateTime(selectedDate, time);
+    }
+  };
+
+  // Função para verificar se a data é válida (não no passado)
   const isDateSelectable = (day: number) => {
+    if (!day) return false;
     const date = new Date(
       currentDate.getFullYear(),
       currentDate.getMonth(),
@@ -152,113 +205,42 @@ export const useCalendar = () => {
     return date >= today;
   };
 
-  const isSelected = (day: number) => {
-    if (!selectedDate) return false;
-    return (
-      selectedDate.getDate() === day &&
-      selectedDate.getMonth() === currentDate.getMonth() &&
-      selectedDate.getFullYear() === currentDate.getFullYear()
-    );
+  // Função que verifica se o horário está disponível
+  const isTimeAvailable = (time: string) => {
+    return availableSlots.includes(time);
   };
 
-  const formatTime = (time: string) => {
-    const [hours, minutes] = time.split(":");
-    let hoursNumber = Number(hours);
-
-    if (hoursNumber >= 24) {
-      hoursNumber = 0;
-    }
-
-    const date = new Date();
-    date.setHours(hoursNumber);
-    date.setMinutes(Number(minutes));
-
-    return date
-      .toLocaleTimeString("pt-BR", {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: true,
-      })
-      .replace(" ", " ");
-  };
-
-  const combineDateTime = (day: number, time: string): string => {
-    const [hours, minutes] = time.split(":");
-    let dateObj = new Date(
-      currentDate.getFullYear(),
-      currentDate.getMonth(),
-      day,
-      Number(hours),
-      Number(minutes)
-    );
-
-    if (Number(hours) >= 24) {
-      dateObj = new Date(dateObj.getTime() + 24 * 60 * 60 * 1000);
-      dateObj.setHours(Number(hours) - 24);
-    }
-
-    return dateObj.toISOString();
-  };
-
-  const handleDayClick = async (day: number) => {
-    const clickedDate = new Date(
-      currentDate.getFullYear(),
-      currentDate.getMonth(),
-      day
-    );
-
-    const startDate = new Date(clickedDate);
-    startDate.setHours(0, 0, 0, 0);
-    
-    const endDate = new Date(clickedDate);
-    endDate.setHours(23, 59, 59, 999);
-    
-    await fetchSchedules(startDate, endDate);
-    
-    if (clickedDate >= startDate) {
-      setSelectedDate(clickedDate);
-      if (order.barber?.id) {
-        await fetchBarberAvailability(order.barber.id, clickedDate);
-      }
-    }
-    if (selectedTime) {
-      setDate(combineDateTime(day, selectedTime));
-    }
-  };
-
-  const handleTimeSelection = (time: string) => {
-    setSelectedTime(time);
-
-    if (selectedDate) {
-      const day = selectedDate.getDate();
-      setDate(combineDateTime(day, time));
-    }
-  };
+  // Função de dias do mês
+  const days = useMemo(
+    () => getDaysInMonth(currentDate),
+    [currentDate, getDaysInMonth]
+  );
 
   return {
     days,
-    order,
-    setDate,
+    date,
     loading,
     navigate,
-    dayOfWeek,
-    formatTime,
     monthNames,
     daysOfWeek,
-    isSelected,
+    isSelected: (day: number) =>
+      selectedDate &&
+      selectedDate.getDate() === day &&
+      selectedDate.getMonth() === currentDate.getMonth() &&
+      selectedDate.getFullYear() === currentDate.getFullYear(),
     currentDate,
     selectedDate,
     selectedTime,
     formattedDate,
-    availableSlots,
     setCurrentDate,
+    availableSlots,
+    appointments,
+    loadingAppointments,
     handleDayClick,
-    isCurrentMonth,
-    isTimeAvailable,
-    setSelectedTime,
     handlePrevMonth,
-    handleNextMonth,
     isDateSelectable,
+    handleNextMonth,
+    isTimeAvailable,
     handleTimeSelection,
   };
 };

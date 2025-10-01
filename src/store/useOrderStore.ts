@@ -1,154 +1,96 @@
 import { create } from "zustand";
+import { IOrderState } from "@/utils/types";
 
-import { OrderStore, Service } from "@/utils/types";
+export const useOrder = create<IOrderState>((set, get) => ({
+  id: '',
+  total: 0,
+  date: null,
+  notes: null,
+  subtotal: 0,
+  discount: 0,
+  barber: null,
+  services: [],
+  paymentFee: 0,
+  startTime: null,
+  promotionCode: null,
+  paymentMethod: null,
 
-const calculatePaymentFee = (method: string, amount: number): number => {
-  if (method === "pix") return amount * 0.01;
-  if (method === "credit_card") return amount * 0.084;
-  return 0;
-};
+  toggleService: (service) =>
+    set((state) => {
+      const existingIndex = state.services.findIndex(
+        (s) => s.id === service.id
+      );
+      if (existingIndex >= 0) {
+        return {
+          services: [
+            ...state.services.slice(0, existingIndex),
+            ...state.services.slice(existingIndex + 1),
+          ],
+        };
+      }
+      return { services: [...state.services, service] };
+    }),
 
-export const useOrderStore = create<OrderStore>((set) => ({
-  currentOrder: {
-    id: "",
-    total: 0,
-    date: null,
-    barber: {
-      id: '',
-      cuts: 0,
-      type: "",
-      name: "",
-      image: "",
-      rating: 0,
-      location: "",
-    },
-    subTotal: 0,
-    discount: 0,
-    services: [],
-    location: "",
-    paymentFee: 0,
-    duration: 0,
-    barber_id: "",
-    client_id: "",
-    date_time: "",
-    service_id: "",
-    created_at: "",
-    payment_fee: 0,
-    total_price: 0,
-    status: "pending",
-    paymentMethod: "",
-    payment_method: ""
+  clearServices: () => set({ services: [] }),
+
+  setBarber: (barber) => set({ barber }),
+
+  setDateTime: (date, startTime) => set({ date, startTime }),
+
+  setPromotionCode: (code) => set({ promotionCode: code }),
+
+  setPaymentMethod: (method) => set({ paymentMethod: method }),
+
+  setNotes: (notes) => set({ notes }),
+
+  calculateTotals: () => {
+    const { services, promotionCode, paymentMethod } = get();
+
+    // Usar pricing.finalPrice se disponível, caso contrário usar price
+    const subtotal = services.reduce((sum, service) => {
+      const price = service.pricing?.finalPrice ?? service.price ?? 0;
+      return sum + price;
+    }, 0);
+
+    let discount = 0;
+
+    // Cálculo do desconto (mantendo sua lógica atual)
+    if (promotionCode) {
+      discount = subtotal * 0.1; // 10% de desconto como exemplo
+    }
+
+    // Encontrar o método de pagamento selecionado e sua taxa
+    const paymentMethods = [
+      { id: "PIX", fee: 0.01 },
+      { id: "pix", fee: 0.01 }, // Compatibilidade
+      { id: "DEBIT_CARD", fee: 0.03 },
+      { id: "debit_card", fee: 0.03 }, // Compatibilidade
+      { id: "CREDIT_CARD", fee: 0.084 },
+      { id: "credit_card", fee: 0.084 }, // Compatibilidade
+      { id: "WALLET", fee: 0 },
+      { id: "wallet", fee: 0 }, // Compatibilidade
+    ];
+
+    const selectedMethod = paymentMethods.find(m => m.id === paymentMethod);
+    const feeRate = selectedMethod ? selectedMethod.fee : 0;
+    const feeAmount = (subtotal - discount) * feeRate;
+
+    const total = subtotal - discount + feeAmount;
+
+    set({ subtotal, discount, total, paymentFee: feeAmount });
   },
-  orders: [],
-  actions: {
-    addOrder: (order) =>
-      set((state) => ({
-        orders: [...state.orders, order],
-        currentOrder: {
-          ...state.currentOrder,
-          id: "",
-          total: 0,
-          barber: {
-            id: '',
-            cuts: 0,
-            type: "",
-            name: "",
-            image: "",
-            rating: 0,
-            location: "",
-          },
-          date: null,
-          discount: 0,
-          subTotal: 0,
-          services: [],
-          paymentFee: 0,
-          paymentMethod: "",
-          status: "pending",
-          location: state.currentOrder.location,
-        },
-      })),
 
-    updateOrderStatus: (orderId, status) =>
-      set((state) => ({
-        orders: state.orders.map((order) =>
-          order.id === orderId ? { ...order, status } : order
-        ),
-      })),
-
-    setDate: (date) =>
-      set((state) => ({
-        currentOrder: { ...state.currentOrder, date },
-      })),
-    toggleService: (service: Service) =>
-      set((state) => {
-        const exists = state.currentOrder.services.some(
-          (s) => s.id === service.id
-        );
-        const newServices = exists
-          ? state.currentOrder.services.filter((s) => s.id !== service.id)
-          : [...state.currentOrder.services, service];
-
-        const subTotal = newServices.reduce((sum, s) => sum + s.price, 0);
-        const paymentFee = calculatePaymentFee(
-          state.currentOrder.paymentMethod,
-          subTotal
-        );
-        const total = subTotal - state.currentOrder.discount + paymentFee;
-
-        return {
-          currentOrder: {
-            ...state.currentOrder,
-            services: newServices,
-            subTotal,
-            paymentFee,
-            total,
-          },
-        };
-      }),
-    setDiscount: (discount) =>
-      set((state) => {
-        const total =
-          state.currentOrder.subTotal -
-          discount +
-          state.currentOrder.paymentFee;
-        return {
-          currentOrder: {
-            ...state.currentOrder,
-            discount,
-            total,
-          },
-        };
-      }),
-    setPaymentMethod: (method) =>
-      set((state) => {
-        const paymentFee = calculatePaymentFee(
-          method,
-          state.currentOrder.subTotal
-        );
-        const total =
-          state.currentOrder.subTotal -
-          state.currentOrder.discount +
-          paymentFee;
-
-        return {
-          currentOrder: {
-            ...state.currentOrder,
-            paymentMethod: method,
-            paymentFee,
-            total,
-          },
-        };
-      }),
-
-    setBarber: (barber) =>
-      set((state) => ({
-        currentOrder: {
-          ...state.currentOrder,
-          barber: barber,
-        },
-      })),
-  },
+  clearOrder: () =>
+    set({
+      services: [],
+      barber: null,
+      date: null,
+      startTime: null,
+      promotionCode: null,
+      paymentMethod: null,
+      notes: null,
+      subtotal: 0,
+      discount: 0,
+      total: 0,
+    }),
 }));
-
-export const useOrder = () => useOrderStore((state) => state.currentOrder);
-export const useOrderActions = () => useOrderStore((state) => state.actions);

@@ -1,113 +1,123 @@
+import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-
-import { getIcons } from "@/assets/icons";
 import { Layout } from "@/components/templates";
+import { Header } from "@/components/organisms";
+import { useOrder } from "@/store/useOrderStore";
+import { Loading, Button, Text, Title } from "@/components/elements";
 import { useBarbers } from "@/hooks/useBarbers";
-import { Card, Header } from "@/components/organisms";
-import { CircleIcon, Loading } from "@/components/elements";
-import { useOrder, useOrderActions } from "@/store/useOrderStore";
+import { BarberCard } from "./BarberCard";
+import { getIcons } from "@/assets/icons";
+import { BarberWithServices } from "@/services";
 
 export const Barbers = () => {
-  const { barber } = useOrder();
   const navigate = useNavigate();
-  const { setBarber } = useOrderActions();
+  const { services, barber, setBarber } = useOrder();
+  const serviceIds = services.map((s) => s.id);
+  const { barbers, loading, error, refetch, hasBarbers } = useBarbers(serviceIds);
 
-  const isBarberSelected = (id: string): boolean => barber.id === id;
+  const handleSelectBarber = useCallback(
+    (selectedBarber: BarberWithServices) => {
+      console.log("Barbeiro selecionado ::", selectedBarber);
+      setBarber(
+        selectedBarber
+      );
+    },
+    [setBarber]
+  );
 
-  const { barbers, loading, error } = useBarbers();
+  const handleConfirm = useCallback(() => {
+    if (barber) navigate("/calendar");
+  }, [barber, navigate]);
 
   if (loading) return <Loading />;
-  if (error) return <div>Erro: {error}</div>;
+
+  // Renderizar erro se houver
+  if (error) {
+    return (
+      <Layout>
+        <div className="flex flex-col h-full w-full">
+          <Header title="Barbeiros" backPath="/services" />
+          <div className="flex flex-col items-center justify-center w-full h-full p-4">
+            <div className="flex flex-col items-center text-center max-w-md">
+              <img
+                src={getIcons("fallback")}
+                alt="Erro"
+                className="size-16 opacity-50 mb-4"
+              />
+              <Title className="text-gray-600 mb-2">Erro ao carregar barbeiros</Title>
+              <Text className="text-gray-500 mb-6">{error}</Text>
+              <Button onClick={refetch}>
+                Tentar novamente
+              </Button>
+            </div>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
-      <div className="flex flex-col justify-start items-center h-full w-full">
-        <Header title={"Barbeiros"} backPath={"/services"} />
+      <div className="flex flex-col h-full w-full">
+        <Header title="Barbeiros" backPath={"/services"} />
 
-        <div className="flex flex-col w-full justify-between items-start gap-2 px-4 pb-2 overflow-auto h-[calc(100vh-0px)]">
-          <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 w-full overflow-auto max-w-full pb-[10px] pr-1">
-            {barbers.map((item) => {
-              const checked = isBarberSelected(item.id);
+        <main className="flex flex-col w-full justify-between items-start gap-2 px-4 pb-2 overflow-auto h-[calc(100vh-0px)]">
+          {hasBarbers ? (
+            <>
+              <div className="flex flex-col w-full gap-4">
+                {barbers.map((barberItem) => (
+                  <BarberCard
+                    key={barberItem.id}
+                    barber={barberItem}
+                    isSelected={barber?.id === barberItem.id}
+                    onSelect={handleSelectBarber}
+                  />
+                ))}
+              </div>
 
-              return (
-                <div
-                  key={item.id}
-                  tabIndex={0}
-                  role="button"
-                  onClick={() => setBarber(item)}
-                  onKeyDown={(e) => e.key === "Enter" && setBarber(item)}
-                  className="btn w-full h-auto bg-transparent border-0 shadow-none p-0"
-                >
-                  <Card
-                    style={{
-                      padding: 0,
-                      minHeight: 130,
-                      minWidth: "100%",
-                      overflow: "hidden",
-                    }}
-                  >
-                    <div className="flex items-center w-full h-full px-3 min-h-28 my-auto relative">
-                      <CircleIcon className="min-w-24 h-24 my-auto overflow-hidden">
-                        <img
-                          src={item.image}
-                          alt={`Barber ${item.name}`}
-                          className="w-24 h-24 object-cover"
-                        />
-                      </CircleIcon>
-
-                      <div className="flex flex-col justify-start items-start w-full gap-2 flex-grow pl-2">
-                        <p className="w-full text-start text-[#6b7280] inter textarea-lg font-bold leading-[150%] border-b border-[#9CA3AF] truncate">
-                          {item.name}
-                        </p>
-                        <p className="text-[#6b7280] font-roboto textarea-md font-normal leading-none">
-                          {item.type}
-                        </p>
-                        <p className="flex items-center gap-[1.5px] text-[#6b7280] inter textarea-md font-normal">
-                          <img
-                            alt="Icon location"
-                            src={getIcons("location_outlined_green")}
-                            className="size-4"
-                          />
-                          {item.location}
-                        </p>
-                        <div className="flex items-center gap-1.5">
-                          <img
-                            alt="Icon star"
-                            src={getIcons("star_solid_green")}
-                            className="size-4 relative top-[-1px]"
-                          />
-                          <p className="flex items-center gap-[2.5px] text-[#6b7280] inter textarea-md font-normal">
-                            {item.rating}
-                          </p>
-                          <div className="h-[7px] rounded-2xl w-[0.5px] bg-[#6C8762]" />
-                          <p className="flex items-center gap-[2.5px] text-[#6b7280] inter textarea-md font-normal">
-                            {item.cuts} Cuts
-                          </p>
-                        </div>
-                      </div>
-
-                      <input
-                        readOnly
-                        type="checkbox"
-                        name="rememberMe"
-                        checked={checked}
-                        className="self-stretch checkbox custom_before_service w-4 h-4 border border-[#6b7280] p-[3px] rounded-3xl !shadow-none absolute top-1.5 right-3"
-                      />
-                    </div>
-                  </Card>
+              <Button
+                type="button"
+                disabled={!barber}
+                onClick={handleConfirm}
+                className="w-full max-w-full border-none bg-[#6C8762] disabled:!bg-[#e5e5e5] rounded text-[14px] text-[#FFF] py-[10px] font-[500] tracking-[0.4px]"
+              >
+                {barber ? `Continuar com ${barber.name}` : 'Selecione um barbeiro'}
+              </Button>
+            </>
+          ) : (
+            <div className="flex flex-col items-center justify-center w-full h-full text-center p-4">
+              <img
+                src={getIcons("barber")}
+                alt="Nenhum barbeiro"
+                className="size-16 opacity-50 mb-4"
+              />
+              <Title className="text-gray-600 mb-2">
+                {serviceIds.length > 0
+                  ? "Nenhum barbeiro encontrado"
+                  : "Selecione serviços primeiro"}
+              </Title>
+              <Text className="text-gray-500 mb-6">
+                {serviceIds.length > 0
+                  ? "Não encontramos barbeiros que fazem todos os serviços selecionados. Tente selecionar menos serviços ou barbeiros diferentes."
+                  : "Você precisa selecionar pelo menos um serviço para ver os barbeiros disponíveis."}
+              </Text>
+              {serviceIds.length > 0 ? (
+                <div className="flex flex-col gap-2">
+                  <Button onClick={refetch} variant="outline">
+                    Tentar novamente
+                  </Button>
+                  <Button onClick={() => navigate("/services")} variant="outline">
+                    Alterar serviços
+                  </Button>
                 </div>
-              );
-            })}
-          </div>
-          <button
-            type="button"
-            disabled={!barber}
-            onClick={() => navigate("/calendar")}
-            className="btn w-full max-w-full border-none bg-[#6C8762] disabled:!bg-[#e5e5e5] rounded text-[14px] text-[#FFF] py-[10px] font-[500] tracking-[0.4px]"
-          >
-            Confirm
-          </button>
-        </div>
+              ) : (
+                <Button onClick={() => navigate("/services")}>
+                  Selecionar serviços
+                </Button>
+              )}
+            </div>
+          )}
+        </main>
       </div>
     </Layout>
   );

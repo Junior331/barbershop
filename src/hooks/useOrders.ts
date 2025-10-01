@@ -1,45 +1,37 @@
-import { useCallback, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { BarberType, Order, Service } from "@/utils/types";
+import { useState, useCallback } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { IBarber, IOrder } from "@/utils/types";
 
 export const useOrders = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [orders, setOrders] = useState<IOrder[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [orders, setOrders] = useState<Order[]>([]);
 
-  // Buscar todos os agendamentos do usuário
+  // Função para buscar os agendamentos usando a função RPC no Supabase
   const fetchOrders = useCallback(async () => {
     if (!user?.id) return;
 
     setLoading(true);
     try {
       const { data, error } = await supabase
-        .from('schedules')
-        .select(`
-          *,
-          barber:barber_id (*),
-          service:service_id (*)
-        `)
-        .eq('client_id', user.id)
-        .order('date_time', { ascending: true });
+        .rpc("fetch_user_orders", { user_id: user.id });
 
       if (error) throw error;
 
-      const formattedOrders = data?.map(order => ({
+      const formattedOrders = data?.map((order: IOrder) => ({
         ...order,
-        barber: order.barber as BarberType,
-        services: order.service ? [order.service as Service] : [],
-        date: order.date_time,
+        barber: {
+          id: order.barber_id,
+          name: order.barber_name,
+        } as IBarber,
+        date: order.date,
       })) || [];
 
       setOrders(formattedOrders);
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "Erro ao buscar agendamentos, tente novamente.";
+      const errorMessage = error instanceof Error ? error.message : "Erro ao buscar agendamentos.";
       setError(errorMessage);
       console.error("Error fetching orders:", error);
     } finally {
@@ -47,105 +39,33 @@ export const useOrders = () => {
     }
   }, [user?.id]);
 
-  // Buscar um agendamento específico
-  const fetchOrderById = useCallback(async (orderId: string) => {
-    setLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from('schedules')
-        .select(`
-          *,
-          barber:barber_id (*),
-          service:service_id (*)
-        `)
-        .eq('id', orderId)
-        .single();
-
-      if (error) throw error;
-
-      if (data) {
-        return {
-          ...data,
-          barber: data.barber as BarberType,
-          services: data.service ? [data.service as Service] : [],
-          date: data.date_time,
-        };
-      }
-      return null;
-    } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "Erro ao buscar agendamento, tente novamente.";
-      setError(errorMessage);
-      console.error("Error fetching order:", error);
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  // Atualizar um agendamento
-  const updateOrder = useCallback(async (orderId: string, updates: Partial<Order>) => {
-    setLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from('schedules')
-        .update({
-          ...updates,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', orderId)
-        .select();
-
-      if (error) throw error;
-
-      if (data?.[0]) {
-        setOrders(prev => prev.map(order => 
-          order.id === orderId ? { ...order, ...data[0] } : order
-        ));
-        return data[0];
-      }
-      return null;
-    } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "Erro ao atualizar agendamento, tente novamente.";
-      setError(errorMessage);
-      console.error("Error updating order:", error);
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  // Cancelar um agendamento
+  // Função para cancelar um agendamento
   const cancelOrder = useCallback(async (orderId: string) => {
-    return updateOrder(orderId, { status: 'canceled' });
-  }, [updateOrder]);
+    setLoading(true);
+    try {
+      const { error } = await supabase.rpc("cancel_order", { order_id: orderId });
+      if (error) throw error;
+      setOrders(prev => prev.filter(order => order.id !== orderId));
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Erro ao cancelar o agendamento.";
+      setError(errorMessage);
+      console.error("Error canceling order:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-  // Deletar um agendamento
+  // Função para deletar um agendamento
   const deleteOrder = useCallback(async (orderId: string) => {
     setLoading(true);
     try {
-      const { error } = await supabase
-        .from('schedules')
-        .delete()
-        .eq('id', orderId);
-
+      const { error } = await supabase.rpc("delete_order", { order_id: orderId });
       if (error) throw error;
-
       setOrders(prev => prev.filter(order => order.id !== orderId));
-      return true;
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "Erro ao deletar agendamento, tente novamente.";
+      const errorMessage = error instanceof Error ? error.message : "Erro ao deletar o agendamento.";
       setError(errorMessage);
       console.error("Error deleting order:", error);
-      return false;
     } finally {
       setLoading(false);
     }
@@ -156,8 +76,6 @@ export const useOrders = () => {
     loading,
     error,
     fetchOrders,
-    fetchOrderById,
-    updateOrder,
     cancelOrder,
     deleteOrder,
   };

@@ -1,27 +1,4 @@
-export type styleGenericProps = {
-  type?: string;
-  size?: string;
-  color?: string;
-  filter?: string;
-  height?: string;
-  status?: string;
-  margin?: string;
-  active?: boolean;
-  content?: string;
-  maxWidth?: string;
-  fontSize?: number;
-  disabled?: boolean;
-  textAlign?: string;
-  selected?: boolean;
-  secondary?: boolean;
-  textShadow?: string;
-  lineHeight?: string;
-  fontWeight?: string;
-  fontFamily?: string;
-  background?: string;
-  textTransform?: string;
-  letterSpacing?: string;
-};
+import { BarberWithServices } from "@/services";
 
 export type formatterProps = {
   type?: string;
@@ -44,84 +21,224 @@ export type randomMessage = {
   message: string;
 };
 
-export type Service = {
-  id: number;
-  name: string;
-  time: number;
-  icon: string;
-  price: number;
-  public: boolean;
-  discount: number;
-  checked?: boolean;
-  created_at: string;
-  description?: string;
-};
-
-export type BarberSchedule = {
-  endTime: string; // "18:00"
-  weekday: number; // 0 (domingo) a 6 (sábado)
-  startTime: string; // "08:00"
-};
-
-export type BarberType = {
-  id: string;
-  type: string;
-  cuts: number;
-  name: string;
-  image: string;
-  rating: number;
-  location: string;
-  checked?: boolean;
-  schedule?: BarberSchedule[];
-};
-
-export interface Order {
-  id: string;
-  total: number;
-  discount: number;
-  subTotal: number;
-  location: string;
-  duration: number;
-  barber_id: string;
-  client_id: string;
-  date_time: string;
-  service_id: string;
-  paymentFee: number;
-  created_at: string;
-  barber: BarberType;
-  date: string | null;
-  services: Service[];
-  payment_fee: number;
-  total_price: number;
-  payment_method: string;
-  status: 'pending' | 'confirmed' | 'canceled' | 'completed';
-  paymentMethod: "pix" | "credit_card" | "debit_card" | string;
-}
-
-export interface CurrentOrder extends Omit<Order, "id" | "status"> {
-  id: string;
-  status: "pending" | "confirmed" | "canceled";
-}
-
-export interface OrderActions {
-  addOrder: (order: Order) => void;
-  setBarber: (barber: BarberType) => void;
-  setDiscount: (discount: number) => void;
-  toggleService: (service: Service) => void;
-  setDate: (dateTime: string | null) => void;
-  setPaymentMethod: (method: string) => void;
-  updateOrderStatus: (orderId: string, status: Order["status"]) => void;
-}
-
-export interface OrderStore {
-  orders: Order[];
-  actions: OrderActions;
-  currentOrder: CurrentOrder;
-}
-
 export type UseAvatarOptions = {
   size?: number;
   rounded?: boolean;
   textColor?: string | "auto";
   backgroundColors?: string[];
 };
+
+export interface IService {
+  id: string;
+  name: string;
+  price: number;
+  imageUrl: string;
+  discount?: number;
+  createdAt: string;
+  updatedAt: string;
+  description: string;
+  barberShopId: string;
+  durationMinutes: number;
+  pricing?: {
+    finalPrice: number;
+    discount?: number;
+  };
+  barberShop?: {
+    id: string;
+    name?: string;
+  };
+}
+export interface BarberService {
+  id: string;
+  name: string;
+  price: number;
+  durationMinutes: number;
+  image_url: string | null;
+  description: string | null;
+}
+export interface BarberDetails {
+  id: string;
+  is_active: boolean;
+  barber_rating: number;
+  // cuts_completed?: number;
+  description: string | null;
+}
+
+export interface IBarber {
+  id: string;
+  name: string;
+  avatarUrl: string;
+  city: string;
+  state: string;
+  biography: string;
+  isVerified: boolean;
+  phone: null;
+  serviceBarbers: [
+    {
+      service: {
+        id: string;
+        name: string;
+        price: number;
+        durationMinutes: number;
+      };
+    },
+    {
+      service: {
+        id: string;
+        name: string;
+        price: number;
+        durationMinutes: number;
+      };
+    }
+  ];
+  averageRating: number;
+  totalReviews: number;
+}
+
+export interface IOrderState {
+  id: string;
+  total: number;
+  subtotal: number;
+  discount: number;
+  date: Date | null;
+  paymentFee: number;
+  barber: BarberWithServices | null;
+  services: IService[];
+  notes: string | null;
+  clearOrder: () => void;
+  startTime: string | null;
+  clearServices: () => void;
+  calculateTotals: () => void;
+  promotionCode: string | null;
+  paymentMethod: string | null;
+  setBarber: (barber: BarberWithServices) => void;
+  setNotes: (notes: string) => void;
+  setPaymentMethod: (method: string) => void;
+  toggleService: (service: IService) => void;
+  setPromotionCode: (code: string | null) => void;
+  setDateTime: (date: Date, startTime: string) => void;
+}
+
+export interface IUserData {
+  // Campos do Supabase Auth
+  id: string;
+  city: string;
+  state: string;
+  email: string;
+  street: string;
+  phone?: string;
+  country: string;
+  isVerified: boolean;
+  biography: string;
+  birthDate: string;
+  postalCode: string;
+  neighborhood: string;
+  created_at?: string;
+  updated_at?: string;
+
+  // Campos customizados da tabela users
+  name?: string;
+  role?: string;
+  provider?: string;
+  isActive?: boolean;
+  avatarUrl?: string;
+  providerId?: string;
+  passwordHash?: string;
+
+  // [key: string]: unknown;
+}
+
+export interface BarberResponse {
+  barber_id: string;
+  barber_name: string;
+  total_price: number;
+  barber_rating: number;
+  barber_email: string | null;
+  barber_phone: string | null;
+  services_info: BarberService[];
+  barber_description: string | null;
+  barber_avatar_url: string | null;
+}
+
+export interface UseBarbersResult {
+  loading: boolean;
+  barbers: IBarber[];
+  error: string | null;
+  refetch: () => Promise<void>;
+}
+
+export interface IOrder {
+  id: string;
+  date: Date;
+  notes: null;
+  status: string;
+  end_time: string;
+  client_id: string;
+  barber_id: string;
+  start_time: string;
+  created_at: string;
+  updated_at: string;
+  barber_name: string;
+  service_name: string;
+  final_amount: number;
+  promotion_id: string;
+  discount_amount: number;
+  services: [
+    {
+      service_id: string;
+      service_name: string;
+      service_icon: string;
+      service_price: number;
+      service_duration: number;
+    }
+  ];
+  barber: {
+    id: string;
+    name: string;
+  };
+  isCompleted: boolean;
+}
+
+export interface ApiError {
+  message: string;
+  status?: number;
+  code?: string;
+  details?: Record<string, unknown>;
+}
+
+export interface ApiResponse<T = unknown> {
+  data: T;
+  message?: string;
+  success: boolean;
+}
+
+export interface IServiceBarber {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  durationMinutes: number;
+  imageUrl: string;
+}
+
+export interface IBarberApiResponse {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  role: string;
+  city: string;
+  state: string;
+  street: string;
+  country: string;
+  biography: string;
+  birthDate: string;
+  postalCode: string;
+  neighborhood: string;
+  avatarUrl: string;
+  isVerified: boolean;
+  createdAt: string;
+  updatedAt: string;
+  serviceBarbers: IServiceBarber[];
+  barberRating?: number; // caso venha algo opcional
+}

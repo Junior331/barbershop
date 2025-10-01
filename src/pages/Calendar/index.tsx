@@ -1,43 +1,47 @@
-import { timeSlots } from "./utiils";
+import { useEffect } from "react";
+import { cn } from "@/utils/utils";
 import { getIcons } from "@/assets/icons";
 import { useCalendar } from "./useCalendar";
 import { Layout } from "@/components/templates";
 import { Header } from "@/components/organisms";
-import { useEffect } from "react";
-import { cn } from "@/utils/utils";
+import { AppointmentsList } from "@/components/organisms/AppointmentsList";
+import { useAuth } from "@/context/AuthContext";
 
 export const Calendar = () => {
+  const { user } = useAuth();
   const {
     days,
-    order,
+    date,
+    loading,
     navigate,
-    dayOfWeek,
-    formatTime,
     monthNames,
     daysOfWeek,
     isSelected,
     currentDate,
+    selectedDate,
     selectedTime,
     formattedDate,
     setCurrentDate,
     handleDayClick,
-    isCurrentMonth,
-    isTimeAvailable,
+    availableSlots,
+    appointments,
+    loadingAppointments,
     handlePrevMonth,
     handleNextMonth,
+    isTimeAvailable,
     isDateSelectable,
     handleTimeSelection,
   } = useCalendar();
 
+  // Sincronizar com a data armazenada no order
   useEffect(() => {
-    if (order.date) {
-      const storedDate = new Date(order.date);
+    if (date) {
+      const storedDate = new Date(date);
       setCurrentDate(
         new Date(storedDate.getFullYear(), storedDate.getMonth(), 1)
       );
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [order.date]);
+  }, [date, setCurrentDate]);
 
   return (
     <Layout>
@@ -49,15 +53,12 @@ export const Calendar = () => {
             <img
               alt="Image avatar"
               src={getIcons("calendar_solid_white")}
-              className="w-[71px] h-[71px] p-2.5 bg-[#6C8762]  rounded-[70px] border-2 border-white object-cover filter drop-shadow-[0_2px_4px_rgba(112,121,116,0.30)]"
+              className="w-[71px] h-[71px] p-2.5 bg-[#6C8762] rounded-[70px] border-2 border-white object-cover filter drop-shadow-[0_2px_4px_rgba(112,121,116,0.30)]"
             />
             <div className="flex flex-col justify-start items-start w-full flex-grow pl-2 gap-1">
-              <p className=" text-black inter textarea-md font-medium leading-none">
-                {dayOfWeek}
-              </p>
-              <h2 className=" text-black inter text-2xl font-bold tracking-[1px] leading-none">
+              <p className="text-black inter textarea-md font-medium leading-none">
                 {formattedDate}
-              </h2>
+              </p>
             </div>
           </div>
 
@@ -105,29 +106,26 @@ export const Calendar = () => {
 
               <div className="grid grid-cols-7 gap-1">
                 {days.map((day, index) => {
-                  const today = new Date();
-                  const isToday =
-                    isCurrentMonth &&
-                    day === today.getDate() &&
-                    currentDate.getMonth() === today.getMonth();
-
-                  const isValidDay = day && isDateSelectable(day);
+                  const isToday = isSelected(day as number);
 
                   return (
                     <div
                       key={index}
-                      onClick={() => isValidDay && handleDayClick(day)}
+                      onClick={() =>
+                        isDateSelectable(day) && handleDayClick(day)
+                      }
                       className={cn(
                         "w-12 h-12 flex items-center justify-center text-sm transition-all text-[#000] rounded-[10px] mx-auto",
-                        day ? "cursor-pointer" : "opacity-0",
                         isToday && "!bg-blue-500 text-white",
-                        isSelected(day as number) && "!bg-[#6C8762] text-white",
-                        isValidDay
-                          ? "hover:bg-gray-100"
-                          : "cursor-not-allowed opacity-50"
+                        isSelected(day) && "!bg-[#6C8762] text-white",
+                        isDateSelectable(day)
+                          ? "cursor-pointer hover:bg-gray-100"
+                          : day
+                          ? "cursor-not-allowed opacity-50"
+                          : "cursor-context-menu opacity-50"
                       )}
                     >
-                      {day}
+                      {day || ""}
                     </div>
                   );
                 })}
@@ -138,59 +136,85 @@ export const Calendar = () => {
               Horários
             </h2>
 
-            <div className="w-full grid grid-cols-3 gap-3">
-              {timeSlots.map((item) => {
-                const isSelected = selectedTime === item.time;
-                const isAvailable = isTimeAvailable(item.time);
+            {loading ? (
+              <div className="flex justify-center items-center py-8">
+                <div className="loading loading-spinner text-[#6C8762]"></div>
+              </div>
+            ) : availableSlots.length ? (
+              <div className="w-full grid grid-cols-3 gap-3">
+                {availableSlots.map((timeSlot) => {
+                  const isAvailable = isTimeAvailable(timeSlot);
 
-                return (
-                  <div
-                    key={item.id}
-                    className="w-full cursor-pointer"
-                    onClick={() =>
-                      isAvailable && handleTimeSelection(item.time)
-                    }
-                  >
+                  return (
                     <div
-                      className={cn(
-                        "w-full h-[33.568px] rounded-[21px] flex items-center justify-center transition-colors",
-                        isSelected
-                          ? "bg-[#ECEFF1]"
-                          : !isAvailable
-                          ? "bg-gray-100 cursor-not-allowed opacity-50"
-                          : "bg-[#FFFFFF] filter drop-shadow-[0px_2px_4px_0px_rgba(156,163,175,0.20)] border border-[#6B7280]"
-                      )}
+                      key={timeSlot}
+                      className="w-full cursor-pointer"
+                      onClick={() =>
+                        isAvailable && handleTimeSelection(timeSlot)
+                      }
                     >
-                      <p
+                      <div
                         className={cn(
-                          "textarea-md inter font-medium leading-none",
-                          isSelected
-                            ? "text-[rgba(107,114,128,0.2)]"
+                          "w-full h-[33.568px] rounded-[21px] flex items-center justify-center transition-colors",
+                          selectedTime === timeSlot
+                            ? "bg-[#99B58E]"
                             : !isAvailable
-                            ? "text-gray-400"
-                            : "text-[#6B7280]"
+                            ? "bg-gray-100 cursor-not-allowed opacity-50"
+                            : "bg-[#FFFFFF] filter drop-shadow-[0px_2px_4px_0px_rgba(156,163,175,0.20)] border border-[#6B7280]"
                         )}
                       >
-                        {formatTime(item.time)}{" "}
-                        {!isAvailable && (
-                          <span className="text-xs text-gray-400">
-                            (Indisponível)
-                          </span>
-                        )}
-                      </p>
+                        <p
+                          className={cn(
+                            "textarea-md inter font-medium leading-none",
+                            selectedTime === timeSlot
+                              ? "!text-white"
+                              : !isAvailable
+                              ? "text-gray-400"
+                              : "text-[#6B7280]"
+                          )}
+                        >
+                          {timeSlot}{" "}
+                          {!isAvailable && (
+                            <span className="text-xs text-gray-400">
+                              (Indisponível)
+                            </span>
+                          )}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="text-center text-gray-400">
+                Nenhum horário disponível.
+              </p>
+            )}
+
+            {/* Seção de Agendamentos - apenas para barbeiros */}
+            {selectedDate && user?.role === 'BARBER' && (
+              <>
+                <h2 className="text-black inter text-[24px] font-medium leading-normal tracking-[1.2px] m-[25px_0px]">
+                  Agendamentos do Dia
+                </h2>
+
+                <AppointmentsList
+                  appointments={appointments}
+                  loading={loadingAppointments}
+                  onAppointmentClick={(appointment) => {
+                    console.log('Agendamento clicado:', appointment);
+                  }}
+                />
+              </>
+            )}
 
             <button
               type="button"
-              disabled={!order.date}
               onClick={() => navigate("/confirm")}
+              disabled={!selectedTime || !selectedDate}
               className="btn w-full max-w-full border-none bg-[#6C8762] disabled:!bg-[#e5e5e5] rounded text-[14px] text-[#FFF] py-[10px] font-[500] tracking-[0.4px] mt-10"
             >
-              Confirm
+              Confirmar
             </button>
           </div>
         </div>

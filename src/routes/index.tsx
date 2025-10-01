@@ -2,7 +2,6 @@ import { Suspense } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 
 import {
-  Home,
   Wallet,
   Signin,
   Signup,
@@ -10,29 +9,40 @@ import {
   Account,
   Confirm,
   Profile,
+  Home,
   Calendar,
   Services,
+  BookingConfirmationImproved,
   MyBookings,
   DetailsOrder,
 } from "@/pages";
-import { Loading } from "@/components/elements";
+import { Loading, ProtectedRoute, RoleBasedRoute } from "@/components/elements";
 
 export const AppRoutes = () => {
   return (
     <Suspense fallback={<Loading />}>
       <Routes>
-        <Route index element={<Home />} />
+        <Route index element={<RoleBasedRoute allowedRoles={['CLIENT']}><Home /></RoleBasedRoute>} />
         <Route path="/signin" element={<Signin />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/wallet" element={<Wallet />} />
-        <Route path="/barbers" element={<Barbers />} />
-        <Route path="/account" element={<Account />} />
-        <Route path="/confirm" element={<Confirm />} />
-        <Route path="/calendar" element={<Calendar />} />
-        <Route path="/services" element={<Services />} />
-        <Route path="/mybookings" element={<MyBookings />} />
-        <Route path="/account/profile" element={<Profile />} />
-        <Route path="/detailsorder/:id" element={<DetailsOrder />} />
+        <Route path="/wallet" element={<ProtectedRoute><Wallet /></ProtectedRoute>} />
+        <Route path="/barbers" element={<ProtectedRoute><Barbers /></ProtectedRoute>} />
+        <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
+        <Route path="/confirm" element={<ProtectedRoute><Confirm /></ProtectedRoute>} />
+        <Route path="/calendar" element={<ProtectedRoute><Calendar /></ProtectedRoute>} />
+        <Route path="/services" element={<ProtectedRoute><Services /></ProtectedRoute>} />
+        {/* <Route path="/schedule" element={<ProtectedRoute><ScheduleImproved /></ProtectedRoute>} /> */}
+        {/* <Route path="/payment" element={<ProtectedRoute><PaymentImproved /></ProtectedRoute>} /> */}
+        <Route path="/booking-confirmation/:appointmentId" element={<ProtectedRoute><BookingConfirmationImproved /></ProtectedRoute>} />
+        {/* <Route path="/review/:appointmentId" element={<ProtectedRoute><ReviewImproved /></ProtectedRoute>} /> */}
+        <Route path="/mybookings" element={<ProtectedRoute><MyBookings /></ProtectedRoute>} />
+        <Route path="/account/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+        <Route path="/detailsorder/:id" element={<ProtectedRoute><DetailsOrder /></ProtectedRoute>} />
+
+        {/* Rotas do Barbeiro */}
+        {/* <Route path="/barber" element={<RoleBasedRoute allowedRoles={['BARBER', 'ADMIN']}><BarberDashboard /></RoleBasedRoute>} />
+        <Route path="/barber/appointments" element={<RoleBasedRoute allowedRoles={['BARBER', 'ADMIN']}><BarberAppointments /></RoleBasedRoute>} /> */}
+
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Suspense>
