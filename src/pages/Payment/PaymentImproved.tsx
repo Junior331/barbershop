@@ -137,27 +137,58 @@ export const PaymentImproved = () => {
         return;
       }
 
-      // Para outros métodos, processar pagamento primeiro
-      const paymentData = {
-        appointmentData,
-        paymentMethod: selectedPaymentMethod,
-        amount: bookingData.totalPrice
-      };
+      // Criar agendamento primeiro (status PENDING)
+      const appointment = await appointmentsService.create(appointmentData);
+      appointmentId = appointment.id;
 
-      const paymentResult = await paymentsService.processPayment(paymentData);
+      // Processar pagamento usando Checkout Transparente
+      if (selectedPaymentMethod === "PIX") {
+        // PIX: Gerar QR Code e mostrar na tela
+        const pixPayment = await paymentsService.createPixPayment({
+          appointmentId: appointmentId,
+          amount: bookingData.totalPrice,
+          description: `Agendamento - ${bookingData.selectedServices.map(s => s.name).join(', ')}`
+        });
 
-      if (paymentResult.success) {
-        appointmentId = paymentResult.appointmentId;
-        toast.success('Pagamento processado com sucesso!');
+        // Salvar dados do PIX para mostrar na próxima tela
+        localStorage.setItem('pixPaymentData', JSON.stringify({
+          qrCode: pixPayment.qrCode,
+          qrCodeBase64: pixPayment.qrCodeBase64,
+          amount: bookingData.totalPrice,
+          paymentId: pixPayment.id,
+          appointmentId: appointmentId
+        }));
 
-        // Limpar localStorage
+        toast.success('QR Code PIX gerado! Escaneie para pagar.');
+
+        // Limpar localStorage de booking
         localStorage.removeItem('selectedServices');
         localStorage.removeItem('bookingData');
         localStorage.removeItem('finalBookingData');
 
-        navigate(`/booking-confirmation/${appointmentId}`);
-      } else {
-        throw new Error(paymentResult.error || 'Erro no processamento do pagamento');
+        // Redirecionar para tela de QR Code PIX
+        navigate(`/payment/pix/${appointmentId}`);
+
+      } else if (selectedPaymentMethod === "CREDIT_CARD" || selectedPaymentMethod === "DEBIT_CARD") {
+        // Cartão: Mostrar modal para entrada de dados
+        // Por enquanto, vamos redirecionar para uma tela de entrada de cartão
+        toast.info('Redirecionando para página de pagamento com cartão...');
+
+        // Salvar appointmentId para usar na próxima tela
+        localStorage.setItem('pendingCardPayment', JSON.stringify({
+          appointmentId: appointmentId,
+          amount: bookingData.totalPrice,
+          method: selectedPaymentMethod,
+          description: `Agendamento - ${bookingData.selectedServices.map(s => s.name).join(', ')}`
+        }));
+
+        // Limpar localStorage de booking
+        localStorage.removeItem('selectedServices');
+        localStorage.removeItem('bookingData');
+        localStorage.removeItem('finalBookingData');
+
+        // Redirecionar para tela de pagamento com cartão
+        navigate(`/payment/card/${appointmentId}`);
       }
 
     } catch (error) {

@@ -59,8 +59,89 @@ export interface PaymentStatusResponse {
   message?: string;
 }
 
+export interface CreatePixPaymentData {
+  appointmentId: string;
+  amount: number;
+  description?: string;
+}
+
+export interface CreateCardPaymentData {
+  appointmentId: string;
+  amount: number;
+  cardToken?: string;
+  cardNumber?: string;
+  securityCode?: string;
+  expirationMonth?: number;
+  expirationYear?: number;
+  cardholderName?: string;
+  installments?: number;
+  saveCard?: boolean;
+  description?: string;
+}
+
 export const paymentsService = {
-  // Criar preferência de pagamento MercadoPago (Checkout Pro)
+  // ===== CHECKOUT TRANSPARENTE (Novo - Recomendado) =====
+
+  /**
+   * Criar pagamento PIX com QR Code (Checkout Transparente)
+   * Retorna QR Code para exibir na tela, sem redirecionamento
+   */
+  async createPixPayment(data: CreatePixPaymentData): Promise<MercadoPagoPaymentResponse> {
+    try {
+      logger.info('Criando pagamento PIX (Checkout Transparente):', {
+        appointmentId: data.appointmentId,
+        amount: data.amount,
+      });
+
+      const response = await api.post('/payments/pix/create', data);
+
+      logger.info('Pagamento PIX criado com sucesso:', {
+        paymentId: response.data.id,
+        qrCodeAvailable: !!response.data.qrCode,
+        status: response.data.status,
+      });
+
+      return response.data;
+    } catch (error) {
+      ApiUtils.logError(error as AxiosError, 'paymentsService.createPixPayment');
+      throw error;
+    }
+  },
+
+  /**
+   * Criar pagamento com cartão (Checkout Transparente)
+   * Processa cartão diretamente sem redirecionamento
+   */
+  async createCardPayment(data: CreateCardPaymentData): Promise<MercadoPagoPaymentResponse> {
+    try {
+      logger.info('Criando pagamento com cartão (Checkout Transparente):', {
+        appointmentId: data.appointmentId,
+        amount: data.amount,
+        installments: data.installments || 1,
+        saveCard: data.saveCard || false,
+      });
+
+      const response = await api.post('/payments/card/create', data);
+
+      logger.info('Pagamento com cartão criado:', {
+        paymentId: response.data.id,
+        status: response.data.status,
+      });
+
+      return response.data;
+    } catch (error) {
+      ApiUtils.logError(error as AxiosError, 'paymentsService.createCardPayment');
+      throw error;
+    }
+  },
+
+  // ===== CHECKOUT PRO (Legacy - com redirecionamento) =====
+
+  /**
+   * @deprecated Use createPixPayment() ou createCardPayment() ao invés
+   * Criar preferência de pagamento MercadoPago (Checkout Pro)
+   * Redireciona para página do MercadoPago (mostra "Saldo em conta")
+   */
   async createPreference(data: CreatePaymentData): Promise<MercadoPagoPaymentResponse> {
     try {
       logger.info('Criando preferência de pagamento MercadoPago:', {
