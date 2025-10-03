@@ -9,6 +9,7 @@ import { Text, Title, Button } from "@/components/elements";
 import { formatter } from "@/utils/utils";
 import { getIcons } from "@/assets/icons";
 import { paymentsService } from "@/services";
+import { Circle, CircleAlertIcon, Copy, CopyPlus } from "lucide-react";
 
 interface PixPaymentData {
   qrCode: string;
@@ -119,7 +120,7 @@ export const PixPayment = () => {
       <div className="flex flex-col justify-start items-center h-full w-full">
         <Header title="Pagamento PIX" backPath="/" />
 
-        <div className="flex flex-col w-full justify-between items-start gap-6 px-4 pb-24 overflow-auto h-[calc(100vh-0px)]">
+        <div className="flex flex-col w-full justify-between items-start gap-6 px-4 pb-4 overflow-auto h-[calc(100vh-0px)]">
 
           {/* Status */}
           {paymentStatus === 'COMPLETED' ? (
@@ -169,7 +170,7 @@ export const PixPayment = () => {
 
           {/* QR Code */}
           <Card className="w-full">
-            <div className="p-6 flex flex-col items-center">
+            <div className="flex flex-col items-center">
               <Title className="mb-4 text-center">QR Code PIX</Title>
 
               {pixData.qrCodeBase64 && (
@@ -182,8 +183,8 @@ export const PixPayment = () => {
                 </div>
               )}
 
-              <div className="w-full bg-[#6C8762] bg-opacity-10 rounded-lg p-4 mb-4">
-                <Text className="text-center font-medium text-[#6C8762] text-xl">
+              <div className="flex items- justify-center w-full bg-[#6C8762] bg-opacity-10 rounded-lg p-2 mb-2">
+                <Text className="!text-center font-medium !text-[#ffffff] text-xl">
                   {formatter({
                     type: "pt-BR",
                     currency: "BRL",
@@ -227,7 +228,7 @@ export const PixPayment = () => {
                   </div>
                 ) : (
                   <div className="flex items-center gap-2">
-                    <img src={getIcons("copy")} alt="Copy" className="w-5 h-5" />
+                    <Copy className="w-5 h-5" />
                     Copiar código PIX
                   </div>
                 )}
@@ -238,13 +239,9 @@ export const PixPayment = () => {
           {/* Informações */}
           <div className="w-full bg-blue-50 border border-blue-200 rounded-lg p-4">
             <div className="flex items-start gap-2">
-              <img
-                src={getIcons("info")}
-                alt="Info"
-                className="w-5 h-5 mt-0.5"
-              />
+              <CircleAlertIcon className="w-6 h-6 text-blue-400" />
               <div>
-                <Text className="font-medium text-blue-800 mb-1">
+                <Text className="font-medium text-blue-700 mb-1">
                   Informações importantes:
                 </Text>
                 <ul className="text-sm text-blue-700 space-y-1">
@@ -257,12 +254,6 @@ export const PixPayment = () => {
             </div>
           </div>
 
-          {/* Espaçador para botão fixo */}
-          <div className="h-20" />
-        </div>
-
-        {/* Botão fixo */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t pt-4 pb-6 px-4">
           <Button
             type="button"
             className="max-w-80 m-auto h-14 w-full"
