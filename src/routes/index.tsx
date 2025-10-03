@@ -20,6 +20,7 @@ import {
   PaymentPending,
 } from "@/pages";
 import { PixPayment } from "@/pages/Payment/PixPayment";
+import { CardPayment } from "@/pages/Payment/CardPayment";
 import { Loading, ProtectedRoute, RoleBasedRoute } from "@/components/elements";
 
 export const AppRoutes = () => {
@@ -50,6 +51,7 @@ export const AppRoutes = () => {
 
         {/* Checkout Transparente Routes */}
         <Route path="/payment/pix/:appointmentId" element={<ProtectedRoute><PixPayment /></ProtectedRoute>} />
+        <Route path="/payment/card/:appointmentId" element={<ProtectedRoute><CardPayment /></ProtectedRoute>} />
 
         {/* Rotas do Barbeiro */}
         {/* <Route path="/barber" element={<RoleBasedRoute allowedRoles={['BARBER', 'ADMIN']}><BarberDashboard /></RoleBasedRoute>} />

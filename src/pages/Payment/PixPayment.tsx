@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
@@ -8,6 +8,7 @@ import { Card, Header } from "@/components/organisms";
 import { Text, Title, Button } from "@/components/elements";
 import { formatter } from "@/utils/utils";
 import { getIcons } from "@/assets/icons";
+import { paymentsService } from "@/services";
 
 interface PixPaymentData {
   qrCode: string;
@@ -22,6 +23,9 @@ export const PixPayment = () => {
   const navigate = useNavigate();
   const [pixData, setPixData] = useState<PixPaymentData | null>(null);
   const [copied, setCopied] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState<string>('PENDING');
+  const [pollingCount, setPollingCount] = useState(0);
+  const pollingInterval = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const data = localStorage.getItem('pixPaymentData');
@@ -34,6 +38,64 @@ export const PixPayment = () => {
     const paymentData: PixPaymentData = JSON.parse(data);
     setPixData(paymentData);
   }, [navigate]);
+
+  // Polling para verificar status do pagamento
+  useEffect(() => {
+    if (!pixData?.paymentId) return;
+
+    const checkPaymentStatus = async () => {
+      try {
+        const status = await paymentsService.checkStatus(pixData.paymentId);
+
+        setPaymentStatus(status.status);
+        setPollingCount(prev => prev + 1);
+
+        if (status.status === 'COMPLETED') {
+          // Pagamento aprovado!
+          clearInterval(pollingInterval.current!);
+          toast.success('Pagamento confirmado! Redirecionando...');
+
+          localStorage.removeItem('pixPaymentData');
+
+          setTimeout(() => {
+            navigate(`/booking-confirmation/${appointmentId}`);
+          }, 2000);
+        } else if (status.status === 'FAILED') {
+          // Pagamento falhou
+          clearInterval(pollingInterval.current!);
+          toast.error('Pagamento não foi aprovado. Tente novamente.');
+        }
+      } catch (error) {
+        console.error('Erro ao verificar status:', error);
+        // Não mostrar erro para o usuário, continuar tentando
+      }
+    };
+
+    // Verificar imediatamente
+    checkPaymentStatus();
+
+    // Depois verificar a cada 5 segundos
+    pollingInterval.current = setInterval(checkPaymentStatus, 5000);
+
+    // Parar após 10 minutos (120 tentativas)
+    const timeout = setTimeout(() => {
+      if (pollingInterval.current) {
+        clearInterval(pollingInterval.current);
+        toast('Tempo de espera excedido. Você pode verificar o status na página de agendamentos.', {
+          icon: '⏱️',
+          duration: 5000,
+        });
+      }
+    }, 10 * 60 * 1000);
+
+    // Cleanup
+    return () => {
+      if (pollingInterval.current) {
+        clearInterval(pollingInterval.current);
+      }
+      clearTimeout(timeout);
+    };
+  }, [pixData, appointmentId, navigate]);
 
   const handleCopyCode = () => {
     if (!pixData) return;
@@ -60,19 +122,50 @@ export const PixPayment = () => {
         <div className="flex flex-col w-full justify-between items-start gap-6 px-4 pb-24 overflow-auto h-[calc(100vh-0px)]">
 
           {/* Status */}
-          <div className="w-full bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-            <div className="flex items-center gap-3">
-              <div className="loading loading-spinner loading-md text-yellow-600"></div>
-              <div>
-                <Text className="font-medium text-yellow-800">
-                  Aguardando pagamento...
-                </Text>
-                <Text className="text-sm text-yellow-700">
-                  Escaneie o QR Code ou copie o código abaixo
-                </Text>
+          {paymentStatus === 'COMPLETED' ? (
+            <div className="w-full bg-green-50 border border-green-200 rounded-lg p-4">
+              <div className="flex items-center gap-3">
+                <img src={getIcons("check")} alt="Success" className="w-8 h-8" />
+                <div>
+                  <Text className="font-medium text-green-800">
+                    Pagamento confirmado! ✅
+                  </Text>
+                  <Text className="text-sm text-green-700">
+                    Seu agendamento foi confirmado com sucesso
+                  </Text>
+                </div>
               </div>
             </div>
-          </div>
+          ) : paymentStatus === 'FAILED' ? (
+            <div className="w-full bg-red-50 border border-red-200 rounded-lg p-4">
+              <div className="flex items-center gap-3">
+                <img src={getIcons("error")} alt="Error" className="w-8 h-8" />
+                <div>
+                  <Text className="font-medium text-red-800">
+                    Pagamento não aprovado ❌
+                  </Text>
+                  <Text className="text-sm text-red-700">
+                    Tente novamente ou escolha outro método de pagamento
+                  </Text>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="w-full bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+              <div className="flex items-center gap-3">
+                <div className="loading loading-spinner loading-md text-yellow-600"></div>
+                <div>
+                  <Text className="font-medium text-yellow-800">
+                    Aguardando pagamento...
+                  </Text>
+                  <Text className="text-sm text-yellow-700">
+                    Escaneie o QR Code ou copie o código abaixo
+                    {pollingCount > 0 && ` (verificando ${pollingCount}x)`}
+                  </Text>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* QR Code */}
           <Card className="w-full">
