@@ -25,8 +25,8 @@ export const PixPayment = () => {
   const [pixData, setPixData] = useState<PixPaymentData | null>(null);
   const [copied, setCopied] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<string>('PENDING');
-  const [pollingCount, setPollingCount] = useState(0);
   const pollingInterval = useRef<NodeJS.Timeout | null>(null);
+  const pollingCountRef = useRef(0); // Usar ref ao invés de estado
 
   useEffect(() => {
     const data = localStorage.getItem('pixPaymentData');
@@ -46,11 +46,13 @@ export const PixPayment = () => {
 
     const checkPaymentStatus = async () => {
       try {
-        setPollingCount(prev => prev + 1);
-        const currentCount = pollingCount + 1;
+        pollingCountRef.current += 1;
+        const currentCount = pollingCountRef.current;
 
         // A cada 3 tentativas, força sincronização com Mercado Pago
         const shouldForceSync = currentCount % 3 === 0;
+
+        console.log(`📊 Verificando pagamento (tentativa ${currentCount}) - ${shouldForceSync ? '🔄 SYNC com MP' : '💾 Banco de dados'}`);
 
         let status;
         if (shouldForceSync) {
@@ -62,6 +64,7 @@ export const PixPayment = () => {
             },
           });
           status = await response.json();
+          console.log('✅ Resposta do sync:', status);
         } else {
           // Consulta normal do banco de dados
           status = await paymentsService.checkStatus(pixData.paymentId);
