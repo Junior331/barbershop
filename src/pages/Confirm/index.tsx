@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import toast from "react-hot-toast";
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { getIcons } from "@/assets/icons";
@@ -20,6 +21,7 @@ import { logger } from "@/utils/logger";
 
 export const Confirm = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const currentOrder = useOrder();
   const [loading, setLoading] = useState(false);
   const [promoCode, setPromoCode] = useState("");
@@ -165,15 +167,14 @@ export const Confirm = () => {
 
       logger.info('Appointment criado:', createdAppointment);
 
-      // Criar preferência de pagamento com ID real do appointment
-      const paymentPreference = await paymentsService.createPreference({
+      // Criar pagamento (PIX = QR Code, Cartão = processamento direto)
+      const paymentResponse = await paymentsService.createPaymentAutomatic({
         appointmentId: createdAppointment.id, // ID real do appointment
         method: currentOrder.paymentMethod as 'CREDIT_CARD' | 'DEBIT_CARD' | 'PIX' | 'WALLET',
         amount: currentOrder.total ?? 0,
-        currency: 'BRL',
         description: `Agendamento de ${currentOrder.services.map(s => s.name).join(', ')}`,
         metadata: {
-          appointmentId: createdAppointment.id, // CRÍTICO: passar appointmentId no metadata para webhook
+          appointmentId: createdAppointment.id,
           barberId: currentOrder.barber.id,
           barberName: currentOrder.barber.name,
           serviceNames: currentOrder.services.map(s => s.name).join(', '),
@@ -185,17 +186,55 @@ export const Confirm = () => {
         }
       });
 
-      logger.info('Preferência criada:', paymentPreference);
+      logger.info('Pagamento criado:', paymentResponse);
 
-      // Limpar pedido - appointment já criado
-      currentOrder.clearOrder();
+      // PIX: Salvar dados e redirecionar para página de QR Code
+      if (currentOrder.paymentMethod === 'PIX' && (paymentResponse.qrCode || paymentResponse.qrCodeBase64)) {
+        // Salvar dados do PIX no localStorage para a página de QR Code
+        localStorage.setItem('pixPaymentData', JSON.stringify({
+          qrCode: paymentResponse.qrCode,
+          qrCodeBase64: paymentResponse.qrCodeBase64,
+          amount: currentOrder.total,
+          paymentId: paymentResponse.id,
+          appointmentId: createdAppointment.id,
+        }));
 
-      // Redirecionar para MercadoPago
-      if (paymentPreference.paymentUrl) {
-        toast.success('Redirecionando para pagamento...');
-        window.location.href = paymentPreference.paymentUrl;
-      } else {
-        toast.error('Erro ao gerar link de pagamento');
+        // Limpar pedido
+        currentOrder.clearOrder();
+
+        toast.success('QR Code PIX gerado! Escaneie para pagar.');
+        navigate(`/payment/pix/${createdAppointment.id}`);
+      }
+      // Cartão: Salvar dados e redirecionar para página de cartão
+      else if (currentOrder.paymentMethod === 'CREDIT_CARD' || currentOrder.paymentMethod === 'DEBIT_CARD') {
+        // Salvar dados do pagamento pendente
+        localStorage.setItem('pendingCardPayment', JSON.stringify({
+          appointmentId: createdAppointment.id,
+          amount: currentOrder.total,
+          method: currentOrder.paymentMethod,
+          description: `Agendamento de ${currentOrder.services.map(s => s.name).join(', ')}`,
+        }));
+
+        // Limpar pedido
+        currentOrder.clearOrder();
+
+        toast.info('Redirecionando para pagamento com cartão...');
+        navigate(`/payment/card/${createdAppointment.id}`);
+      }
+      // Outros métodos ou fallback
+      else {
+        currentOrder.clearOrder();
+
+        if (paymentResponse.status === 'paid') {
+          toast.success('Pagamento aprovado!');
+          navigate(`/payment/success?appointmentId=${createdAppointment.id}`);
+        } else if (paymentResponse.status === 'pending') {
+          toast.loading('Pagamento pendente...');
+          navigate(`/payment/pending?appointmentId=${createdAppointment.id}`);
+        } else {
+          toast.error('Pagamento recusado');
+          navigate(`/payment/error?appointmentId=${createdAppointment.id}`);
+        }
       }
     } catch (error: any) {
       console.error('Erro ao confirmar agendamento:', error);

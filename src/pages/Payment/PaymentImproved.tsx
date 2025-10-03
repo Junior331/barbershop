@@ -141,16 +141,30 @@ export const PaymentImproved = () => {
       const appointment = await appointmentsService.create(appointmentData);
       appointmentId = appointment.id;
 
-      // Processar pagamento usando Checkout Transparente
+      // Processar pagamento usando Checkout Transparente ou Redirect
       if (selectedPaymentMethod === "PIX") {
-        // PIX: Gerar QR Code e mostrar na tela
+        // PIX: Criar pagamento e verificar se tem URL de redirecionamento
         const pixPayment = await paymentsService.createPixPayment({
           appointmentId: appointmentId,
           amount: bookingData.totalPrice,
           description: `Agendamento - ${bookingData.selectedServices.map(s => s.name).join(', ')}`
         });
 
-        // Salvar dados do PIX para mostrar na próxima tela
+        // Limpar localStorage de booking
+        localStorage.removeItem('selectedServices');
+        localStorage.removeItem('bookingData');
+        localStorage.removeItem('finalBookingData');
+
+        // Se tem URL de pagamento, redirecionar para o Mercado Pago
+        if (pixPayment.paymentUrl) {
+          toast.success('Redirecionando para o Mercado Pago...');
+
+          // Redirecionar para URL do Mercado Pago
+          window.location.href = pixPayment.paymentUrl;
+          return;
+        }
+
+        // Caso contrário, mostrar QR Code na tela (fallback)
         localStorage.setItem('pixPaymentData', JSON.stringify({
           qrCode: pixPayment.qrCode,
           qrCodeBase64: pixPayment.qrCodeBase64,
@@ -160,13 +174,6 @@ export const PaymentImproved = () => {
         }));
 
         toast.success('QR Code PIX gerado! Escaneie para pagar.');
-
-        // Limpar localStorage de booking
-        localStorage.removeItem('selectedServices');
-        localStorage.removeItem('bookingData');
-        localStorage.removeItem('finalBookingData');
-
-        // Redirecionar para tela de QR Code PIX
         navigate(`/payment/pix/${appointmentId}`);
 
       } else if (selectedPaymentMethod === "CREDIT_CARD" || selectedPaymentMethod === "DEBIT_CARD") {

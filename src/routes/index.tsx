@@ -23,6 +23,7 @@ import {
 } from "@/pages";
 import { PixPayment } from "@/pages/Payment/PixPayment";
 import { CardPayment } from "@/pages/Payment/CardPayment";
+import { PaymentCallback } from "@/pages/Payment/PaymentCallback";
 import { Loading, ProtectedRoute, RoleBasedRoute } from "@/components/elements";
 
 export const AppRoutes = () => {
@@ -50,6 +51,7 @@ export const AppRoutes = () => {
         <Route path="/payment/success" element={<ProtectedRoute><PaymentSuccess /></ProtectedRoute>} />
         <Route path="/payment/error" element={<ProtectedRoute><PaymentError /></ProtectedRoute>} />
         <Route path="/payment/pending" element={<ProtectedRoute><PaymentPending /></ProtectedRoute>} />
+        <Route path="/payment/callback" element={<ProtectedRoute><PaymentCallback /></ProtectedRoute>} />
 
         {/* Checkout Transparente Routes */}
         <Route path="/payment/pix/:appointmentId" element={<ProtectedRoute><PixPayment /></ProtectedRoute>} />

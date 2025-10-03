@@ -83,6 +83,52 @@ export const paymentsService = {
   // ===== CHECKOUT TRANSPARENTE (Novo - Recomendado) =====
 
   /**
+   * Criar pagamento automaticamente baseado no método escolhido
+   * - PIX → createPixPayment (mostra QR Code no site)
+   * - CREDIT_CARD/DEBIT_CARD → createCardPayment (processa no site)
+   */
+  async createPaymentAutomatic(data: CreatePaymentData & Partial<CreateCardPaymentData>): Promise<MercadoPagoPaymentResponse> {
+    try {
+      logger.info('Criando pagamento automático:', {
+        appointmentId: data.appointmentId,
+        method: data.method,
+        amount: data.amount,
+      });
+
+      // PIX → usa createPixPayment
+      if (data.method === 'PIX') {
+        return await this.createPixPayment({
+          appointmentId: data.appointmentId,
+          amount: data.amount,
+          description: data.description,
+        });
+      }
+
+      // Cartão → usa createCardPayment
+      if (data.method === 'CREDIT_CARD' || data.method === 'DEBIT_CARD') {
+        return await this.createCardPayment({
+          appointmentId: data.appointmentId,
+          amount: data.amount,
+          cardToken: data.cardToken,
+          cardNumber: data.cardNumber,
+          securityCode: data.securityCode,
+          expirationMonth: data.expirationMonth,
+          expirationYear: data.expirationYear,
+          cardholderName: data.cardholderName,
+          installments: data.installments || 1,
+          saveCard: data.saveCard || false,
+          description: data.description,
+        });
+      }
+
+      throw new Error(`Método de pagamento não suportado: ${data.method}`);
+    } catch (error) {
+      ApiUtils.logError(error as AxiosError, 'paymentsService.createPaymentAutomatic');
+      throw error;
+    }
+  },
+
+  /**
    * Criar pagamento PIX com QR Code (Checkout Transparente)
    * Retorna QR Code para exibir na tela, sem redirecionamento
    */
