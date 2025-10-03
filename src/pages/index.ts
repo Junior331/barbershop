@@ -14,6 +14,8 @@ import { DetailsOrder } from "./DetailsOrder";
 import { PaymentSuccess } from "./PaymentSuccess";
 import { PaymentError } from "./PaymentError";
 import { PaymentPending } from "./PaymentPending";
+import { ScheduleImproved } from "./Schedule/ScheduleImproved";
+import { PaymentImproved } from "./Payment/PaymentImproved";
 
 export {
   Home,
@@ -32,4 +34,6 @@ export {
   PaymentSuccess,
   PaymentError,
   PaymentPending,
+  ScheduleImproved,
+  PaymentImproved,
 };

@@ -18,6 +18,8 @@ import {
   PaymentSuccess,
   PaymentError,
   PaymentPending,
+  ScheduleImproved,
+  PaymentImproved,
 } from "@/pages";
 import { PixPayment } from "@/pages/Payment/PixPayment";
 import { CardPayment } from "@/pages/Payment/CardPayment";
@@ -36,8 +38,8 @@ export const AppRoutes = () => {
         <Route path="/confirm" element={<ProtectedRoute><Confirm /></ProtectedRoute>} />
         <Route path="/calendar" element={<ProtectedRoute><Calendar /></ProtectedRoute>} />
         <Route path="/services" element={<ProtectedRoute><Services /></ProtectedRoute>} />
-        {/* <Route path="/schedule" element={<ProtectedRoute><ScheduleImproved /></ProtectedRoute>} /> */}
-        {/* <Route path="/payment" element={<ProtectedRoute><PaymentImproved /></ProtectedRoute>} /> */}
+        <Route path="/schedule" element={<ProtectedRoute><ScheduleImproved /></ProtectedRoute>} />
+        <Route path="/payment" element={<ProtectedRoute><PaymentImproved /></ProtectedRoute>} />
         <Route path="/booking-confirmation/:appointmentId" element={<ProtectedRoute><BookingConfirmationImproved /></ProtectedRoute>} />
         {/* <Route path="/review/:appointmentId" element={<ProtectedRoute><ReviewImproved /></ProtectedRoute>} /> */}
         <Route path="/mybookings" element={<ProtectedRoute><MyBookings /></ProtectedRoute>} />
