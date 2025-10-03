@@ -46,10 +46,28 @@ export const PixPayment = () => {
 
     const checkPaymentStatus = async () => {
       try {
-        const status = await paymentsService.checkStatus(pixData.paymentId);
+        setPollingCount(prev => prev + 1);
+        const currentCount = pollingCount + 1;
+
+        // A cada 3 tentativas, força sincronização com Mercado Pago
+        const shouldForceSync = currentCount % 3 === 0;
+
+        let status;
+        if (shouldForceSync) {
+          console.log('🔄 Forçando sincronização com Mercado Pago (tentativa', currentCount, ')...');
+          // Chama endpoint que consulta o Mercado Pago diretamente
+          const response = await fetch(`${import.meta.env.VITE_API_URL}/payments/${pixData.paymentId}/sync-status`, {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            },
+          });
+          status = await response.json();
+        } else {
+          // Consulta normal do banco de dados
+          status = await paymentsService.checkStatus(pixData.paymentId);
+        }
 
         setPaymentStatus(status.status);
-        setPollingCount(prev => prev + 1);
 
         if (status.status === 'COMPLETED') {
           // Pagamento aprovado!
