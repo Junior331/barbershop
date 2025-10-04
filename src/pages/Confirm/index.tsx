@@ -183,6 +183,9 @@ export const Confirm = () => {
           logger.info('🔗 Preferência criada:', preference);
           logger.info('🔗 Payment URL:', preference.paymentUrl);
 
+          // DEBUG: Mostrar URL em alert
+          alert(`Payment URL: ${preference.paymentUrl || 'VAZIO!'}\n\nPreference ID: ${preference.id || 'VAZIO!'}`);
+
           // Abrir Mercado Pago
           if (preference.paymentUrl) {
             // Limpar pedido antes de redirecionar

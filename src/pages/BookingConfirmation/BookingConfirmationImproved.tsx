@@ -146,8 +146,13 @@ export const BookingConfirmationImproved = () => {
   return (
     <Layout>
       <div className="flex flex-col justify-start items-center h-full w-full">
-        {/* Header de sucesso */}
-        <div className="w-full bg-gradient-to-r from-[#6C8762] to-[#5a7354] text-white py-8 px-4 text-center">
+        {/* Header de status */}
+        <div className={cn(
+          "w-full text-white py-8 px-4 text-center",
+          appointment.paymentStatus === 'PENDING'
+            ? "bg-gradient-to-r from-yellow-500 to-yellow-600"
+            : "bg-gradient-to-r from-[#6C8762] to-[#5a7354]"
+        )}>
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
@@ -155,22 +160,48 @@ export const BookingConfirmationImproved = () => {
             className="mb-4"
           >
             <div className="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto">
-              <CircleCheck className="w-14 h-14 text-green-400" />
+              {appointment.paymentStatus === 'PENDING' ? (
+                <CircleAlert className="w-14 h-14 text-white" />
+              ) : (
+                <CircleCheck className="w-14 h-14 text-green-400" />
+              )}
             </div>
           </motion.div>
           <Title className="text-2xl text-white mb-2">
-            {appointment.status === 'PENDING'
+            {appointment.paymentStatus === 'PENDING'
+              ? 'Aguardando Pagamento!'
+              : appointment.status === 'PENDING'
               ? 'Agendamento Solicitado!'
               : 'Agendamento Confirmado!'}
           </Title>
           <Text className="text-white text-opacity-90">
-            {appointment.status === 'PENDING'
+            {appointment.paymentStatus === 'PENDING'
+              ? 'Complete o pagamento para confirmar seu horário'
+              : appointment.status === 'PENDING'
               ? 'Aguardando confirmação do barbeiro'
               : 'Seu horário foi reservado com sucesso'}
           </Text>
         </div>
 
         <div className="flex flex-col w-full justify-start items-start gap-4 px-4 pb-6 overflow-auto">
+
+          {/* Alerta de pagamento pendente */}
+          {appointment.status === 'PENDING' && appointment.paymentStatus === 'PENDING' && (
+            <div className="w-full mt-4 bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="w-6 h-6 text-yellow-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <Text className="font-medium text-yellow-800 mb-1">
+                    Pagamento Pendente
+                  </Text>
+                  <Text className="text-sm text-yellow-700">
+                    Seu agendamento está aguardando a confirmação do pagamento.
+                    {appointment.paymentMethod === 'PIX' && ' Complete o pagamento PIX para confirmar seu horário.'}
+                  </Text>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Status do agendamento */}
           <Card className="w-full mt-4">
