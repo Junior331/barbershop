@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import { IOrder } from "@/utils/types";
 import { getIcons } from "@/assets/icons";
+import { getServices } from "@/assets/services";
 import { useOrders } from "@/hooks/useOrders";
 import { Layout } from "@/components/templates";
 import { Header } from "@/components/organisms";
@@ -15,15 +16,29 @@ export const DetailsOrder = () => {
   const navigate = useNavigate();
   const [editDate, setEditDate] = useState("");
   const [isEditing, setIsEditing] = useState(false);
-  const [order] = useState<IOrder | null>(null);
-  const { cancelOrder, loading } = useOrders();
+  const [order, setOrder] = useState<IOrder | null>(null);
+  const { orders, cancelOrder, loading, fetchOrders } = useOrders();
 
   useEffect(() => {
-    // TODO: Implement order loading when API is ready
-    if (id) {
-      console.log('Loading order:', id);
+    // Carregar pedidos se ainda não carregou
+    if (!orders.length) {
+      fetchOrders();
     }
-  }, [id]);
+  }, [fetchOrders, orders.length]);
+
+  useEffect(() => {
+    // Encontrar o pedido pelo ID
+    if (id && orders.length > 0) {
+      const foundOrder = orders.find(o => o.id === id);
+      if (foundOrder) {
+        console.log('📦 Order encontrado:', foundOrder);
+        setOrder(foundOrder);
+        setEditDate(foundOrder.start_time);
+      } else {
+        console.warn('⚠️ Order não encontrado:', id);
+      }
+    }
+  }, [id, orders]);
 
   const handleCancelOrder = async () => {
     if (order && window.confirm("Tem certeza que deseja cancelar este agendamento?")) {
@@ -141,80 +156,111 @@ export const DetailsOrder = () => {
 
           {/* Detalhes do Agendamento */}
           <AnimatePresence>
-            {order.services?.map((service: any) => (
-              <motion.div
-                key={service.id}
-                animate={{ opacity: 1, y: 0 }}
-                initial={{ opacity: 0, y: 20 }}
-                exit={{
-                  y: -50,
-                  opacity: 0,
-                  transition: { duration: 0.3 },
-                }}
-                transition={{
-                  damping: 10,
-                  type: "spring",
-                  stiffness: 120,
-                }}
-                className="w-full"
-              >
-                <div className="flex flex-col py-2.5 px-3.5 justify-between items-center self-stretch rounded-md bg-white shadow-lg relative">
-                  <CircleIcon className="w-32 h-32 my-auto overflow-hidden">
-                    <img
-                      alt="Image service"
-                      src={service.icon || getIcons("fallback")}
-                      className="w-[calc(100%-25px)] h-[calc(100%-25px)] object-cover"
-                    />
-                  </CircleIcon>
+            {order.services?.map((service: any, index: number) => {
+              // Função para mapear nome do serviço para ícone local (igual ao SwipeableCard)
+              const getServiceIconByName = (serviceName: string): string => {
+                const nameMap: { [key: string]: string } = {
+                  'corte de cabelo': 'haircuts',
+                  'corte': 'haircuts',
+                  'cabelo': 'haircuts',
+                  'barba': 'beard',
+                  'sobrancelha': 'eyebrow',
+                  'infantil': 'kids_cuts',
+                  'criança': 'kids_cuts',
+                  'reflexo': 'reflex',
+                  'pigmentação': 'pigmentation',
+                  'tesoura': 'scissor_cut',
+                  'maquina': 'electric_razor_cut',
+                  'máquina': 'electric_razor_cut',
+                };
 
-                  <div className="flex flex-col justify-start items-start w-full flex-grow pl-2 gap-3 mt-4">
-                    <p className="text-[#6B7280] dm_sans text-base font-light">
-                      {order.barber?.name || "Barbeiro não especificado"}
-                    </p>
-                    <h2 className="text-[#494949] dm_sans textarea-lg font-medium leading-normal">
-                      {service.name}
-                    </h2>
+                const lowerName = serviceName.toLowerCase();
+                for (const [key, icon] of Object.entries(nameMap)) {
+                  if (lowerName.includes(key)) {
+                    return getServices(icon as any);
+                  }
+                }
+                return getIcons("fallback");
+              };
 
-                    <p className="flex items-center gap-[1.5px] text-[#6B7280] dm_sans text-base">
+              const serviceIcon = service.service_icon || getServiceIconByName(service.service_name);
+
+              return (
+                <motion.div
+                  key={index}
+                  animate={{ opacity: 1, y: 0 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  exit={{
+                    y: -50,
+                    opacity: 0,
+                    transition: { duration: 0.3 },
+                  }}
+                  transition={{
+                    damping: 10,
+                    type: "spring",
+                    stiffness: 120,
+                  }}
+                  className="w-full"
+                >
+                  <div className="flex flex-col py-2.5 px-3.5 justify-between items-center self-stretch rounded-md bg-white shadow-lg relative">
+                    <CircleIcon className="w-32 h-32 my-auto overflow-hidden">
                       <img
-                        className="size-5"
-                        alt="Icon location"
-                        src={getIcons("location_outlined_green")}
+                        alt="Image service"
+                        src={serviceIcon}
+                        className="w-[calc(100%-25px)] h-[calc(100%-25px)] object-cover"
+                        onError={(e) => {
+                          e.currentTarget.src = getIcons("fallback");
+                        }}
                       />
-                      {"Barbearia faz milagres"}
-                    </p>
+                    </CircleIcon>
 
-                    <p className="flex items-center gap-1.5 text-[#6B7280] dm_sans text-base">
-                      <img
-                        alt="Icon calendar"
-                        className="size-5"
-                        src={getIcons("calendar_tick")}
-                      />
-                      <div className="h-3 w-[0.5px] bg-[#6C8760] rounded-3xl" />
-                      {formatCustomDateTime(
-                        (order as any).date || (order as any).datetime || ""
-                      )}
-                    </p>
-
-                    <div className="w-full flex justify-between items-center">
-                      <h2 className="text-[#494949] dm_sans text-base font-medium">
-                        {formatter({
-                          type: "pt-BR",
-                          currency: "BRL",
-                          style: "currency",
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        }).format(service.price || 0)}
+                    <div className="flex flex-col justify-start items-start w-full flex-grow pl-2 gap-3 mt-4">
+                      <p className="text-[#6B7280] dm_sans text-base font-light">
+                        {order.barber?.name || "Barbeiro não especificado"}
+                      </p>
+                      <h2 className="text-[#494949] dm_sans textarea-lg font-medium leading-normal">
+                        {service.service_name}
                       </h2>
 
-                      <span className="text-sm text-gray-500">
-                        Duração: {service.time || 0} minutos
-                      </span>
+                      <p className="flex items-center gap-[1.5px] text-[#6B7280] dm_sans text-base">
+                        <img
+                          className="size-5"
+                          alt="Icon location"
+                          src={getIcons("location_outlined_green")}
+                        />
+                        Barbearia faz milagres
+                      </p>
+
+                      <p className="flex items-center gap-1.5 text-[#6B7280] dm_sans text-base">
+                        <img
+                          alt="Icon calendar"
+                          className="size-5"
+                          src={getIcons("calendar_tick")}
+                        />
+                        <div className="h-3 w-[0.5px] bg-[#6C8760] rounded-3xl" />
+                        {formatCustomDateTime(new Date(order.start_time))}
+                      </p>
+
+                      <div className="w-full flex justify-between items-center">
+                        <h2 className="text-[#494949] dm_sans text-base font-medium">
+                          {formatter({
+                            type: "pt-BR",
+                            currency: "BRL",
+                            style: "currency",
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          }).format(service.service_price || 0)}
+                        </h2>
+
+                        <span className="text-sm text-gray-500">
+                          Duração: {service.service_duration || 0} minutos
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              );
+            })}
           </AnimatePresence>
 
           {/* Informações de Pagamento */}
@@ -224,19 +270,27 @@ export const DetailsOrder = () => {
               <div className="flex justify-between">
                 <span>Método:</span>
                 <span className="font-medium">
-                  {(order as any).payment_method === "pix"
-                    ? "Pix"
-                    : (order as any).payment_method === "debit_card"
+                  {order.payment_method === "PIX"
+                    ? "PIX"
+                    : order.payment_method === "DEBIT"
                     ? "Cartão de Débito"
-                    : (order as any).payment_method === "credit_card"
+                    : order.payment_method === "CREDIT"
                     ? "Cartão de Crédito"
-                    : "Não especificado"}
+                    : order.payment_method || "Não especificado"}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span>Taxa:</span>
                 <span className="font-medium">
-                  {"0%"}
+                  {order.discount_amount > 0
+                    ? `-${formatter({
+                        type: "pt-BR",
+                        currency: "BRL",
+                        style: "currency",
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      }).format(order.discount_amount)}`
+                    : "0%"}
                 </span>
               </div>
               <div className="flex justify-between">
@@ -246,7 +300,9 @@ export const DetailsOrder = () => {
                     type: "pt-BR",
                     currency: "BRL",
                     style: "currency",
-                  }).format((order as any).total_price || 0)}
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  }).format(order.final_amount || 0)}
                 </span>
               </div>
             </div>

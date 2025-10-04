@@ -154,9 +154,6 @@ export const PaymentImproved = () => {
         console.log('🔗 Preference criada:', preference);
         console.log('🔗 Payment URL:', preference.paymentUrl);
 
-        // DEBUG: Mostrar URL em alert
-        alert(`Payment URL: ${preference.paymentUrl || 'VAZIO!'}\n\nPreference ID: ${preference.id || 'VAZIO!'}`);
-
         // Redirecionar para URL do Mercado Pago (Checkout Pro - webhook garantido)
         if (preference.paymentUrl) {
           // Limpar localStorage de booking
