@@ -209,23 +209,14 @@ export const Confirm = () => {
         // Limpar pedido
         currentOrder.clearOrder();
 
-        toast.info('Redirecionando para pagamento com cartão...');
+        toast.success('Redirecionando para pagamento com cartão...');
         navigate(`/payment/card/${createdAppointment.id}`);
       }
-      // Outros métodos ou fallback
+      // Outros métodos (CASH, WALLET)
       else {
         currentOrder.clearOrder();
-
-        if (paymentResponse.status === 'paid') {
-          toast.success('Pagamento aprovado!');
-          navigate(`/payment/success?appointmentId=${createdAppointment.id}`);
-        } else if (paymentResponse.status === 'pending') {
-          toast.loading('Pagamento pendente...');
-          navigate(`/payment/pending?appointmentId=${createdAppointment.id}`);
-        } else {
-          toast.error('Pagamento recusado');
-          navigate(`/payment/error?appointmentId=${createdAppointment.id}`);
-        }
+        toast.success('Agendamento confirmado!');
+        navigate(`/booking-confirmation/${createdAppointment.id}`);
       }
     } catch (error: any) {
       console.error('Erro ao confirmar agendamento:', error);

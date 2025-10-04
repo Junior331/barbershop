@@ -17,7 +17,7 @@ import {
 
 import { appointmentsService } from "@/services";
 import type { Appointment } from "@/services";
-import { AlertOctagon, AlertTriangle, CircleAlert, CircleCheck } from "lucide-react";
+import { AlertTriangle, CircleAlert, CircleCheck } from "lucide-react";
 
 export const BookingConfirmationImproved = () => {
   const navigate = useNavigate();
@@ -116,10 +116,6 @@ export const BookingConfirmationImproved = () => {
 
   const handleViewMyBookings = () => {
     navigate('/mybookings');
-  };
-
-  const handleBackToHome = () => {
-    navigate('/');
   };
 
   const handleCancelAppointment = async () => {

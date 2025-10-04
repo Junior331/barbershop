@@ -46,6 +46,7 @@ export interface Appointment {
     name: string;
     price: number;
     durationMinutes: number;
+    imageUrl?: string;
   };
   barberShop: {
     id: string;
