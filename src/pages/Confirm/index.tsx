@@ -167,43 +167,34 @@ export const Confirm = () => {
 
       logger.info('Appointment criado:', createdAppointment);
 
-      // Criar pagamento (PIX = QR Code, Cartão = processamento direto)
-      const paymentResponse = await paymentsService.createPaymentAutomatic({
-        appointmentId: createdAppointment.id, // ID real do appointment
-        method: currentOrder.paymentMethod as 'CREDIT_CARD' | 'DEBIT_CARD' | 'PIX' | 'WALLET',
-        amount: currentOrder.total ?? 0,
-        description: `Agendamento de ${currentOrder.services.map(s => s.name).join(', ')}`,
-        metadata: {
+      // Criar pagamento usando Checkout Pro (PIX = URL do Mercado Pago)
+      if (currentOrder.paymentMethod === 'PIX') {
+        // PIX: Usar Checkout Pro com redirecionamento
+        const preference = await paymentsService.createPreference({
           appointmentId: createdAppointment.id,
-          barberId: currentOrder.barber.id,
-          barberName: currentOrder.barber.name,
-          serviceNames: currentOrder.services.map(s => s.name).join(', '),
-          scheduledTo: startDateTime.toISOString(),
-          promotionCode: currentOrder.promotionCode || null,
-          clientId: user.id,
-          clientEmail: user.email,
-          clientName: user.name,
-        }
-      });
+          method: 'PIX',
+          amount: currentOrder.total ?? 0,
+          description: `Agendamento de ${currentOrder.services.map(s => s.name).join(', ')}`,
+        });
 
-      logger.info('Pagamento criado:', paymentResponse);
-
-      // PIX: Salvar dados e redirecionar para página de QR Code
-      if (currentOrder.paymentMethod === 'PIX' && (paymentResponse.qrCode || paymentResponse.qrCodeBase64)) {
-        // Salvar dados do PIX no localStorage para a página de QR Code
-        localStorage.setItem('pixPaymentData', JSON.stringify({
-          qrCode: paymentResponse.qrCode,
-          qrCodeBase64: paymentResponse.qrCodeBase64,
-          amount: currentOrder.total,
-          paymentId: paymentResponse.id,
-          appointmentId: createdAppointment.id,
-        }));
+        logger.info('🔗 Preferência criada:', preference);
+        logger.info('🔗 Payment URL:', preference.paymentUrl);
 
         // Limpar pedido
         currentOrder.clearOrder();
 
-        toast.success('QR Code PIX gerado! Escaneie para pagar.');
-        navigate(`/payment/pix/${createdAppointment.id}`);
+        // Abrir Mercado Pago em nova aba
+        if (preference.paymentUrl) {
+          toast.success('Abrindo Mercado Pago em nova aba...');
+          window.open(preference.paymentUrl, '_blank');
+
+          // Redirecionar para confirmação
+          setTimeout(() => {
+            navigate(`/booking-confirmation/${createdAppointment.id}`);
+          }, 1000);
+        } else {
+          toast.error('Erro ao gerar link de pagamento');
+        }
       }
       // Cartão: Salvar dados e redirecionar para página de cartão
       else if (currentOrder.paymentMethod === 'CREDIT_CARD' || currentOrder.paymentMethod === 'DEBIT_CARD') {
@@ -438,11 +429,11 @@ export const Confirm = () => {
               ✕
             </button>
 
-            <h3 className="font-bold text-lg mb-4">
+            <h2 className="font-bold text-lg mb-4">
               Selecione o Método de Pagamento
-            </h3>
+            </h2>
 
-            <div className="space-y-3">
+            <div className="flex flex-col space-y-3 gap-2">
               {paymentMethods.map((method) => (
                 <div
                   key={method.id}
