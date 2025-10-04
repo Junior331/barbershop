@@ -52,13 +52,13 @@ export const Confirm = () => {
   const paymentMethods = [
     { id: "PIX", name: "Pix", fee: 0.01, icon: "pix" },
     {
-      id: "DEBIT",
+      id: "DEBIT_CARD",
       name: "Cartão de Débito",
       fee: 0.03,
       icon: "debit_card",
     },
     {
-      id: "CREDIT",
+      id: "CREDIT_CARD",
       name: "Cartão de Crédito",
       fee: 0.084,
       icon: "credit_card",
@@ -154,43 +154,70 @@ export const Confirm = () => {
         appointmentData.notes = currentOrder.notes;
       }
 
-      const appointment = await appointmentsService.create(appointmentData);
+      // NOVO FLUXO: Criar appointment PRIMEIRO com status PENDING
 
-      // TESTE: Usar R$ 1,00 para pagamento de teste
-      const testAmount = 100; // 100 centavos = R$ 1,00
+      logger.info('Criando appointment com status PENDING...');
 
-      // Criar pagamento com Mercado Pago
-      const payment = await paymentsService.createRealPayment({
-        appointmentId: appointment.id,
-        method: currentOrder.paymentMethod as 'CREDIT' | 'DEBIT' | 'PIX' | 'WALLET',
-        amount: testAmount, // Usando valor de teste
-        currency: 'BRL',
-        description: `Agendamento de ${currentOrder.services.map(s => s.name).join(', ')}`,
-        metadata: {
-          barberId: currentOrder.barber.id,
-          barberName: currentOrder.barber.name,
-          serviceNames: currentOrder.services.map(s => s.name).join(', '),
-          scheduledTo: startDateTime.toISOString(),
-          promotionCode: currentOrder.promotionCode,
-          originalAmount: currentOrder.total,
-        }
+      // Criar appointment com status PENDING
+      const createdAppointment = await appointmentsService.create({
+        ...appointmentData,
+        status: 'PENDING',
+        paymentStatus: 'PENDING',
       });
 
-      logger.info('Pagamento criado:', payment);
+      logger.info('Appointment criado:', createdAppointment);
 
-      // Se for PIX, mostrar QR Code
-      if (currentOrder.paymentMethod === 'PIX' && payment.qrCode) {
-        toast.success('Pagamento PIX criado! Escaneie o QR Code para pagar.');
-        // TODO: Mostrar modal com QR Code
-      } else {
-        toast.success('Pagamento criado com sucesso!');
+      // Criar pagamento usando Checkout Pro (PIX = URL do Mercado Pago)
+      if (currentOrder.paymentMethod === 'PIX') {
+        // PIX: Usar Checkout Pro com redirecionamento
+        const preference = await paymentsService.createPreference({
+          appointmentId: createdAppointment.id,
+          method: 'PIX',
+          amount: currentOrder.total ?? 0,
+          description: `Agendamento de ${currentOrder.services.map(s => s.name).join(', ')}`,
+        });
+
+        logger.info('🔗 Preferência criada:', preference);
+        logger.info('🔗 Payment URL:', preference.paymentUrl);
+
+        // Limpar pedido
+        currentOrder.clearOrder();
+
+        // Abrir Mercado Pago em nova aba
+        if (preference.paymentUrl) {
+          toast.success('Abrindo Mercado Pago em nova aba...');
+          window.open(preference.paymentUrl, '_blank');
+
+          // Redirecionar para confirmação
+          setTimeout(() => {
+            navigate(`/booking-confirmation/${createdAppointment.id}`);
+          }, 1000);
+        } else {
+          toast.error('Erro ao gerar link de pagamento');
+        }
       }
+      // Cartão: Salvar dados e redirecionar para página de cartão
+      else if (currentOrder.paymentMethod === 'CREDIT_CARD' || currentOrder.paymentMethod === 'DEBIT_CARD') {
+        // Salvar dados do pagamento pendente
+        localStorage.setItem('pendingCardPayment', JSON.stringify({
+          appointmentId: createdAppointment.id,
+          amount: currentOrder.total,
+          method: currentOrder.paymentMethod,
+          description: `Agendamento de ${currentOrder.services.map(s => s.name).join(', ')}`,
+        }));
 
-      // Limpar o pedido após sucesso
-      currentOrder.clearOrder();
+        // Limpar pedido
+        currentOrder.clearOrder();
 
-      // Redirecionar para a página de confirmação
-      navigate(`/booking-confirmation/${appointment.id}`);
+        toast.success('Redirecionando para pagamento com cartão...');
+        navigate(`/payment/card/${createdAppointment.id}`);
+      }
+      // Outros métodos (CASH, WALLET)
+      else {
+        currentOrder.clearOrder();
+        toast.success('Agendamento confirmado!');
+        navigate(`/booking-confirmation/${createdAppointment.id}`);
+      }
     } catch (error: any) {
       console.error('Erro ao confirmar agendamento:', error);
       toast.error(error.response?.data?.message || error.message || "Erro ao confirmar agendamento");
@@ -393,11 +420,11 @@ export const Confirm = () => {
               ✕
             </button>
 
-            <h3 className="font-bold text-lg mb-4">
+            <h2 className="font-bold text-lg mb-4">
               Selecione o Método de Pagamento
-            </h3>
+            </h2>
 
-            <div className="space-y-3">
+            <div className="flex flex-col space-y-3 gap-2">
               {paymentMethods.map((method) => (
                 <div
                   key={method.id}

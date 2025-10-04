@@ -62,13 +62,13 @@ export const useOrder = create<IOrderState>((set, get) => ({
     // Encontrar o método de pagamento selecionado e sua taxa
     const paymentMethods = [
       { id: "PIX", fee: 0.01 },
-      { id: "pix", fee: 0.01 }, // Compatibilidade
+      { id: "pix", fee: 0.01 },
       { id: "DEBIT_CARD", fee: 0.03 },
-      { id: "debit_card", fee: 0.03 }, // Compatibilidade
+      { id: "debit_card", fee: 0.03 },
       { id: "CREDIT_CARD", fee: 0.084 },
-      { id: "credit_card", fee: 0.084 }, // Compatibilidade
+      { id: "credit_card", fee: 0.084 },
       { id: "WALLET", fee: 0 },
-      { id: "wallet", fee: 0 }, // Compatibilidade
+      { id: "wallet", fee: 0 },
     ];
 
     const selectedMethod = paymentMethods.find(m => m.id === paymentMethod);

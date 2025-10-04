@@ -137,27 +137,67 @@ export const PaymentImproved = () => {
         return;
       }
 
-      // Para outros métodos, processar pagamento primeiro
-      const paymentData = {
-        appointmentData,
-        paymentMethod: selectedPaymentMethod,
-        amount: bookingData.totalPrice
-      };
+      // Criar agendamento primeiro (status PENDING)
+      const appointment = await appointmentsService.create(appointmentData);
+      appointmentId = appointment.id;
 
-      const paymentResult = await paymentsService.processPayment(paymentData);
+      // Processar pagamento usando Checkout Pro (Mercado Pago Hosted)
+      if (selectedPaymentMethod === "PIX") {
+        // PIX: Usar Checkout Pro para garantir webhook automático
+        const preference = await paymentsService.createPreference({
+          appointmentId: appointmentId,
+          amount: bookingData.totalPrice,
+          method: 'PIX',
+          description: `Agendamento - ${bookingData.selectedServices.map(s => s.name).join(', ')}`
+        });
 
-      if (paymentResult.success) {
-        appointmentId = paymentResult.appointmentId;
-        toast.success('Pagamento processado com sucesso!');
+        console.log('🔗 Preference criada:', preference);
+        console.log('🔗 Payment URL:', preference.paymentUrl);
 
-        // Limpar localStorage
+        // Limpar localStorage de booking
         localStorage.removeItem('selectedServices');
         localStorage.removeItem('bookingData');
         localStorage.removeItem('finalBookingData');
 
-        navigate(`/booking-confirmation/${appointmentId}`);
-      } else {
-        throw new Error(paymentResult.error || 'Erro no processamento do pagamento');
+        // Redirecionar para URL do Mercado Pago (Checkout Pro - webhook garantido)
+        if (preference.paymentUrl) {
+          toast.success('Abrindo Mercado Pago em nova aba...');
+
+          // Abrir em nova aba
+          window.open(preference.paymentUrl, '_blank');
+
+          // Redirecionar para página de confirmação
+          setTimeout(() => {
+            navigate(`/booking-confirmation/${appointmentId}`);
+          }, 1000);
+          return;
+        } else {
+          console.error('❌ paymentUrl não encontrado:', preference);
+          toast.error('Erro ao gerar link de pagamento');
+          setProcessing(false);
+          return;
+        }
+
+      } else if (selectedPaymentMethod === "CREDIT_CARD" || selectedPaymentMethod === "DEBIT_CARD") {
+        // Cartão: Mostrar modal para entrada de dados
+        // Por enquanto, vamos redirecionar para uma tela de entrada de cartão
+        toast.info('Redirecionando para página de pagamento com cartão...');
+
+        // Salvar appointmentId para usar na próxima tela
+        localStorage.setItem('pendingCardPayment', JSON.stringify({
+          appointmentId: appointmentId,
+          amount: bookingData.totalPrice,
+          method: selectedPaymentMethod,
+          description: `Agendamento - ${bookingData.selectedServices.map(s => s.name).join(', ')}`
+        }));
+
+        // Limpar localStorage de booking
+        localStorage.removeItem('selectedServices');
+        localStorage.removeItem('bookingData');
+        localStorage.removeItem('finalBookingData');
+
+        // Redirecionar para tela de pagamento com cartão
+        navigate(`/payment/card/${appointmentId}`);
       }
 
     } catch (error) {

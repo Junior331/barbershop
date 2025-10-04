@@ -26,7 +26,7 @@ export interface Payment {
 
 export interface CreatePaymentData {
   appointmentId: string;
-  method: 'CREDIT' | 'DEBIT' | 'PIX' | 'WALLET';
+  method: 'CREDIT_CARD' | 'DEBIT_CARD' | 'PIX' | 'WALLET';
   amount: number;
   currency?: string;
   description?: string;
@@ -41,13 +41,16 @@ export interface MercadoPagoPaymentResponse {
   currency: string;
   method: string;
   gateway: string;
+  paymentUrl?: string;
   qrCode?: string;
   qrCodeBase64?: string;
+  qrCodeData?: string;
   fees: {
     amount: number;
     percentage: number;
   };
   createdAt: string;
+  metadata?: Record<string, any>;
 }
 
 export interface PaymentStatusResponse {
@@ -56,8 +59,162 @@ export interface PaymentStatusResponse {
   message?: string;
 }
 
+export interface CreatePixPaymentData {
+  appointmentId: string;
+  amount: number;
+  description?: string;
+}
+
+export interface CreateCardPaymentData {
+  appointmentId: string;
+  amount: number;
+  cardToken?: string;
+  cardNumber?: string;
+  securityCode?: string;
+  expirationMonth?: number;
+  expirationYear?: number;
+  cardholderName?: string;
+  installments?: number;
+  saveCard?: boolean;
+  description?: string;
+}
+
 export const paymentsService = {
-  // Criar pagamento real com Mercado Pago
+  // ===== CHECKOUT TRANSPARENTE (Novo - Recomendado) =====
+
+  /**
+   * Criar pagamento automaticamente baseado no método escolhido
+   * - PIX → createPixPayment (mostra QR Code no site)
+   * - CREDIT_CARD/DEBIT_CARD → createCardPayment (processa no site)
+   */
+  async createPaymentAutomatic(data: CreatePaymentData & Partial<CreateCardPaymentData>): Promise<MercadoPagoPaymentResponse> {
+    try {
+      logger.info('Criando pagamento automático:', {
+        appointmentId: data.appointmentId,
+        method: data.method,
+        amount: data.amount,
+      });
+
+      // PIX → usa createPixPayment
+      if (data.method === 'PIX') {
+        return await this.createPixPayment({
+          appointmentId: data.appointmentId,
+          amount: data.amount,
+          description: data.description,
+        });
+      }
+
+      // Cartão → usa createCardPayment
+      if (data.method === 'CREDIT_CARD' || data.method === 'DEBIT_CARD') {
+        return await this.createCardPayment({
+          appointmentId: data.appointmentId,
+          amount: data.amount,
+          cardToken: data.cardToken,
+          cardNumber: data.cardNumber,
+          securityCode: data.securityCode,
+          expirationMonth: data.expirationMonth,
+          expirationYear: data.expirationYear,
+          cardholderName: data.cardholderName,
+          installments: data.installments || 1,
+          saveCard: data.saveCard || false,
+          description: data.description,
+        });
+      }
+
+      throw new Error(`Método de pagamento não suportado: ${data.method}`);
+    } catch (error) {
+      ApiUtils.logError(error as AxiosError, 'paymentsService.createPaymentAutomatic');
+      throw error;
+    }
+  },
+
+  /**
+   * Criar pagamento PIX com QR Code (Checkout Transparente)
+   * Retorna QR Code para exibir na tela, sem redirecionamento
+   */
+  async createPixPayment(data: CreatePixPaymentData): Promise<MercadoPagoPaymentResponse> {
+    try {
+      logger.info('Criando pagamento PIX (Checkout Transparente):', {
+        appointmentId: data.appointmentId,
+        amount: data.amount,
+      });
+
+      const response = await api.post('/payments/pix/create', data);
+
+      logger.info('Pagamento PIX criado com sucesso:', {
+        paymentId: response.data.id,
+        qrCodeAvailable: !!response.data.qrCode,
+        status: response.data.status,
+      });
+
+      return response.data;
+    } catch (error) {
+      ApiUtils.logError(error as AxiosError, 'paymentsService.createPixPayment');
+      throw error;
+    }
+  },
+
+  /**
+   * Criar pagamento com cartão (Checkout Transparente)
+   * Processa cartão diretamente sem redirecionamento
+   */
+  async createCardPayment(data: CreateCardPaymentData): Promise<MercadoPagoPaymentResponse> {
+    try {
+      logger.info('Criando pagamento com cartão (Checkout Transparente):', {
+        appointmentId: data.appointmentId,
+        amount: data.amount,
+        installments: data.installments || 1,
+        saveCard: data.saveCard || false,
+      });
+
+      const response = await api.post('/payments/card/create', data);
+
+      logger.info('Pagamento com cartão criado:', {
+        paymentId: response.data.id,
+        status: response.data.status,
+      });
+
+      return response.data;
+    } catch (error) {
+      ApiUtils.logError(error as AxiosError, 'paymentsService.createCardPayment');
+      throw error;
+    }
+  },
+
+  // ===== CHECKOUT PRO (Legacy - com redirecionamento) =====
+
+  /**
+   * @deprecated Use createPixPayment() ou createCardPayment() ao invés
+   * Criar preferência de pagamento MercadoPago (Checkout Pro)
+   * Redireciona para página do MercadoPago (mostra "Saldo em conta")
+   */
+  async createPreference(data: CreatePaymentData): Promise<MercadoPagoPaymentResponse> {
+    try {
+      logger.info('Criando preferência de pagamento MercadoPago:', {
+        appointmentId: data.appointmentId,
+        method: data.method,
+        amount: data.amount,
+      });
+
+      const response = await api.post('/payments/create-preference', {
+        ...data,
+        currency: data.currency || 'BRL',
+      });
+
+      logger.info('Preferência criada com sucesso:', {
+        paymentId: response.data.id,
+        paymentUrl: response.data.paymentUrl,
+        preferenceId: response.data.gatewayPaymentId,
+      });
+
+      return response.data;
+    } catch (error) {
+      ApiUtils.logError(error as AxiosError, 'paymentsService.createPreference');
+      throw error;
+    }
+  },
+
+  // Criar pagamento real com Mercado Pago (legacy - direct payment API)
   async createRealPayment(data: CreatePaymentData): Promise<MercadoPagoPaymentResponse> {
     try {
       logger.info('Criando pagamento real com Mercado Pago:', {
@@ -185,6 +342,26 @@ export const paymentsService = {
     }
   },
 
+  // Obter pagamento mais recente de um agendamento
+  async getByAppointmentId(appointmentId: string): Promise<any> {
+    try {
+      logger.info('Buscando pagamento por appointmentId:', { appointmentId });
+
+      const response = await api.get(`/payments/appointment/${appointmentId}`);
+
+      logger.info('Pagamento encontrado:', {
+        paymentId: response.data.id,
+        status: response.data.status,
+        amount: response.data.amount,
+      });
+
+      return response.data;
+    } catch (error) {
+      ApiUtils.logError(error as AxiosError, 'paymentsService.getByAppointmentId');
+      throw error;
+    }
+  },
+
   // Verificar status do pagamento
   async checkStatus(paymentId: string): Promise<PaymentStatusResponse> {
     try {
@@ -201,6 +378,26 @@ export const paymentsService = {
       return response.data;
     } catch (error) {
       ApiUtils.logError(error as AxiosError, 'paymentsService.checkStatus');
+      throw error;
+    }
+  },
+
+  // Forçar sincronização com gateway (Mercado Pago)
+  async syncStatusFromGateway(paymentId: string): Promise<PaymentStatusResponse> {
+    try {
+      logger.info('🔄 Sincronizando status com gateway:', { paymentId });
+
+      const response = await api.get(`/payments/${paymentId}/sync-status`);
+
+      logger.info('✅ Status sincronizado do gateway:', {
+        paymentId,
+        status: response.data.status,
+        transactionId: response.data.transactionId,
+      });
+
+      return response.data;
+    } catch (error) {
+      ApiUtils.logError(error as AxiosError, 'paymentsService.syncStatusFromGateway');
       throw error;
     }
   },

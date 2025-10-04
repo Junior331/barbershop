@@ -11,6 +11,11 @@ import { Services } from "./Services";
 import { BookingConfirmationImproved } from "./BookingConfirmation/BookingConfirmationImproved";
 import { MyBookings } from "./MyBookings";
 import { DetailsOrder } from "./DetailsOrder";
+import { PaymentSuccess } from "./PaymentSuccess";
+import { PaymentError } from "./PaymentError";
+import { PaymentPending } from "./PaymentPending";
+import { ScheduleImproved } from "./Schedule/ScheduleImproved";
+import { PaymentImproved } from "./Payment/PaymentImproved";
 
 export {
   Home,
@@ -26,4 +31,9 @@ export {
   BookingConfirmationImproved,
   MyBookings,
   DetailsOrder,
+  PaymentSuccess,
+  PaymentError,
+  PaymentPending,
+  ScheduleImproved,
+  PaymentImproved,
 };
