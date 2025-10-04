@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useCallback } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { IBarber, IOrder } from "@/utils/types";
+import { IOrder } from "@/utils/types";
 import { appointmentsService, Appointment } from "@/services";
 import toast from "react-hot-toast";
 
