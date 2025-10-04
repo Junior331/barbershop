@@ -154,26 +154,32 @@ export const PaymentImproved = () => {
         console.log('🔗 Preference criada:', preference);
         console.log('🔗 Payment URL:', preference.paymentUrl);
 
-        // Limpar localStorage de booking
-        localStorage.removeItem('selectedServices');
-        localStorage.removeItem('bookingData');
-        localStorage.removeItem('finalBookingData');
+        // DEBUG: Mostrar URL em alert
+        alert(`Payment URL: ${preference.paymentUrl || 'VAZIO!'}\n\nPreference ID: ${preference.id || 'VAZIO!'}`);
 
         // Redirecionar para URL do Mercado Pago (Checkout Pro - webhook garantido)
         if (preference.paymentUrl) {
-          toast.success('Abrindo Mercado Pago em nova aba...');
+          // Limpar localStorage de booking
+          localStorage.removeItem('selectedServices');
+          localStorage.removeItem('bookingData');
+          localStorage.removeItem('finalBookingData');
 
-          // Abrir em nova aba
-          window.open(preference.paymentUrl, '_blank');
+          toast.success('Redirecionando para pagamento...');
 
-          // Redirecionar para página de confirmação
-          setTimeout(() => {
-            navigate(`/booking-confirmation/${appointmentId}`);
-          }, 1000);
+          // Em mobile, redirecionar na mesma aba
+          const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+          if (isMobile) {
+            window.location.href = preference.paymentUrl;
+          } else {
+            window.open(preference.paymentUrl, '_blank');
+            setTimeout(() => {
+              navigate(`/booking-confirmation/${appointmentId}`);
+            }, 1000);
+          }
           return;
         } else {
           console.error('❌ paymentUrl não encontrado:', preference);
-          toast.error('Erro ao gerar link de pagamento');
+          toast.error('Erro: Link de pagamento não foi gerado. Tente novamente.');
           setProcessing(false);
           return;
         }

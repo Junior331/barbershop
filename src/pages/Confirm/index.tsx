@@ -169,31 +169,49 @@ export const Confirm = () => {
 
       // Criar pagamento usando Checkout Pro (PIX = URL do Mercado Pago)
       if (currentOrder.paymentMethod === 'PIX') {
-        // PIX: Usar Checkout Pro com redirecionamento
-        const preference = await paymentsService.createPreference({
-          appointmentId: createdAppointment.id,
-          method: 'PIX',
-          amount: currentOrder.total ?? 0,
-          description: `Agendamento de ${currentOrder.services.map(s => s.name).join(', ')}`,
-        });
+        try {
+          // PIX: Usar Checkout Pro com redirecionamento
+          const preference = await paymentsService.createPreference({
+            appointmentId: createdAppointment.id,
+            method: 'PIX',
+            amount: currentOrder.total ?? 0,
+            description: `Agendamento de ${currentOrder.services.map(s => s.name).join(', ')}`,
+          });
 
-        logger.info('🔗 Preferência criada:', preference);
-        logger.info('🔗 Payment URL:', preference.paymentUrl);
+          console.log('🔗 Preferência criada:', preference);
+          console.log('🔗 Payment URL:', preference.paymentUrl);
+          logger.info('🔗 Preferência criada:', preference);
+          logger.info('🔗 Payment URL:', preference.paymentUrl);
 
-        // Limpar pedido
-        currentOrder.clearOrder();
+          // DEBUG: Mostrar URL em alert
+          alert(`Payment URL: ${preference.paymentUrl || 'VAZIO!'}\n\nPreference ID: ${preference.id || 'VAZIO!'}`);
 
-        // Abrir Mercado Pago em nova aba
-        if (preference.paymentUrl) {
-          toast.success('Abrindo Mercado Pago em nova aba...');
-          window.open(preference.paymentUrl, '_blank');
+          // Abrir Mercado Pago
+          if (preference.paymentUrl) {
+            // Limpar pedido antes de redirecionar
+            currentOrder.clearOrder();
 
-          // Redirecionar para confirmação
-          setTimeout(() => {
-            navigate(`/booking-confirmation/${createdAppointment.id}`);
-          }, 1000);
-        } else {
-          toast.error('Erro ao gerar link de pagamento');
+            toast.success('Redirecionando para pagamento...');
+
+            // Em mobile, redirecionar na mesma aba (melhor experiência)
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            if (isMobile) {
+              window.location.href = preference.paymentUrl;
+            } else {
+              window.open(preference.paymentUrl, '_blank');
+              setTimeout(() => {
+                navigate(`/booking-confirmation/${createdAppointment.id}`);
+              }, 1000);
+            }
+          } else {
+            console.error('❌ paymentUrl não encontrado:', preference);
+            toast.error('Erro: Link de pagamento não gerado. Tente novamente.');
+          }
+        } catch (error: any) {
+          console.error('❌ Erro ao criar preferência:', error);
+          logger.error('Erro ao criar preferência:', error);
+          toast.error('Erro ao criar pagamento. Tente novamente.');
+          throw error;
         }
       }
       // Cartão: Salvar dados e redirecionar para página de cartão
