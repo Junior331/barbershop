@@ -19,10 +19,10 @@ export const useOrders = () => {
       barber: {
         id: appointment.barber.id,
         name: appointment.barber.name,
-        avatarUrl: appointment.barber.avatarUrl,
-      } as IBarber,
+      },
       date: new Date(appointment.scheduledTo),
       start_time: appointment.scheduledTo,
+      end_time: appointment.scheduledTo,
       status: appointment.status.toLowerCase() as any,
       services: [{
         service_id: appointment.service.id,
@@ -31,10 +31,16 @@ export const useOrders = () => {
         service_price: appointment.service.price,
         service_duration: appointment.service.durationMinutes,
       }],
-      total_price: appointment.totalPrice,
-      payment_method: appointment.paymentMethod,
-      payment_status: appointment.paymentStatus,
-    };
+      final_amount: appointment.totalPrice,
+      discount_amount: appointment.discountAmount || 0,
+      service_name: appointment.service.name,
+      promotion_id: '',
+      client_id: appointment.clientId,
+      created_at: appointment.createdAt,
+      updated_at: appointment.createdAt,
+      notes: null,
+      isCompleted: appointment.status === 'COMPLETED',
+    } as IOrder;
   };
 
   // Função para buscar os agendamentos usando o backend
