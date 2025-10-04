@@ -25,8 +25,9 @@ export const PixPayment = () => {
   const [pixData, setPixData] = useState<PixPaymentData | null>(null);
   const [copied, setCopied] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<string>('PENDING');
+  const [pollingCountDisplay, setPollingCountDisplay] = useState(0); // Para exibir na UI
   const pollingInterval = useRef<NodeJS.Timeout | null>(null);
-  const pollingCountRef = useRef(0); // Usar ref ao invés de estado
+  const pollingCountRef = useRef(0); // Usar ref para lógica
 
   useEffect(() => {
     const data = localStorage.getItem('pixPaymentData');
@@ -48,6 +49,7 @@ export const PixPayment = () => {
       try {
         pollingCountRef.current += 1;
         const currentCount = pollingCountRef.current;
+        setPollingCountDisplay(currentCount);
 
         // A cada 3 tentativas, força sincronização com Mercado Pago
         const shouldForceSync = currentCount % 3 === 0;
@@ -58,12 +60,7 @@ export const PixPayment = () => {
         if (shouldForceSync) {
           console.log('🔄 Forçando sincronização com Mercado Pago (tentativa', currentCount, ')...');
           // Chama endpoint que consulta o Mercado Pago diretamente
-          const response = await fetch(`${import.meta.env.VITE_API_URL}/payments/${pixData.paymentId}/sync-status`, {
-            headers: {
-              'Authorization': `Bearer ${localStorage.getItem('token')}`,
-            },
-          });
-          status = await response.json();
+          status = await paymentsService.syncStatusFromGateway(pixData.paymentId);
           console.log('✅ Resposta do sync:', status);
         } else {
           // Consulta normal do banco de dados
@@ -182,7 +179,7 @@ export const PixPayment = () => {
                   </Text>
                   <Text className="text-sm text-yellow-700">
                     Escaneie o QR Code ou copie o código abaixo
-                    {pollingCount > 0 && ` (verificando ${pollingCount}x)`}
+                    {pollingCountDisplay > 0 && ` (verificando ${pollingCountDisplay}x)`}
                   </Text>
                 </div>
               </div>

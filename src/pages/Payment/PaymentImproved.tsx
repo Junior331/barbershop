@@ -141,40 +141,42 @@ export const PaymentImproved = () => {
       const appointment = await appointmentsService.create(appointmentData);
       appointmentId = appointment.id;
 
-      // Processar pagamento usando Checkout Transparente ou Redirect
+      // Processar pagamento usando Checkout Pro (Mercado Pago Hosted)
       if (selectedPaymentMethod === "PIX") {
-        // PIX: Criar pagamento e verificar se tem URL de redirecionamento
-        const pixPayment = await paymentsService.createPixPayment({
+        // PIX: Usar Checkout Pro para garantir webhook automático
+        const preference = await paymentsService.createPreference({
           appointmentId: appointmentId,
           amount: bookingData.totalPrice,
+          method: 'PIX',
           description: `Agendamento - ${bookingData.selectedServices.map(s => s.name).join(', ')}`
         });
+
+        console.log('🔗 Preference criada:', preference);
+        console.log('🔗 Payment URL:', preference.paymentUrl);
 
         // Limpar localStorage de booking
         localStorage.removeItem('selectedServices');
         localStorage.removeItem('bookingData');
         localStorage.removeItem('finalBookingData');
 
-        // Se tem URL de pagamento, redirecionar para o Mercado Pago
-        if (pixPayment.paymentUrl) {
-          toast.success('Redirecionando para o Mercado Pago...');
+        // Redirecionar para URL do Mercado Pago (Checkout Pro - webhook garantido)
+        if (preference.paymentUrl) {
+          toast.success('Abrindo Mercado Pago em nova aba...');
 
-          // Redirecionar para URL do Mercado Pago
-          window.location.href = pixPayment.paymentUrl;
+          // Abrir em nova aba
+          window.open(preference.paymentUrl, '_blank');
+
+          // Redirecionar para página de confirmação
+          setTimeout(() => {
+            navigate(`/booking-confirmation/${appointmentId}`);
+          }, 1000);
+          return;
+        } else {
+          console.error('❌ paymentUrl não encontrado:', preference);
+          toast.error('Erro ao gerar link de pagamento');
+          setProcessing(false);
           return;
         }
-
-        // Caso contrário, mostrar QR Code na tela (fallback)
-        localStorage.setItem('pixPaymentData', JSON.stringify({
-          qrCode: pixPayment.qrCode,
-          qrCodeBase64: pixPayment.qrCodeBase64,
-          amount: bookingData.totalPrice,
-          paymentId: pixPayment.id,
-          appointmentId: appointmentId
-        }));
-
-        toast.success('QR Code PIX gerado! Escaneie para pagar.');
-        navigate(`/payment/pix/${appointmentId}`);
 
       } else if (selectedPaymentMethod === "CREDIT_CARD" || selectedPaymentMethod === "DEBIT_CARD") {
         // Cartão: Mostrar modal para entrada de dados

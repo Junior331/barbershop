@@ -382,6 +382,26 @@ export const paymentsService = {
     }
   },
 
+  // Forçar sincronização com gateway (Mercado Pago)
+  async syncStatusFromGateway(paymentId: string): Promise<PaymentStatusResponse> {
+    try {
+      logger.info('🔄 Sincronizando status com gateway:', { paymentId });
+
+      const response = await api.get(`/payments/${paymentId}/sync-status`);
+
+      logger.info('✅ Status sincronizado do gateway:', {
+        paymentId,
+        status: response.data.status,
+        transactionId: response.data.transactionId,
+      });
+
+      return response.data;
+    } catch (error) {
+      ApiUtils.logError(error as AxiosError, 'paymentsService.syncStatusFromGateway');
+      throw error;
+    }
+  },
+
   // Cancelar/Estornar pagamento
   async refund(paymentId: string, reason?: string): Promise<Payment> {
     try {
