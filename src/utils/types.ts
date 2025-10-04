@@ -183,6 +183,7 @@ export interface IOrder {
   final_amount: number;
   promotion_id: string;
   discount_amount: number;
+  payment_method?: string;
   services: [
     {
       service_id: string;
