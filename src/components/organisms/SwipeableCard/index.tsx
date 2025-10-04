@@ -140,19 +140,57 @@ export const ServiceIcons = ({ services }: { services: any }) => {
   const displayedServices = services.slice(0, 6);
   const remainingServicesCount = services.length - displayedServices.length;
 
+  // Função para mapear nome do serviço para ícone local
+  const getServiceIconByName = (serviceName: string): string => {
+    const nameMap: { [key: string]: string } = {
+      'corte de cabelo': 'haircuts',
+      'corte': 'haircuts',
+      'cabelo': 'haircuts',
+      'barba': 'beard',
+      'sobrancelha': 'eyebrow',
+      'infantil': 'kids_cuts',
+      'criança': 'kids_cuts',
+      'reflexo': 'reflex',
+      'pigmentação': 'pigmentation',
+      'tesoura': 'scissor_cut',
+      'maquina': 'electric_razor_cut',
+      'máquina': 'electric_razor_cut',
+    };
+
+    const lowerName = serviceName.toLowerCase();
+
+    // Tentar match exato ou parcial
+    for (const [key, icon] of Object.entries(nameMap)) {
+      if (lowerName.includes(key)) {
+        return getServices(icon as any);
+      }
+    }
+
+    return getServices("fallback");
+  };
+
   return (
     <div className="flex items-center w-full mb-2">
-      {displayedServices.map((service: any, index: Key | null | undefined) => (
-        <div key={index} className="-ml-4 first:ml-0">
-          <CircleIcon className="w-24 h-24 border-2 border-white">
-            <img
-              alt={`Service ${service.service_name}`}
-              src={service.service_icon || getServices("fallback")}
-              className="w-[calc(100%-15px)] h-[calc(100%-15px)] object-cover"
-            />
-          </CircleIcon>
-        </div>
-      ))}
+      {displayedServices.map((service: any, index: Key | null | undefined) => {
+        // Prioridade: 1) URL do backend, 2) Match por nome, 3) Fallback
+        const imageUrl = service.service_icon || getServiceIconByName(service.service_name);
+
+        return (
+          <div key={index} className="-ml-4 first:ml-0">
+            <CircleIcon className="w-24 h-24 border-2 border-white">
+              <img
+                alt={`Service ${service.service_name}`}
+                src={imageUrl}
+                className="w-[calc(100%-15px)] h-[calc(100%-15px)] object-cover"
+                onError={(e) => {
+                  console.error('❌ Erro ao carregar imagem:', imageUrl, 'para serviço:', service.service_name);
+                  e.currentTarget.src = getServices("fallback");
+                }}
+              />
+            </CircleIcon>
+          </div>
+        );
+      })}
       {remainingServicesCount > 0 && (
         <div className="-ml-4">
           <CircleIcon className="w-24 h-24 bg-orange-500 flex items-center justify-center border-2 border-white text-white font-bold">
