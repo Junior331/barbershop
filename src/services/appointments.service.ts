@@ -156,7 +156,7 @@ export const appointmentsService = {
     try {
       logger.info('Cancelando agendamento pelo cliente:', { id });
 
-      const response = await api.delete(`/appointments/${id}/cancel-by-client`);
+      const response = await api.delete(`/appointments/${id}`);
 
       logger.info('Agendamento cancelado pelo cliente:', {
         appointmentId: id,
