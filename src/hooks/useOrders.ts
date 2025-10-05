@@ -34,6 +34,7 @@ export const useOrders = () => {
       }],
       final_amount: appointment.totalPrice,
       discount_amount: appointment.discountAmount || 0,
+      payment_method: appointment.paymentMethod,
       service_name: appointment.service.name,
       promotion_id: '',
       client_id: appointment.clientId,

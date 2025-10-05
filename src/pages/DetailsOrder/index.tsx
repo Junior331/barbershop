@@ -92,31 +92,37 @@ export const DetailsOrder = () => {
                 className={`px-2 py-1 rounded text-sm ${
                   order.status === "confirmed"
                     ? "bg-green-100 text-green-800"
-                    : order.status === "canceled"
+                    : order.status === "cancelled" || order.status === "canceled"
                     ? "bg-red-100 text-red-800"
+                    : order.status === "completed"
+                    ? "bg-blue-100 text-blue-800"
                     : "bg-yellow-100 text-yellow-800"
                 }`}
               >
                 {order.status === "confirmed"
                   ? "Confirmado"
-                  : order.status === "canceled"
+                  : order.status === "cancelled" || order.status === "canceled"
                   ? "Cancelado"
+                  : order.status === "completed"
+                  ? "Concluído"
                   : "Pendente"}
               </span>
             </div>
 
-            <div className="flex gap-2">
-              {order.status === "confirmed" && (
+            <div className="flex gap-2 flex-wrap">
+              {(order.status === "confirmed" || order.status === "pending") && (
                 <>
-                  <button
-                    onClick={() => setIsEditing(!isEditing)}
-                    className="px-4 py-2 bg-blue-500 text-white rounded"
-                  >
-                    {isEditing ? "Cancelar Edição" : "Editar Data"}
-                  </button>
+                  {order.status === "pending" && (
+                    <button
+                      onClick={() => setIsEditing(!isEditing)}
+                      className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors flex-1 min-w-[120px]"
+                    >
+                      {isEditing ? "Cancelar Edição" : "Editar Data"}
+                    </button>
+                  )}
                   <button
                     onClick={handleCancelOrder}
-                    className="px-4 py-2 bg-red-500 text-white rounded"
+                    className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors flex-1 min-w-[120px]"
                   >
                     Cancelar Agendamento
                   </button>
@@ -268,7 +274,21 @@ export const DetailsOrder = () => {
             <h3 className="font-bold mb-3">Informações de Pagamento</h3>
             <div className="space-y-2">
               <div className="flex justify-between">
-                <span>Método:</span>
+                <span>Subtotal:</span>
+                <span className="font-medium">
+                  {formatter({
+                    type: "pt-BR",
+                    currency: "BRL",
+                    style: "currency",
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  }).format(
+                    order.services.reduce((sum, s) => sum + (s.service_price || 0), 0)
+                  )}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span>Método de Pagamento:</span>
                 <span className="font-medium">
                   {order.payment_method === "PIX"
                     ? "PIX"
@@ -279,23 +299,23 @@ export const DetailsOrder = () => {
                     : order.payment_method || "Não especificado"}
                 </span>
               </div>
-              <div className="flex justify-between">
-                <span>Taxa:</span>
-                <span className="font-medium">
-                  {order.discount_amount > 0
-                    ? `-${formatter({
-                        type: "pt-BR",
-                        currency: "BRL",
-                        style: "currency",
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      }).format(order.discount_amount)}`
-                    : "0%"}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span>Total:</span>
-                <span className="font-bold">
+              {order.discount_amount > 0 && (
+                <div className="flex justify-between text-green-600">
+                  <span>Desconto:</span>
+                  <span className="font-medium">
+                    -{formatter({
+                      type: "pt-BR",
+                      currency: "BRL",
+                      style: "currency",
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }).format(order.discount_amount)}
+                  </span>
+                </div>
+              )}
+              <div className="flex justify-between pt-2 border-t border-gray-200">
+                <span className="font-bold">Total:</span>
+                <span className="font-bold text-lg">
                   {formatter({
                     type: "pt-BR",
                     currency: "BRL",
