@@ -21,7 +21,7 @@ import {
   ScheduleImproved,
   PaymentImproved,
 } from "@/pages";
-import { PixPayment } from "@/pages/Payment/PixPayment";
+import { PixPaymentPage } from "@/pages/Payment/PixPaymentPage";
 import { CardPayment } from "@/pages/Payment/CardPayment";
 import { PaymentCallback } from "@/pages/Payment/PaymentCallback";
 import { Loading, ProtectedRoute, RoleBasedRoute } from "@/components/elements";
@@ -54,7 +54,7 @@ export const AppRoutes = () => {
         <Route path="/payment/callback" element={<ProtectedRoute><PaymentCallback /></ProtectedRoute>} />
 
         {/* Checkout Transparente Routes */}
-        <Route path="/payment/pix/:appointmentId" element={<ProtectedRoute><PixPayment /></ProtectedRoute>} />
+        <Route path="/payment/pix/:appointmentId" element={<ProtectedRoute><PixPaymentPage /></ProtectedRoute>} />
         <Route path="/payment/card/:appointmentId" element={<ProtectedRoute><CardPayment /></ProtectedRoute>} />
 
         {/* Rotas do Barbeiro */}

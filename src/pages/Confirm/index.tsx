@@ -52,13 +52,13 @@ export const Confirm = () => {
   const paymentMethods = [
     { id: "PIX", name: "Pix", fee: 0.01, icon: "pix" },
     {
-      id: "DEBIT_CARD",
+      id: "DEBIT",
       name: "Cartão de Débito",
       fee: 0.03,
       icon: "debit_card",
     },
     {
-      id: "CREDIT_CARD",
+      id: "CREDIT",
       name: "Cartão de Crédito",
       fee: 0.084,
       icon: "credit_card",
@@ -145,6 +145,7 @@ export const Confirm = () => {
         scheduledTo: scheduledToISO,
         totalPrice: currentOrder.total ?? 0,
       };
+      console.log('🚀 appointmentData ::', appointmentData);
 
       // Adicionar campos opcionais apenas se tiverem valor
       if (currentOrder.paymentMethod) {

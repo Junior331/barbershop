@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { api, ApiUtils } from './api';
 import { AxiosError } from 'axios';
 import { logger } from '@/utils/logger';

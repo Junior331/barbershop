@@ -1,10 +1,9 @@
-// @ts-nocheck
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
 import { getIcons } from "@/assets/icons";
-import { cn, formatter } from "@/utils/utils";
+import { cn, formatter, getPaymentMethodIcon } from "@/utils/utils";
 import { Layout } from "@/components/templates";
 import { Card, Header } from "@/components/organisms";
 import {
@@ -16,7 +15,9 @@ import {
 } from "@/components/elements";
 
 import { appointmentsService, paymentsService } from "@/services";
-import type { Barber, Service, PaymentMethod } from "@/services";
+import type { Barber, Service } from "@/services";
+
+type PaymentMethod = 'CREDIT' | 'DEBIT' | 'PIX' | 'CASH' | 'WALLET';
 
 interface SelectedService extends Service {
   selectedBarbers?: string[];
@@ -35,10 +36,10 @@ export const PaymentImproved = () => {
 
   const [bookingData, setBookingData] = useState<FinalBookingData | null>(null);
   const [barbers, setBarbers] = useState<Barber[]>([]);
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod>("CREDIT_CARD");
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod>("CREDIT");
   const [paymentMethods] = useState<{ id: PaymentMethod; name: string; icon: string }[]>([
-    { id: "CREDIT_CARD", name: "Cartão de Crédito", icon: "credit_card" },
-    { id: "DEBIT_CARD", name: "Cartão de Débito", icon: "debit_card" },
+    { id: "CREDIT", name: "Cartão de Crédito", icon: "credit_card" },
+    { id: "DEBIT", name: "Cartão de Débito", icon: "debit_card" },
     { id: "PIX", name: "PIX", icon: "pix" },
     { id: "CASH", name: "Dinheiro (na barbearia)", icon: "cash" }
   ]);
@@ -71,10 +72,11 @@ export const PaymentImproved = () => {
             Promise.resolve({
               id,
               name: `Barbeiro ${id.substring(0, 8)}`,
-              avatarUrl: null,
+              avatarUrl: '',
               role: 'Barbeiro',
               averageRating: 4.5,
               totalAppointments: 150,
+              totalReviews: 40,
               barberShop: { name: 'Barbearia Principal' }
             } as Barber)
           )
@@ -104,19 +106,38 @@ export const PaymentImproved = () => {
   };
 
   const handleConfirmPayment = async () => {
+    console.log('🚀 selectedPaymentMethod ::', selectedPaymentMethod);
     if (!bookingData) return;
 
     setProcessing(true);
 
     try {
       // Preparar dados do agendamento
+      // Use first service and barber (backend expects single values)
+      const firstService = bookingData.selectedServices[0];
+      const firstBarberId = bookingData.selectedBarbers[0];
+
+      // Get barberShopId from service
+      const barberShopId = firstService.barberShop?.id;
+
+      if (!barberShopId) {
+        throw new Error('ID da barbearia não encontrado');
+      }
+
+      // Combine date and time into ISO format
+      const startDateTime = new Date(bookingData.selectedDate);
+      const [hours, minutes] = bookingData.selectedTime.split(':').map(Number);
+      startDateTime.setHours(hours, minutes, 0, 0);
+
       const appointmentData = {
-        serviceIds: bookingData.selectedServices.map(s => s.id),
-        barberIds: bookingData.selectedBarbers,
-        scheduledDate: bookingData.selectedDate,
-        scheduledTime: bookingData.selectedTime,
-        paymentMethod: selectedPaymentMethod,
-        totalPrice: bookingData.totalPrice
+        barberId: firstBarberId,
+        serviceId: firstService.id,
+        barberShopId: barberShopId,
+        scheduledTo: startDateTime.toISOString(),
+        totalPrice: bookingData.totalPrice,
+        paymentMethod: selectedPaymentMethod === 'CASH' ? 'WALLET' : selectedPaymentMethod,
+        status: 'PENDING' as const,
+        paymentStatus: 'PENDING' as const,
       };
 
       let appointmentId: string;
@@ -141,66 +162,83 @@ export const PaymentImproved = () => {
       const appointment = await appointmentsService.create(appointmentData);
       appointmentId = appointment.id;
 
-      // Processar pagamento usando Checkout Pro (Mercado Pago Hosted)
+      // 🎯 HYBRID PAYMENT FLOW: PIX in-app, Cards redirect to Mercado Pago
+      console.log('🔍 DEBUG - Selected Payment Method:', selectedPaymentMethod);
+      console.log('🔍 DEBUG - Appointment ID:', appointmentId);
+      console.log('🔍 DEBUG - Is PIX?', selectedPaymentMethod === "PIX");
+      console.log('🔍 DEBUG - Is CARD?', selectedPaymentMethod === "CREDIT" || selectedPaymentMethod === "DEBIT");
+
       if (selectedPaymentMethod === "PIX") {
-        // PIX: Usar Checkout Pro para garantir webhook automático
-        const preference = await paymentsService.createPreference({
+        console.log('✅ Entering PIX payment flow (Checkout Transparente)');
+
+        // ✅ PIX: Checkout Transparente - Show QR Code in our app
+        toast.loading('Gerando código PIX...', { id: 'pix-loading' });
+
+        const pixPayment = await paymentsService.createPixPayment({
           appointmentId: appointmentId,
           amount: bookingData.totalPrice,
-          method: 'PIX',
           description: `Agendamento - ${bookingData.selectedServices.map(s => s.name).join(', ')}`
         });
 
-        console.log('🔗 Preference criada:', preference);
-        console.log('🔗 Payment URL:', preference.paymentUrl);
+        console.log('✅ PIX Payment criado:', pixPayment);
+        console.log('📱 QR Code disponível:', !!pixPayment.qrCodeBase64);
 
-        // Redirecionar para URL do Mercado Pago (Checkout Pro - webhook garantido)
-        if (preference.paymentUrl) {
-          // Limpar localStorage de booking
-          localStorage.removeItem('selectedServices');
-          localStorage.removeItem('bookingData');
-          localStorage.removeItem('finalBookingData');
-
-          toast.success('Redirecionando para pagamento...');
-
-          // Em mobile, redirecionar na mesma aba
-          const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-          if (isMobile) {
-            window.location.href = preference.paymentUrl;
-          } else {
-            window.open(preference.paymentUrl, '_blank');
-            setTimeout(() => {
-              navigate(`/booking-confirmation/${appointmentId}`);
-            }, 1000);
-          }
-          return;
-        } else {
-          console.error('❌ paymentUrl não encontrado:', preference);
-          toast.error('Erro: Link de pagamento não foi gerado. Tente novamente.');
-          setProcessing(false);
-          return;
-        }
-
-      } else if (selectedPaymentMethod === "CREDIT_CARD" || selectedPaymentMethod === "DEBIT_CARD") {
-        // Cartão: Mostrar modal para entrada de dados
-        // Por enquanto, vamos redirecionar para uma tela de entrada de cartão
-        toast.info('Redirecionando para página de pagamento com cartão...');
-
-        // Salvar appointmentId para usar na próxima tela
-        localStorage.setItem('pendingCardPayment', JSON.stringify({
-          appointmentId: appointmentId,
-          amount: bookingData.totalPrice,
-          method: selectedPaymentMethod,
-          description: `Agendamento - ${bookingData.selectedServices.map(s => s.name).join(', ')}`
-        }));
+        toast.success('Código PIX gerado com sucesso!', { id: 'pix-loading' });
 
         // Limpar localStorage de booking
         localStorage.removeItem('selectedServices');
         localStorage.removeItem('bookingData');
         localStorage.removeItem('finalBookingData');
 
-        // Redirecionar para tela de pagamento com cartão
-        navigate(`/payment/card/${appointmentId}`);
+        // Navigate to PIX payment page with QR Code data
+        navigate(`/payment/pix/${appointmentId}`, {
+          state: {
+            paymentId: pixPayment.id,
+            appointmentId: appointmentId,
+            amount: bookingData.totalPrice,
+            qrCode: pixPayment.qrCode,
+            qrCodeBase64: pixPayment.qrCodeBase64,
+            services: bookingData.selectedServices.map(s => s.name).join(', '),
+          }
+        });
+
+      } else if (selectedPaymentMethod === "CREDIT" || selectedPaymentMethod === "DEBIT") {
+        console.log('💳 Entering CARD payment flow (Checkout Pro redirect)');
+
+        // 💳 CARD: Checkout Pro - Redirect to Mercado Pago secure page
+        toast.loading('Preparando pagamento seguro...', { id: 'card-loading' });
+
+        const preference = await paymentsService.createPreference({
+          appointmentId: appointmentId,
+          amount: bookingData.totalPrice,
+          method: selectedPaymentMethod === 'CREDIT' ? 'CREDIT_CARD' : 'DEBIT_CARD',
+          description: `Agendamento - ${bookingData.selectedServices.map(s => s.name).join(', ')}`
+        });
+
+        console.log('🔗 Preference criada:', preference);
+        console.log('🔗 Payment URL:', preference.paymentUrl);
+
+        if (preference.paymentUrl) {
+          toast.success('Redirecionando para pagamento seguro...', { id: 'card-loading' });
+
+          // Limpar localStorage de booking
+          localStorage.removeItem('selectedServices');
+          localStorage.removeItem('bookingData');
+          localStorage.removeItem('finalBookingData');
+
+          // Redirect to Mercado Pago (secure PCI-compliant form)
+          setTimeout(() => {
+            if (preference.paymentUrl) {
+              window.location.href = preference.paymentUrl;
+            }
+          }, 1000);
+          return;
+        } else {
+          console.error('❌ paymentUrl não encontrado:', preference);
+          toast.error('Erro: Link de pagamento não foi gerado. Tente novamente.', { id: 'card-loading' });
+          setProcessing(false);
+          return;
+        }
       }
 
     } catch (error) {
@@ -229,7 +267,7 @@ export const PaymentImproved = () => {
               {/* Data e Horário */}
               <div className="flex items-center gap-3 mb-4 p-3 bg-[#6C8762] bg-opacity-10 rounded-lg">
                 <img
-                  src={getIcons("calendar_outlined_green")}
+                  src={getIcons("calendar_solid_green")}
                   alt="Calendar"
                   className="w-6 h-6"
                 />
@@ -328,7 +366,7 @@ export const PaymentImproved = () => {
                   )}
                 >
                   <img
-                    src={getIcons(method.icon)}
+                    src={getPaymentMethodIcon(method.icon)}
                     alt={method.name}
                     className="w-6 h-6"
                   />
