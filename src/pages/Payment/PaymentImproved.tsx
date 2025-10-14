@@ -17,7 +17,7 @@ import {
 import { appointmentsService, paymentsService } from "@/services";
 import type { Barber, Service } from "@/services";
 
-type PaymentMethod = 'CREDIT_CARD' | 'DEBIT_CARD' | 'PIX' | 'CASH';
+type PaymentMethod = 'CREDIT' | 'DEBIT' | 'PIX' | 'CASH' | 'WALLET';
 
 interface SelectedService extends Service {
   selectedBarbers?: string[];
@@ -36,10 +36,10 @@ export const PaymentImproved = () => {
 
   const [bookingData, setBookingData] = useState<FinalBookingData | null>(null);
   const [barbers, setBarbers] = useState<Barber[]>([]);
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod>("CREDIT_CARD");
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod>("CREDIT");
   const [paymentMethods] = useState<{ id: PaymentMethod; name: string; icon: string }[]>([
-    { id: "CREDIT_CARD", name: "Cartão de Crédito", icon: "credit_card" },
-    { id: "DEBIT_CARD", name: "Cartão de Débito", icon: "debit_card" },
+    { id: "CREDIT", name: "Cartão de Crédito", icon: "credit_card" },
+    { id: "DEBIT", name: "Cartão de Débito", icon: "debit_card" },
     { id: "PIX", name: "PIX", icon: "pix" },
     { id: "CASH", name: "Dinheiro (na barbearia)", icon: "cash" }
   ]);
@@ -106,6 +106,7 @@ export const PaymentImproved = () => {
   };
 
   const handleConfirmPayment = async () => {
+    console.log('🚀 selectedPaymentMethod ::', selectedPaymentMethod);
     if (!bookingData) return;
 
     setProcessing(true);
@@ -117,7 +118,7 @@ export const PaymentImproved = () => {
         barberIds: bookingData.selectedBarbers,
         scheduledDate: bookingData.selectedDate,
         scheduledTime: bookingData.selectedTime,
-        paymentMethod: selectedPaymentMethod,
+        paymentMethod: selectedPaymentMethod === 'CASH' ? 'WALLET' : selectedPaymentMethod,
         totalPrice: bookingData.totalPrice
       };
 
@@ -144,7 +145,14 @@ export const PaymentImproved = () => {
       appointmentId = appointment.id;
 
       // 🎯 HYBRID PAYMENT FLOW: PIX in-app, Cards redirect to Mercado Pago
+      console.log('🔍 DEBUG - Selected Payment Method:', selectedPaymentMethod);
+      console.log('🔍 DEBUG - Appointment ID:', appointmentId);
+      console.log('🔍 DEBUG - Is PIX?', selectedPaymentMethod === "PIX");
+      console.log('🔍 DEBUG - Is CARD?', selectedPaymentMethod === "CREDIT" || selectedPaymentMethod === "DEBIT");
+
       if (selectedPaymentMethod === "PIX") {
+        console.log('✅ Entering PIX payment flow (Checkout Transparente)');
+
         // ✅ PIX: Checkout Transparente - Show QR Code in our app
         toast.loading('Gerando código PIX...', { id: 'pix-loading' });
 
@@ -176,14 +184,16 @@ export const PaymentImproved = () => {
           }
         });
 
-      } else if (selectedPaymentMethod === "CREDIT_CARD" || selectedPaymentMethod === "DEBIT_CARD") {
+      } else if (selectedPaymentMethod === "CREDIT" || selectedPaymentMethod === "DEBIT") {
+        console.log('💳 Entering CARD payment flow (Checkout Pro redirect)');
+
         // 💳 CARD: Checkout Pro - Redirect to Mercado Pago secure page
         toast.loading('Preparando pagamento seguro...', { id: 'card-loading' });
 
         const preference = await paymentsService.createPreference({
           appointmentId: appointmentId,
           amount: bookingData.totalPrice,
-          method: selectedPaymentMethod,
+          method: selectedPaymentMethod === 'CREDIT' ? 'CREDIT_CARD' : 'DEBIT_CARD',
           description: `Agendamento - ${bookingData.selectedServices.map(s => s.name).join(', ')}`
         });
 
