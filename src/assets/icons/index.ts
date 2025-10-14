@@ -47,6 +47,11 @@ import logout from "./logout.svg";
 import shield_done from "./shield_done.svg";
 import notification from "./notification.svg";
 import profile_custom from "./profile_custom.svg";
+import timer from "./timer.svg";
+import copy from "./copy.svg";
+import check from "./check.svg";
+import info from "./info.svg";
+import refresh from "./refresh.svg";
 
 export const icons = {
   pole,
@@ -98,6 +103,11 @@ export const icons = {
   shield_done,
   notification,
   profile_custom,
+  timer,
+  copy,
+  check,
+  info,
+  refresh,
 };
 
 type IIcons = keyof typeof icons;
