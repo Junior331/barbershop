@@ -113,13 +113,31 @@ export const PaymentImproved = () => {
 
     try {
       // Preparar dados do agendamento
+      // Use first service and barber (backend expects single values)
+      const firstService = bookingData.selectedServices[0];
+      const firstBarberId = bookingData.selectedBarbers[0];
+
+      // Get barberShopId from service
+      const barberShopId = firstService.barberShop?.id;
+
+      if (!barberShopId) {
+        throw new Error('ID da barbearia não encontrado');
+      }
+
+      // Combine date and time into ISO format
+      const startDateTime = new Date(bookingData.selectedDate);
+      const [hours, minutes] = bookingData.selectedTime.split(':').map(Number);
+      startDateTime.setHours(hours, minutes, 0, 0);
+
       const appointmentData = {
-        serviceIds: bookingData.selectedServices.map(s => s.id),
-        barberIds: bookingData.selectedBarbers,
-        scheduledDate: bookingData.selectedDate,
-        scheduledTime: bookingData.selectedTime,
+        barberId: firstBarberId,
+        serviceId: firstService.id,
+        barberShopId: barberShopId,
+        scheduledTo: startDateTime.toISOString(),
+        totalPrice: bookingData.totalPrice,
         paymentMethod: selectedPaymentMethod === 'CASH' ? 'WALLET' : selectedPaymentMethod,
-        totalPrice: bookingData.totalPrice
+        status: 'PENDING' as const,
+        paymentStatus: 'PENDING' as const,
       };
 
       let appointmentId: string;
@@ -210,7 +228,9 @@ export const PaymentImproved = () => {
 
           // Redirect to Mercado Pago (secure PCI-compliant form)
           setTimeout(() => {
-            window.location.href = preference.paymentUrl;
+            if (preference.paymentUrl) {
+              window.location.href = preference.paymentUrl;
+            }
           }, 1000);
           return;
         } else {
