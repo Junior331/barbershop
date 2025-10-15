@@ -69,18 +69,30 @@ export const PaymentError = () => {
     setRetrying(true);
 
     try {
-      // Create a new payment preference
-      const paymentResponse = await paymentsService.createPreference({
+      // ✅ Create PIX payment with Checkout Transparente
+      const pixPayment = await paymentsService.createPixPayment({
         appointmentId: appointment.id,
         amount: appointment.totalPrice,
-        method: 'PIX', // Default to PIX, you can make this selectable
+        description: `Reagendamento - Appointment ${appointment.id}`,
+        metadata: {
+          source: 'payment-error-retry',
+        }
       });
 
-      // Redirect to MercadoPago
-      if (paymentResponse.paymentUrl) {
-        window.location.href = paymentResponse.paymentUrl;
+      // Navigate to PIX QR Code page
+      if (pixPayment.qrCode && pixPayment.qrCodeBase64) {
+        navigate(`/payment/pix/${appointment.id}`, {
+          state: {
+            paymentId: pixPayment.id,
+            appointmentId: appointment.id,
+            amount: appointment.totalPrice,
+            qrCode: pixPayment.qrCode,
+            qrCodeBase64: pixPayment.qrCodeBase64,
+            services: 'Reagendamento',
+          }
+        });
       } else {
-        toast.error('URL de pagamento não disponível');
+        toast.error('Erro ao gerar QR Code PIX');
       }
     } catch (error) {
       console.error('Error retrying payment:', error);
