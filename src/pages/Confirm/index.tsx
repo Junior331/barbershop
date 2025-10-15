@@ -168,47 +168,51 @@ export const Confirm = () => {
 
       logger.info('Appointment criado:', createdAppointment);
 
-      // Criar pagamento usando Checkout Pro (PIX = URL do Mercado Pago)
+      // Criar pagamento usando Checkout Transparente (PIX = QR Code in-app)
       if (currentOrder.paymentMethod === 'PIX') {
         try {
-          // PIX: Usar Checkout Pro com redirecionamento
-          const preference = await paymentsService.createPreference({
+          // ✅ PIX: Usar Checkout Transparente - Mostrar QR Code no app
+          const pixPayment = await paymentsService.createPixPayment({
             appointmentId: createdAppointment.id,
-            method: 'PIX',
             amount: currentOrder.total ?? 0,
             description: `Agendamento de ${currentOrder.services.map(s => s.name).join(', ')}`,
+            metadata: {
+              deviceId: 'unknown',
+              source: 'confirm-page',
+            }
           });
 
-          console.log('🔗 Preferência criada:', preference);
-          console.log('🔗 Payment URL:', preference.paymentUrl);
-          logger.info('🔗 Preferência criada:', preference);
-          logger.info('🔗 Payment URL:', preference.paymentUrl);
+          console.log('✅ PIX Payment criado:', pixPayment);
+          console.log('📱 QR Code disponível:', !!pixPayment.qrCodeBase64);
+          logger.info('✅ PIX Payment criado:', pixPayment);
+          logger.info('📱 QR Code disponível:', !!pixPayment.qrCodeBase64);
 
-          // Abrir Mercado Pago
-          if (preference.paymentUrl) {
-            // Limpar pedido antes de redirecionar
+          // Validar que temos QR Code
+          if (pixPayment.qrCode && pixPayment.qrCodeBase64) {
+            // Limpar pedido antes de navegar
             currentOrder.clearOrder();
 
-            toast.success('Redirecionando para pagamento...');
+            toast.success('Código PIX gerado com sucesso!');
 
-            // Em mobile, redirecionar na mesma aba (melhor experiência)
-            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-            if (isMobile) {
-              window.location.href = preference.paymentUrl;
-            } else {
-              window.open(preference.paymentUrl, '_blank');
-              setTimeout(() => {
-                navigate(`/booking-confirmation/${createdAppointment.id}`);
-              }, 1000);
-            }
+            // Navegar para página de QR Code
+            navigate(`/payment/pix/${createdAppointment.id}`, {
+              state: {
+                paymentId: pixPayment.id,
+                appointmentId: createdAppointment.id,
+                amount: currentOrder.total ?? 0,
+                qrCode: pixPayment.qrCode,
+                qrCodeBase64: pixPayment.qrCodeBase64,
+                services: currentOrder.services.map(s => s.name).join(', '),
+              }
+            });
           } else {
-            console.error('❌ paymentUrl não encontrado:', preference);
-            toast.error('Erro: Link de pagamento não gerado. Tente novamente.');
+            console.error('❌ QR Code não gerado:', pixPayment);
+            toast.error('Erro: QR Code PIX não foi gerado. Tente novamente.');
           }
         } catch (error: any) {
-          console.error('❌ Erro ao criar preferência:', error);
-          logger.error('Erro ao criar preferência:', error);
-          toast.error('Erro ao criar pagamento. Tente novamente.');
+          console.error('❌ Erro ao criar pagamento PIX:', error);
+          logger.error('Erro ao criar pagamento PIX:', error);
+          toast.error('Erro ao criar pagamento PIX. Tente novamente.');
           throw error;
         }
       }
