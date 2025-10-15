@@ -38,10 +38,10 @@ export const PaymentImproved = () => {
   const [barbers, setBarbers] = useState<Barber[]>([]);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod>("CREDIT");
   const [paymentMethods] = useState<{ id: PaymentMethod; name: string; icon: string }[]>([
-    { id: "CREDIT", name: "Cartão de Crédito", icon: "credit_card" },
-    { id: "DEBIT", name: "Cartão de Débito", icon: "debit_card" },
-    { id: "PIX", name: "PIX", icon: "pix" },
-    { id: "CASH", name: "Dinheiro (na barbearia)", icon: "cash" }
+    { id: "CREDIT", name: "Cartão de Crédito", icon: "card_credit" },
+    { id: "DEBIT", name: "Cartão de Débito", icon: "card_credit" },
+    { id: "PIX", name: "PIX", icon: "pix_solid" },
+    { id: "CASH", name: "Dinheiro (na barbearia)", icon: "wallet" }
   ]);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
@@ -164,12 +164,15 @@ export const PaymentImproved = () => {
 
       // 🎯 HYBRID PAYMENT FLOW: PIX in-app, Cards redirect to Mercado Pago
       console.log('🔍 DEBUG - Selected Payment Method:', selectedPaymentMethod);
+      console.log('🔍 DEBUG - Payment Method Type:', typeof selectedPaymentMethod);
       console.log('🔍 DEBUG - Appointment ID:', appointmentId);
       console.log('🔍 DEBUG - Is PIX?', selectedPaymentMethod === "PIX");
-      console.log('🔍 DEBUG - Is CARD?', selectedPaymentMethod === "CREDIT" || selectedPaymentMethod === "DEBIT");
+      console.log('🔍 DEBUG - Is CREDIT?', selectedPaymentMethod === "CREDIT");
+      console.log('🔍 DEBUG - Is DEBIT?', selectedPaymentMethod === "DEBIT");
 
       if (selectedPaymentMethod === "PIX") {
         console.log('✅ Entering PIX payment flow (Checkout Transparente)');
+        console.log('📊 Booking data:', bookingData);
 
         // ✅ PIX: Checkout Transparente - Show QR Code in our app
         toast.loading('Gerando código PIX...', { id: 'pix-loading' });

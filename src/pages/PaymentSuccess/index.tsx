@@ -97,7 +97,7 @@ export const PaymentSuccess = () => {
 
   return (
     <Layout>
-      <div className="flex flex-col items-center justify-start min-h-screen p-4 pb-24">
+      <div className="flex flex-col items-center h-screen justify-start min-h-screen p-4 pb-24 overflow-y-auto">
         {/* Success Icon */}
         <div className="w-24 h-24 rounded-full bg-green-100 flex items-center justify-center mb-6 mt-8">
           <img
@@ -177,7 +177,7 @@ export const PaymentSuccess = () => {
               </div>
               {paymentDetails && (
                 <Text className="text-sm text-gray-600 mt-1">
-                  ID do Pagamento: {paymentDetails.id?.substring(0, 8)}...
+                  ID do Pagamento: {paymentDetails.id}
                 </Text>
               )}
             </div>
@@ -222,7 +222,7 @@ export const PaymentSuccess = () => {
         </Card>
 
         {/* Action Buttons */}
-        <div className="w-full max-w-md space-y-3">
+        <div className="flex w-full max-w-md gap-4 flex-col">
           <Button
             type="button"
             className="w-full h-12"
