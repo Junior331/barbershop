@@ -172,6 +172,13 @@ export const PaymentImproved = () => {
       console.log('🔍 DEBUG - Is CREDIT?', selectedPaymentMethod === "CREDIT");
       console.log('🔍 DEBUG - Is DEBIT?', selectedPaymentMethod === "DEBIT");
 
+      // 🚨 ALERT para debug - remover depois
+      if (selectedPaymentMethod === "PIX") {
+        alert('🔵 ENTRANDO NO FLUXO PIX - Vou chamar createPixPayment()');
+      } else if (selectedPaymentMethod === "CREDIT" || selectedPaymentMethod === "DEBIT") {
+        alert('💳 ENTRANDO NO FLUXO CARTÃO - Vou chamar createPreference()');
+      }
+
       if (selectedPaymentMethod === "PIX") {
         console.log('✅ Entering PIX payment flow (Checkout Transparente)');
         console.log('📊 Booking data:', bookingData);
