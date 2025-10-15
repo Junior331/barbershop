@@ -193,6 +193,23 @@ export const PaymentImproved = () => {
 
         console.log('✅ PIX Payment criado:', pixPayment);
         console.log('📱 QR Code disponível:', !!pixPayment.qrCodeBase64);
+        console.log('🔍 QR Code string:', pixPayment.qrCode ? 'SIM' : 'NÃO');
+        console.log('🔍 QR Code Base64:', pixPayment.qrCodeBase64 ? 'SIM' : 'NÃO');
+        console.log('🔍 Payment URL (NÃO DEVE TER):', pixPayment.paymentUrl || 'NENHUMA');
+
+        // Validação crítica: PIX DEVE ter QR Code, NÃO deve ter paymentUrl
+        if (!pixPayment.qrCode || !pixPayment.qrCodeBase64) {
+          console.error('❌ ERRO: PIX payment sem QR Code!', pixPayment);
+          toast.error('Erro ao gerar QR Code PIX. Tente novamente.', { id: 'pix-loading' });
+          setProcessing(false);
+          return;
+        }
+
+        // Se tiver paymentUrl, IGNORAR (não queremos redirect)
+        if (pixPayment.paymentUrl) {
+          console.warn('⚠️ paymentUrl detectado no PIX (será ignorado):', pixPayment.paymentUrl);
+          delete pixPayment.paymentUrl; // Remove para garantir
+        }
 
         toast.success('Código PIX gerado com sucesso!', { id: 'pix-loading' });
 
@@ -202,6 +219,7 @@ export const PaymentImproved = () => {
         localStorage.removeItem('finalBookingData');
 
         // Navigate to PIX payment page with QR Code data
+        console.log('🚀 Navegando para tela de QR Code PIX...');
         navigate(`/payment/pix/${appointmentId}`, {
           state: {
             paymentId: pixPayment.id,
