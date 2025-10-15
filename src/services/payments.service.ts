@@ -64,6 +64,7 @@ export interface CreatePixPaymentData {
   appointmentId: string;
   amount: number;
   description?: string;
+  metadata?: Record<string, any>;
 }
 
 export interface CreateCardPaymentData {
@@ -135,18 +136,25 @@ export const paymentsService = {
    */
   async createPixPayment(data: CreatePixPaymentData): Promise<MercadoPagoPaymentResponse> {
     try {
-      logger.info('Criando pagamento PIX (Checkout Transparente):', {
+      logger.info('🔵 Criando pagamento PIX (Checkout Transparente):', {
         appointmentId: data.appointmentId,
         amount: data.amount,
       });
 
       const response = await api.post('/payments/pix/create', data);
 
-      logger.info('Pagamento PIX criado com sucesso:', {
+      logger.info('✅ Pagamento PIX criado com sucesso:', {
         paymentId: response.data.id,
         qrCodeAvailable: !!response.data.qrCode,
+        qrCodeBase64Available: !!response.data.qrCodeBase64,
+        paymentUrlAvailable: !!response.data.paymentUrl,
         status: response.data.status,
       });
+
+      console.log('📦 RESPONSE COMPLETA DO BACKEND:', response.data);
+      console.log('🔍 qrCode:', response.data.qrCode ? 'SIM (tamanho: ' + response.data.qrCode.length + ')' : 'NÃO');
+      console.log('🔍 qrCodeBase64:', response.data.qrCodeBase64 ? 'SIM (começa com: ' + response.data.qrCodeBase64.substring(0, 30) + '...)' : 'NÃO');
+      console.log('🔍 paymentUrl:', response.data.paymentUrl || 'NÃO');
 
       return response.data;
     } catch (error) {

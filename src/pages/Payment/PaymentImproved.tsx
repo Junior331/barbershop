@@ -16,6 +16,7 @@ import {
 
 import { appointmentsService, paymentsService } from "@/services";
 import type { Barber, Service } from "@/services";
+import { useMercadoPago } from "@/context/MercadoPagoContext";
 
 type PaymentMethod = 'CREDIT' | 'DEBIT' | 'PIX' | 'CASH' | 'WALLET';
 
@@ -33,6 +34,7 @@ interface FinalBookingData {
 
 export const PaymentImproved = () => {
   const navigate = useNavigate();
+  const { deviceId, initialized: mpInitialized } = useMercadoPago();
 
   const [bookingData, setBookingData] = useState<FinalBookingData | null>(null);
   const [barbers, setBarbers] = useState<Barber[]>([]);
@@ -173,6 +175,7 @@ export const PaymentImproved = () => {
       if (selectedPaymentMethod === "PIX") {
         console.log('✅ Entering PIX payment flow (Checkout Transparente)');
         console.log('📊 Booking data:', bookingData);
+        console.log('🔐 Device ID:', deviceId);
 
         // ✅ PIX: Checkout Transparente - Show QR Code in our app
         toast.loading('Gerando código PIX...', { id: 'pix-loading' });
@@ -180,7 +183,12 @@ export const PaymentImproved = () => {
         const pixPayment = await paymentsService.createPixPayment({
           appointmentId: appointmentId,
           amount: bookingData.totalPrice,
-          description: `Agendamento - ${bookingData.selectedServices.map(s => s.name).join(', ')}`
+          description: `Agendamento - ${bookingData.selectedServices.map(s => s.name).join(', ')}`,
+          metadata: {
+            deviceId: deviceId || 'unknown',
+            mpInitialized: mpInitialized,
+            userAgent: navigator.userAgent,
+          }
         });
 
         console.log('✅ PIX Payment criado:', pixPayment);
@@ -207,6 +215,7 @@ export const PaymentImproved = () => {
 
       } else if (selectedPaymentMethod === "CREDIT" || selectedPaymentMethod === "DEBIT") {
         console.log('💳 Entering CARD payment flow (Checkout Pro redirect)');
+        console.log('🔐 Device ID:', deviceId);
 
         // 💳 CARD: Checkout Pro - Redirect to Mercado Pago secure page
         toast.loading('Preparando pagamento seguro...', { id: 'card-loading' });
@@ -215,7 +224,12 @@ export const PaymentImproved = () => {
           appointmentId: appointmentId,
           amount: bookingData.totalPrice,
           method: selectedPaymentMethod === 'CREDIT' ? 'CREDIT_CARD' : 'DEBIT_CARD',
-          description: `Agendamento - ${bookingData.selectedServices.map(s => s.name).join(', ')}`
+          description: `Agendamento - ${bookingData.selectedServices.map(s => s.name).join(', ')}`,
+          metadata: {
+            deviceId: deviceId || 'unknown',
+            mpInitialized: mpInitialized,
+            userAgent: navigator.userAgent,
+          }
         });
 
         console.log('🔗 Preference criada:', preference);
