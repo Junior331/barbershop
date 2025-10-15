@@ -53,9 +53,10 @@ export const PixPaymentPage = () => {
     const checkPaymentStatus = async () => {
       try {
         setCheckingPayment(true);
-        const statusResponse = await paymentsService.checkStatus(state.paymentId);
+        // ✅ Use syncStatusFromGateway to query Mercado Pago directly
+        const statusResponse = await paymentsService.syncStatusFromGateway(state.paymentId);
 
-        console.log('🔍 Payment status checked:', statusResponse.status);
+        console.log('🔍 Payment status synced from Mercado Pago:', statusResponse.status);
 
         if (statusResponse.status === 'COMPLETED') {
           setPaymentStatus('COMPLETED');
