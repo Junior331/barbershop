@@ -113,56 +113,62 @@ export const Home = () => {
               </button>
             </div>
 
-            <div className="space-y-3">
+            <div className="flex gap-2 space-x-3 overflow-x-auto pb-2">
               {loading.appointments ? (
                 <div className="flex items-center justify-center w-full py-8">
                   <Loading />
                 </div>
               ) : hasAppointments ? (
                 data.appointments.slice(0, 5).map((appointment) => (
+                  
                   <div
                     key={appointment.id}
-                    className="bg-white rounded-lg shadow-sm border border-gray-100 p-3 flex items-center space-x-3 cursor-pointer"
-                    onClick={() => navigate(`/appointment/${appointment.id}`)}
+                    className="btn w-full h-auto bg-transparent border-0 shadow-none p-0"
                   >
-                    <div className="w-12 h-12 bg-[#7B9A7C] rounded-full flex items-center justify-center">
-                      <img
-                        src={appointment.service.imageUrl || getServices("haircuts")}
-                        alt={appointment.service.name}
-                        className="w-8 h-8 object-cover rounded-full"
-                        onError={(e) => {
-                          e.currentTarget.src = getServices("haircuts");
-                        }}
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <Title className="text-sm font-bold text-black mb-1">
-                        {appointment.service.name}
-                      </Title>
-                      <Text className="text-xs text-gray-600 mb-1">
-                        {appointment.barber.name}
-                      </Text>
-                      <div className="flex items-center space-x-1">
-                        <img
-                          src={getIcons("location_outlined_green")}
-                          alt="Location"
-                          className="w-3 h-3"
-                        />
-                        <Text className="text-xs text-gray-500">
-                          {appointment.barberShop.name}
-                        </Text>
+                    <Card
+                      style={{
+                        padding: 0,
+                        minHeight: 130,
+                        minWidth: "100%",
+                        overflow: "hidden",
+                      }}
+                    >
+                      <div className="flex items-center w-full h-full px-3 min-h-28 my-auto">
+                        <CircleIcon className="min-w-24 h-24 my-auto overflow-hidden">
+                          <img
+                            alt={appointment.name}
+                            className="w-12 h-12 object-cover rounded-full"
+                            src={appointment.service.imageUrl || getServices("fallback")}
+                          />
+                        </CircleIcon>
+
+                        <div className="flex flex-col justify-start items-start w-full gap-2 flex-grow pl-2">
+                          <p className="w-full text-start text-[#6b7280] inter textarea-lg font-bold leading-[150%] border-b border-gray-100 truncate">
+                            {appointment.service.name}
+                          </p>
+                          <p className="text-[#6b7280] font-roboto textarea-md font-normal leading-none">
+                            {appointment.barber.name}
+
+                          </p>
+                          <p className="flex items-center gap-[1.5px] text-[#6b7280] inter textarea-md font-normal">
+                            <img
+                              alt="Icon location"
+                              src={getIcons("location_outlined_green")}
+                              className="size-4"
+                            />
+                            {appointment.barberShop?.name || ''}
+                          </p>
+                          <p className="flex items-center gap-[1.5px] text-[#6b7280] inter textarea-md font-normal">
+                            <img
+                              alt="Icon location"
+                              src={getIcons("clock_outlined_green")}
+                              className="size-4"
+                            />
+                            {appointment.service.durationMinutes || ''}min
+                          </p>
+                        </div>
                       </div>
-                      <div className="flex items-center space-x-1 mt-1">
-                        <img
-                          src={getIcons("clock_outlined_green")}
-                          alt="Clock"
-                          className="w-3 h-3"
-                        />
-                        <Text className="text-xs text-gray-500">
-                          {appointment.service.durationMinutes}min
-                        </Text>
-                      </div>
-                    </div>
+                    </Card>
                   </div>
                 ))
               ) : (
@@ -257,26 +263,26 @@ export const Home = () => {
               )}
             </div>
           </div>
-        <motion.button
-          className="fixed bottom-20 right-2 flex items-center justify-center border border-white px-6 py-3 font-medium text-white rounded-lg shadow-lg bg-gradient-to-r bg-[#6C8762] focus:outline-none focus:ring-2 focus:ring-offset-2 cursor-pointer z-2"
-          initial={{ boxShadow: "0 0 0 0 rgba(156,163,175, 0.7)" }}
-          animate={{
-            boxShadow: [
-              "0 0 0 0 rgba(156,163,175, 0.7)",
-              "0 0 0 10px rgba(156,163,175, 0)",
-              "0 0 0 0 rgba(156,163,175, 0)",
-            ],
-          }}
-          transition={{
-            duration: 2,
-            ease: "easeOut",
-            repeat: Infinity,
-            repeatType: "loop",
-          }}
-          onClick={() => navigate("/services")}
-        >
-          Agendar
-        </motion.button>
+          <motion.button
+            className="fixed bottom-20 right-2 flex items-center justify-center border border-white px-6 py-3 font-medium text-white rounded-lg shadow-lg bg-gradient-to-r bg-[#6C8762] focus:outline-none focus:ring-2 focus:ring-offset-2 cursor-pointer z-2"
+            initial={{ boxShadow: "0 0 0 0 rgba(156,163,175, 0.7)" }}
+            animate={{
+              boxShadow: [
+                "0 0 0 0 rgba(156,163,175, 0.7)",
+                "0 0 0 10px rgba(156,163,175, 0)",
+                "0 0 0 0 rgba(156,163,175, 0)",
+              ],
+            }}
+            transition={{
+              duration: 2,
+              ease: "easeOut",
+              repeat: Infinity,
+              repeatType: "loop",
+            }}
+            onClick={() => navigate("/services")}
+          >
+            Agendar
+          </motion.button>
         </div>
       </div>
     </Layout>
