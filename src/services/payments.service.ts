@@ -64,6 +64,7 @@ export interface CreatePixPaymentData {
   appointmentId: string;
   amount: number;
   description?: string;
+  metadata?: Record<string, any>;
 }
 
 export interface CreateCardPaymentData {
