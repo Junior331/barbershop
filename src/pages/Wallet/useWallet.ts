@@ -73,30 +73,10 @@ export const useWallet = (userId: string) => {
         throw walletError;
       }
 
-      // ✅ Fetch payment methods from backend
-      const paymentMethodsResponse = await paymentsService.getPaymentMethods(userId);
-      let methods = paymentMethodsResponse || [];
-
-      // Add default payment method if none exist
-      if (methods.length === 0) {
-        const defaultMethod = {
-          method_type: isAndroid() ? "google_pay" : "apple_pay",
-          is_default: true,
-          cardholder_name: "Pagamento Padrão",
-        };
-
-        try {
-          const addedMethod = await paymentsService.addPaymentMethod(userId, defaultMethod);
-          methods = [addedMethod];
-
-          if (!silent) {
-            toast.success("Método de pagamento padrão adicionado");
-          }
-        } catch (addError) {
-          console.error("Error adding default payment method:", addError);
-          // Continue even if adding default method fails
-        }
-      }
+      // TODO: Fetch payment methods from backend when SavedCard endpoints are implemented
+      // For now, use empty array to avoid 404 errors
+      const methods: PaymentMethod[] = [];
+      console.log('⚠️ [Wallet] Payment methods temporarily disabled - SavedCard endpoints not implemented yet');
 
       // ✅ Format transactions from backend
       const formattedTransactions: Transaction[] = (walletData.recentTransactions || []).map(
@@ -188,34 +168,9 @@ export const useWallet = (userId: string) => {
   }, [userId, fetchWalletData]);
 
   const removePaymentMethod = async (methodId: string) => {
-    try {
-      if (!wallet) {
-        toast.error("Carteira não carregada");
-        return;
-      }
-
-      if (!userId) {
-        toast.error("Usuário não identificado");
-        return;
-      }
-
-      // Show loading toast
-      const loadingToast = toast.loading("Removendo método de pagamento...");
-
-      // ✅ Use backend API to remove payment method
-      await paymentsService.deletePaymentMethod(userId, methodId);
-
-      // Dismiss loading toast and show success
-      toast.dismiss(loadingToast);
-      toast.success("Método de pagamento removido com sucesso");
-
-      // Update wallet data after removing payment method - silent refresh
-      await fetchWalletData({ force: true, silent: true });
-    } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : "Erro desconhecido";
-      toast.error(`Erro ao remover método de pagamento: ${errorMsg}`);
-      console.error("Error removing payment method:", err);
-    }
+    // TODO: Implement when SavedCard endpoints are available
+    toast.error("Funcionalidade temporariamente indisponível");
+    console.warn('⚠️ [Wallet] removePaymentMethod: SavedCard endpoints not implemented yet');
   };
 
 
@@ -248,76 +203,10 @@ export const useWallet = (userId: string) => {
       cardholder_name: string;
     }
   ) => {
-    try {
-      if (!wallet) {
-        toast.error("Carteira não carregada. Por favor, tente novamente.");
-        throw new Error("Wallet not loaded");
-      }
-
-      if (!userId) {
-        toast.error("Usuário não identificado");
-        throw new Error("User not identified");
-      }
-
-      // Validação básica para cartão de crédito
-      if (method.method_type === "credit_card") {
-        if (!method.card_number || method.card_number.length < 13) {
-          toast.error("Número do cartão inválido");
-          throw new Error("Número do cartão inválido");
-        }
-        if (!method.expiry_date) {
-          toast.error("Data de expiração inválida");
-          throw new Error("Data de expiração inválida");
-        }
-      }
-
-      // Show loading toast with appropriate message
-      const methodTypeLabel = method.method_type === "credit_card"
-        ? "cartão"
-        : method.method_type === "pix"
-          ? "PIX"
-          : "método de pagamento";
-
-      const loadingToast = toast.loading(`Adicionando ${methodTypeLabel}...`);
-
-      let result;
-      if (method.method_type === "credit_card" && method.card_number) {
-        const lastFour = method.card_number.slice(-4);
-        const brand = detectCardBrand(method.card_number);
-
-        // ✅ Use backend API to add payment method
-        result = await paymentsService.addPaymentMethod(userId, {
-          method_type: "credit_card",
-          card_last_four: lastFour,
-          card_brand: brand,
-          is_default: false,
-          cardholder_name: method.cardholder_name,
-          expiry_date: method.expiry_date,
-        });
-
-        toast.dismiss(loadingToast);
-        toast.success(`Cartão ${brand} terminado em ${lastFour} adicionado com sucesso!`);
-      } else {
-        // ✅ Use backend API for other payment methods
-        result = await paymentsService.addPaymentMethod(userId, {
-          ...method,
-          is_default: false,
-        });
-
-        toast.dismiss(loadingToast);
-        toast.success(`${getPaymentMethodLabel(method.method_type)} adicionado com sucesso!`);
-      }
-
-      // Force refresh after adding payment method - silent refresh
-      await fetchWalletData({ force: true, silent: true });
-      return result;
-    } catch (err) {
-      const errorMsg =
-        err instanceof Error ? err.message : "Erro ao adicionar método";
-      toast.error(errorMsg);
-      console.error("Error adding payment method:", err);
-      throw err; // Re-lança o erro para ser tratado no UI
-    }
+    // TODO: Implement when SavedCard endpoints are available
+    toast.error("Funcionalidade temporariamente indisponível");
+    console.warn('⚠️ [Wallet] addPaymentMethod: SavedCard endpoints not implemented yet');
+    throw new Error("Payment methods not implemented");
   };
 
   const transactions = useMemo(() => wallet?.transactions || [], [wallet]);
