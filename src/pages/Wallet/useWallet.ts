@@ -57,8 +57,21 @@ export const useWallet = (userId: string) => {
       setLoading(true);
       setError(null);
 
+      // Debug: Check authentication
+      const token = document.cookie.split('; ').find(row => row.startsWith('access_token='));
+      console.log('🔍 [Wallet] Auth token exists:', !!token);
+      console.log('🔍 [Wallet] Fetching wallet data for userId:', userId);
+
       // ✅ Fetch wallet data from backend API (auto-creates if not exists)
-      const walletData = await walletService.getWallet();
+      let walletData;
+      try {
+        walletData = await walletService.getWallet();
+        console.log('✅ [Wallet] Wallet data received:', walletData);
+      } catch (walletError: any) {
+        console.error('❌ [Wallet] Failed to fetch wallet:', walletError);
+        console.error('❌ [Wallet] Error response:', walletError.response?.data);
+        throw walletError;
+      }
 
       // ✅ Fetch payment methods from backend
       const paymentMethodsResponse = await paymentsService.getPaymentMethods(userId);
