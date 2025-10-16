@@ -491,4 +491,50 @@ export const paymentsService = {
         return 0;
     }
   },
+
+  // ===== PAYMENT METHODS MANAGEMENT =====
+
+  /**
+   * Get user's saved payment methods
+   */
+  async getPaymentMethods(userId: string): Promise<any[]> {
+    try {
+      logger.info('Fetching payment methods for user:', userId);
+      const response = await api.get(`/users/${userId}/payment-methods`);
+      logger.info(`Found ${response.data.length} payment methods`);
+      return response.data;
+    } catch (error) {
+      ApiUtils.logError(error as AxiosError, 'paymentsService.getPaymentMethods');
+      throw error;
+    }
+  },
+
+  /**
+   * Add a new payment method
+   */
+  async addPaymentMethod(userId: string, paymentMethod: any): Promise<any> {
+    try {
+      logger.info('Adding payment method for user:', userId);
+      const response = await api.post(`/users/${userId}/payment-methods`, paymentMethod);
+      logger.info('Payment method added successfully:', response.data.id);
+      return response.data;
+    } catch (error) {
+      ApiUtils.logError(error as AxiosError, 'paymentsService.addPaymentMethod');
+      throw error;
+    }
+  },
+
+  /**
+   * Delete a payment method
+   */
+  async deletePaymentMethod(userId: string, methodId: string): Promise<void> {
+    try {
+      logger.info('Deleting payment method:', methodId);
+      await api.delete(`/users/${userId}/payment-methods/${methodId}`);
+      logger.info('Payment method deleted successfully');
+    } catch (error) {
+      ApiUtils.logError(error as AxiosError, 'paymentsService.deletePaymentMethod');
+      throw error;
+    }
+  },
 };

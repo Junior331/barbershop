@@ -107,7 +107,8 @@ export const useWallet = (userId: string) => {
           payment_method: "Carteira",
           date: new Date(item.createdAt).toLocaleDateString("pt-BR"),
           amount: item.amount,
-          status: item.status,
+          // Convert backend status (UPPERCASE) to frontend format (lowercase)
+          status: item.status.toLowerCase() as "completed" | "pending" | "failed",
         })
       );
 
