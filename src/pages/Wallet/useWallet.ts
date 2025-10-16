@@ -2,10 +2,7 @@ import { toast } from "react-hot-toast";
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 
 import { walletService } from "@/services/wallet.service";
-import { paymentsService } from "@/services/payments.service";
 import type { WalletTransaction } from "@/services/wallet.service";
-import { isAndroid } from "@/utils/platform";
-import { detectCardBrand } from "@/utils/utils";
 import { WalletData, PaymentMethod, Transaction } from "./@types";
 
 export const useWallet = (userId: string) => {
@@ -167,7 +164,7 @@ export const useWallet = (userId: string) => {
     }
   }, [userId, fetchWalletData]);
 
-  const removePaymentMethod = async (methodId: string) => {
+  const removePaymentMethod = async (_methodId: string) => {
     // TODO: Implement when SavedCard endpoints are available
     toast.error("Funcionalidade temporariamente indisponível");
     console.warn('⚠️ [Wallet] removePaymentMethod: SavedCard endpoints not implemented yet');
@@ -195,7 +192,7 @@ export const useWallet = (userId: string) => {
   };
 
   const addPaymentMethod = async (
-    method: Omit<PaymentMethod, "id" | "created_at" | "is_default"> & {
+    _method: Omit<PaymentMethod, "id" | "created_at" | "is_default"> & {
       cvv?: string;
       method_type: string;
       card_number?: string;
