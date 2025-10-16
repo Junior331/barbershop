@@ -1,7 +1,9 @@
 import { toast } from "react-hot-toast";
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 
-import { supabase } from "@/lib/supabase";
+import { walletService } from "@/services/wallet.service";
+import { paymentsService } from "@/services/payments.service";
+import type { WalletTransaction } from "@/services/wallet.service";
 import { isAndroid } from "@/utils/platform";
 import { detectCardBrand } from "@/utils/utils";
 import { WalletData, PaymentMethod, Transaction } from "./@types";
@@ -33,12 +35,12 @@ export const useWallet = (userId: string) => {
     const { force = false, silent = false } = options || {};
     const now = Date.now();
     const cacheTimeout = 30000; // 30 seconds cache
-    
+
     // Skip if already loading or if cached data is recent (unless forced)
     if (
-      cacheRef.current.isLoading || 
-      (!force && 
-       userId === cacheRef.current.lastUserId && 
+      cacheRef.current.isLoading ||
+      (!force &&
+       userId === cacheRef.current.lastUserId &&
        now - cacheRef.current.lastFetchTime < cacheTimeout)
     ) {
       return true; // Retorna true para indicar que não houve erro
@@ -55,122 +57,42 @@ export const useWallet = (userId: string) => {
       setLoading(true);
       setError(null);
 
-      // Fetch wallet data
-      const { data: walletData, error: walletError } = await supabase
-        .from("wallet")
-        .select("id, balance")
-        .eq("user_id", userId)
-        .single();
+      // ✅ Fetch wallet data from backend API (auto-creates if not exists)
+      const walletData = await walletService.getWallet();
 
-      if (walletError) {
-        // Verificar se é um erro de "não encontrado" - isso pode ser normal para novos usuários
-        if (walletError.code === "PGRST116") {
-          // Não encontrou a carteira - vamos criar uma automaticamente
-          if (!silent) {
-            toast.loading("Criando sua carteira...", { id: "create-wallet" });
-          }
+      // ✅ Fetch payment methods from backend
+      const paymentMethodsResponse = await paymentsService.getPaymentMethods(userId);
+      let methods = paymentMethodsResponse || [];
 
-          try {
-            // Criar nova carteira no Supabase
-            const { data: newWallet, error: createError } = await supabase
-              .from("wallet")
-              .insert([
-                {
-                  user_id: userId,
-                  balance: 0,
-                }
-              ])
-              .select()
-              .single();
-
-            if (createError) throw createError;
-
-            if (!silent) {
-              toast.success("Carteira criada com sucesso!", { id: "create-wallet" });
-            }
-
-            // Recursivamente buscar os dados da carteira recém-criada
-            return await fetchWalletData({ force: true, silent });
-          } catch (createErr) {
-            const errorMsg = createErr instanceof Error ? createErr.message : "Erro ao criar carteira";
-            setError(errorMsg);
-            if (!silent) {
-              toast.error(`Erro ao criar carteira: ${errorMsg}`, { id: "create-wallet" });
-            }
-            return false;
-          }
-        }
-        throw walletError;
-      }
-      
-      if (!walletData) {
-        setError("Carteira não encontrada");
-        if (!silent) {
-          toast.error("Carteira não encontrada");
-        }
-        return false;
-      }
-
-      // Fetch payment methods
-      const { data: paymentMethods, error: methodsError } = await supabase
-        .from("payment_methods")
-        .select("*")
-        .eq("wallet_id", walletData.id);
-
-      if (methodsError) throw methodsError;
-
-      let methods = paymentMethods;
+      // Add default payment method if none exist
       if (methods.length === 0) {
-        const defaultMethod: Omit<PaymentMethod, "id" | "created_at"> = {
+        const defaultMethod = {
           method_type: isAndroid() ? "google_pay" : "apple_pay",
           is_default: true,
+          cardholder_name: "Pagamento Padrão",
         };
 
-        const { data: insertedMethod, error: insertError } = await supabase
-          .from("payment_methods")
-          .insert([
-            {
-              ...defaultMethod,
-              wallet_id: walletData.id,
-            },
-          ])
-          .select();
+        try {
+          const addedMethod = await paymentsService.addPaymentMethod(userId, defaultMethod);
+          methods = [addedMethod];
 
-        if (insertError) throw insertError;
-        methods = insertedMethod;
-        
-        if (!silent) {
-          toast.success("Método de pagamento padrão adicionado");
+          if (!silent) {
+            toast.success("Método de pagamento padrão adicionado");
+          }
+        } catch (addError) {
+          console.error("Error adding default payment method:", addError);
+          // Continue even if adding default method fails
         }
       }
 
-      // Fetch transactions
-      const { data: transactionsData, error: transactionsError } =
-        await supabase
-          .from("transactions")
-          .select(
-            `
-          id,
-          amount,
-          transaction_date,
-          status,
-          services:service_id(name),
-          users:barber_id(name)
-        `
-          )
-          .eq("wallet_id", walletData.id)
-          .order("transaction_date", { ascending: false })
-          .limit(5);
-
-      if (transactionsError) throw transactionsError;
-
-      const formattedTransactions: Transaction[] = transactionsData.map(
-        (item) => ({
+      // ✅ Format transactions from backend
+      const formattedTransactions: Transaction[] = (walletData.recentTransactions || []).map(
+        (item: WalletTransaction) => ({
           id: item.id,
-          service_name: item.services?.[0]?.name || "Serviço não especificado",
-          barber_name: item.users?.[0]?.name || "Barbeiro não especificado",
-          payment_method: "Apple Pay",
-          date: new Date(item.transaction_date).toLocaleDateString("pt-BR"),
+          service_name: item.description || "Transação",
+          barber_name: "", // Backend doesn't return barber info yet
+          payment_method: "Carteira",
+          date: new Date(item.createdAt).toLocaleDateString("pt-BR"),
           amount: item.amount,
           status: item.status,
         })
@@ -186,17 +108,16 @@ export const useWallet = (userId: string) => {
       // Update cache
       cacheRef.current.lastFetchTime = now;
       cacheRef.current.lastUserId = userId;
-      
+
       return true;
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : "Erro desconhecido";
       setError(errorMsg);
-      
+
       if (!silent) {
-        // Usar toast.error apenas se não estiver em modo silencioso
         toast.error(`Erro ao carregar carteira: ${errorMsg}`);
       }
-      
+
       console.error("Error fetching wallet data:", err);
       return false;
     } finally {
@@ -259,20 +180,21 @@ export const useWallet = (userId: string) => {
         return;
       }
 
+      if (!userId) {
+        toast.error("Usuário não identificado");
+        return;
+      }
+
       // Show loading toast
       const loadingToast = toast.loading("Removendo método de pagamento...");
 
-      const { error } = await supabase
-        .from("payment_methods")
-        .delete()
-        .eq("id", methodId);
-
-      if (error) throw error;
+      // ✅ Use backend API to remove payment method
+      await paymentsService.deletePaymentMethod(userId, methodId);
 
       // Dismiss loading toast and show success
       toast.dismiss(loadingToast);
       toast.success("Método de pagamento removido com sucesso");
-      
+
       // Update wallet data after removing payment method - silent refresh
       await fetchWalletData({ force: true, silent: true });
     } catch (err) {
@@ -318,6 +240,11 @@ export const useWallet = (userId: string) => {
         throw new Error("Wallet not loaded");
       }
 
+      if (!userId) {
+        toast.error("Usuário não identificado");
+        throw new Error("User not identified");
+      }
+
       // Validação básica para cartão de crédito
       if (method.method_type === "credit_card") {
         if (!method.card_number || method.card_number.length < 13) {
@@ -331,12 +258,12 @@ export const useWallet = (userId: string) => {
       }
 
       // Show loading toast with appropriate message
-      const methodTypeLabel = method.method_type === "credit_card" 
-        ? "cartão" 
-        : method.method_type === "pix" 
-          ? "PIX" 
+      const methodTypeLabel = method.method_type === "credit_card"
+        ? "cartão"
+        : method.method_type === "pix"
+          ? "PIX"
           : "método de pagamento";
-      
+
       const loadingToast = toast.loading(`Adicionando ${methodTypeLabel}...`);
 
       let result;
@@ -344,41 +271,25 @@ export const useWallet = (userId: string) => {
         const lastFour = method.card_number.slice(-4);
         const brand = detectCardBrand(method.card_number);
 
-        const { data, error } = await supabase
-          .from("payment_methods")
-          .insert([
-            {
-              wallet_id: wallet.id,
-              method_type: "credit_card",
-              card_last_four: lastFour,
-              card_brand: brand,
-              is_default: false,
-              cardholder_name: method.cardholder_name,
-              expiry_date: method.expiry_date,
-            },
-          ])
-          .select();
+        // ✅ Use backend API to add payment method
+        result = await paymentsService.addPaymentMethod(userId, {
+          method_type: "credit_card",
+          card_last_four: lastFour,
+          card_brand: brand,
+          is_default: false,
+          cardholder_name: method.cardholder_name,
+          expiry_date: method.expiry_date,
+        });
 
-        if (error) throw error;
-
-        result = data[0];
         toast.dismiss(loadingToast);
         toast.success(`Cartão ${brand} terminado em ${lastFour} adicionado com sucesso!`);
       } else {
-        const { data, error } = await supabase
-          .from("payment_methods")
-          .insert([
-            {
-              wallet_id: wallet.id,
-              ...method,
-              is_default: false,
-            },
-          ])
-          .select();
+        // ✅ Use backend API for other payment methods
+        result = await paymentsService.addPaymentMethod(userId, {
+          ...method,
+          is_default: false,
+        });
 
-        if (error) throw error;
-
-        result = data[0];
         toast.dismiss(loadingToast);
         toast.success(`${getPaymentMethodLabel(method.method_type)} adicionado com sucesso!`);
       }

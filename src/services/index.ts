@@ -10,3 +10,5 @@ export { paymentsService } from './payments.service';
 export type { Payment, PaymentMethod } from './payments.service';
 export { workingHoursService } from './working-hours.service';
 export type { WorkingHour, AvailableTimeSlot, AvailableSlotsResponse, CreateWorkingHourData, AvailableTimesParams } from './working-hours.service';
+export { walletService } from './wallet.service';
+export type { Wallet, WalletTransaction, PaginatedTransactions } from './wallet.service';

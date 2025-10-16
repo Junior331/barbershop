@@ -39,15 +39,23 @@ interface MercadoPagoProviderProps {
 
 export const MercadoPagoProvider: React.FC<MercadoPagoProviderProps> = ({
   children,
-  publicKey = import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY || 'TEST-your-public-key',
+  publicKey = import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY,
 }) => {
   const [mp, setMp] = useState<any>(null);
   const [deviceId, setDeviceId] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
+    // ✅ Don't initialize if public key is missing or placeholder
+    if (!publicKey || publicKey === 'TEST-placeholder' || publicKey.includes('placeholder')) {
+      logger.warn('⚠️ MercadoPago public key not configured. Card payments will not work.');
+      setIsLoading(false);
+      setError('MercadoPago não configurado');
+      return;
+    }
+
     const initializeMercadoPago = async () => {
       try {
         setIsLoading(true);
