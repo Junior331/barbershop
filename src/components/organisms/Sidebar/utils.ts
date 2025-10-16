@@ -8,13 +8,13 @@ export const routes = [
     icon: getIcons("home"),
     icon_active: getIcons("home_active"),
   },
-  {
-    id: 2,
-    name: "Wallet",
-    path: "/wallet",
-    icon: getIcons("wallet"),
-    icon_active: getIcons("wallet_active"),
-  },
+  // {
+  //   id: 2,
+  //   name: "Wallet",
+  //   path: "/wallet",
+  //   icon: getIcons("wallet"),
+  //   icon_active: getIcons("wallet_active"),
+  // },
   {
     id: 3,
     name: "My Bookings",
