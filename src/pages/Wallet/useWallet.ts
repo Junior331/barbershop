@@ -65,16 +65,40 @@ export const useWallet = (userId: string) => {
       if (walletError) {
         // Verificar se é um erro de "não encontrado" - isso pode ser normal para novos usuários
         if (walletError.code === "PGRST116") {
-          // Não encontrou a carteira - pode ser um novo usuário
-          // Podemos criar uma carteira aqui ou tratar de outra forma
+          // Não encontrou a carteira - vamos criar uma automaticamente
           if (!silent) {
-            toast.loading("Criando nova carteira para você...");
+            toast.loading("Criando sua carteira...", { id: "create-wallet" });
           }
-          
-          // Aqui você poderia implementar a lógica para criar uma nova carteira
-          // Por enquanto, apenas retornamos false para indicar que não foi bem-sucedido
-          setError("Carteira não encontrada. Por favor, tente novamente mais tarde.");
-          return false;
+
+          try {
+            // Criar nova carteira no Supabase
+            const { data: newWallet, error: createError } = await supabase
+              .from("wallet")
+              .insert([
+                {
+                  user_id: userId,
+                  balance: 0,
+                }
+              ])
+              .select()
+              .single();
+
+            if (createError) throw createError;
+
+            if (!silent) {
+              toast.success("Carteira criada com sucesso!", { id: "create-wallet" });
+            }
+
+            // Recursivamente buscar os dados da carteira recém-criada
+            return await fetchWalletData({ force: true, silent });
+          } catch (createErr) {
+            const errorMsg = createErr instanceof Error ? createErr.message : "Erro ao criar carteira";
+            setError(errorMsg);
+            if (!silent) {
+              toast.error(`Erro ao criar carteira: ${errorMsg}`, { id: "create-wallet" });
+            }
+            return false;
+          }
         }
         throw walletError;
       }
