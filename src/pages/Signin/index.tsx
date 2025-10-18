@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 import { useSignin } from "./useSignin";
 import { getIcons } from "@/assets/icons";
@@ -46,12 +46,12 @@ export const Signin = () => {
             <label className="text-[#6E6B7B] text-base font-normal leading-[18px]">
               Senha
             </label>
-            <button
-              type="button"
+            <Link
+              to="/reset-password"
               className="btn btn-link border-none no-underline text-[#7367f0]"
             >
               Recuperação de senha?
-            </button>
+            </Link>
           </div>
           <div className="flex items-center justify-between w-full h-[48px] px-[10px]  rounded-[5px] border border-[#D8D6DE]">
             <input

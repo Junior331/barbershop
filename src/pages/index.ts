@@ -16,6 +16,7 @@ import { PaymentError } from "./PaymentError";
 import { PaymentPending } from "./PaymentPending";
 import { ScheduleImproved } from "./Schedule/ScheduleImproved";
 import { PaymentImproved } from "./Payment/PaymentImproved";
+import { ResetPassword } from "./ResetPassword";
 
 export {
   Home,
@@ -36,4 +37,5 @@ export {
   PaymentPending,
   ScheduleImproved,
   PaymentImproved,
+  ResetPassword,
 };

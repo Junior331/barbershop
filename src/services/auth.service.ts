@@ -252,3 +252,32 @@ export const authService = {
     return undefined;
   }
 };
+
+// Interface para reset password
+export interface ResetPasswordData {
+  email: string;
+  newPassword: string;
+}
+
+export interface ResetPasswordResponse {
+  message: string;
+  user: User;
+}
+
+// Adicionar método de reset password
+export const resetPasswordService = {
+  async resetPassword(data: ResetPasswordData): Promise<ResetPasswordResponse> {
+    try {
+      logger.info('Iniciando reset de senha:', { email: data.email });
+
+      const response = await api.post('/auth/reset-password', data);
+
+      logger.info('Reset de senha realizado com sucesso');
+
+      return response.data;
+    } catch (error) {
+      ApiUtils.logError(error as AxiosError, 'resetPasswordService.resetPassword');
+      throw authService.formatAuthError(error as AxiosError);
+    }
+  }
+};

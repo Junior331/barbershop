@@ -20,6 +20,7 @@ import {
   PaymentPending,
   ScheduleImproved,
   PaymentImproved,
+  ResetPassword,
 } from "@/pages";
 import { PixPaymentPage } from "@/pages/Payment/PixPaymentPage";
 import { CardPayment } from "@/pages/Payment/CardPayment";
@@ -33,6 +34,7 @@ export const AppRoutes = () => {
         <Route index element={<RoleBasedRoute allowedRoles={['CLIENT']}><Home /></RoleBasedRoute>} />
         <Route path="/signin" element={<Signin />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/wallet" element={<ProtectedRoute><Wallet /></ProtectedRoute>} />
         <Route path="/barbers" element={<ProtectedRoute><Barbers /></ProtectedRoute>} />
         <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
