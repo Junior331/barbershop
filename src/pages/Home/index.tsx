@@ -120,7 +120,6 @@ export const Home = () => {
                 </div>
               ) : hasAppointments ? (
                 data.appointments.slice(0, 5).map((appointment) => (
-                  
                   <div
                     key={appointment.id}
                     className="btn w-full h-auto bg-transparent border-0 shadow-none p-0"
@@ -136,9 +135,12 @@ export const Home = () => {
                       <div className="flex items-center w-full h-full px-3 min-h-28 my-auto">
                         <CircleIcon className="min-w-24 h-24 my-auto overflow-hidden">
                           <img
-                            alt={appointment.name}
-                            className="w-12 h-12 object-cover rounded-full"
-                            src={appointment.service.imageUrl || getServices("fallback")}
+                            alt={appointment.service?.name || 'Serviço'}
+                            className="w-[calc(100%-15px)] h-[calc(100%-15px)] object-cover"
+                            src={appointment.service?.imageUrl || getServices("fallback")}
+                            onError={(e) => {
+                              e.currentTarget.src = getServices("fallback");
+                            }}
                           />
                         </CircleIcon>
 

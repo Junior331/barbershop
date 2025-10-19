@@ -5,7 +5,7 @@ import toast from "react-hot-toast";
 import { getIcons } from "@/assets/icons";
 import { cn, formatter, getPaymentMethodIcon } from "@/utils/utils";
 import { Layout } from "@/components/templates";
-import { Card, Header } from "@/components/organisms";
+import { Card, Header, AddCardModal } from "@/components/organisms";
 import {
   Text,
   Title,
@@ -17,8 +17,19 @@ import {
 import { appointmentsService, paymentsService } from "@/services";
 import type { Barber, Service } from "@/services";
 import { useMercadoPago } from "@/context/MercadoPagoContext";
+import { useAuth } from "@/context/AuthContext";
 
 type PaymentMethod = 'CREDIT' | 'DEBIT' | 'PIX' | 'CASH' | 'WALLET';
+
+interface SavedCard {
+  id: string;
+  last4: string;
+  brand: string;
+  expiryMonth: string;
+  expiryYear: string;
+  cardholderName: string;
+  isDefault?: boolean;
+}
 
 interface SelectedService extends Service {
   selectedBarbers?: string[];
@@ -34,6 +45,7 @@ interface FinalBookingData {
 
 export const PaymentImproved = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { deviceId, initialized: mpInitialized } = useMercadoPago();
 
   const [bookingData, setBookingData] = useState<FinalBookingData | null>(null);
@@ -47,6 +59,40 @@ export const PaymentImproved = () => {
   ]);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
+
+  // Cartões salvos
+  const [savedCards, setSavedCards] = useState<SavedCard[]>([]);
+  const [selectedCard, setSelectedCard] = useState<string | null>(null);
+  const [loadingCards, setLoadingCards] = useState(false);
+  const [showAddCardModal, setShowAddCardModal] = useState(false);
+
+  // Carregar cartões salvos quando selecionar crédito ou débito
+  const loadSavedCards = async () => {
+    if (!user?.sub) {
+      console.log('❌ User não está logado, não pode carregar cartões');
+      return;
+    }
+
+    console.log('🔄 Carregando cartões salvos para user:', user.sub);
+    setLoadingCards(true);
+    try {
+      const cards = await paymentsService.getPaymentMethods(user.sub);
+      console.log('✅ Cartões carregados:', cards);
+      setSavedCards(cards);
+
+      // Selecionar cartão padrão automaticamente
+      const defaultCard = cards.find((card: SavedCard) => card.isDefault);
+      if (defaultCard) {
+        setSelectedCard(defaultCard.id);
+        console.log('✅ Cartão padrão selecionado:', defaultCard.id);
+      }
+    } catch (error) {
+      console.error('❌ Erro ao carregar cartões:', error);
+      toast.error('Erro ao carregar cartões salvos');
+    } finally {
+      setLoadingCards(false);
+    }
+  };
 
   useEffect(() => {
     const loadBookingData = () => {
@@ -94,10 +140,40 @@ export const PaymentImproved = () => {
 
     loadBookingData();
     loadBarbers();
-  }, [navigate]);
+
+    // Carregar cartões se CREDIT está selecionado por padrão
+    console.log('🔄 useEffect - Verificando se deve carregar cartões');
+    console.log('selectedPaymentMethod:', selectedPaymentMethod);
+    console.log('user:', user);
+
+    if (selectedPaymentMethod === 'CREDIT' || selectedPaymentMethod === 'DEBIT') {
+      console.log('✅ Método de pagamento é cartão, carregando cartões...');
+      loadSavedCards();
+    }
+  }, [navigate, user]);
 
   const handlePaymentMethodSelect = (method: PaymentMethod) => {
     setSelectedPaymentMethod(method);
+
+    // Carregar cartões salvos quando selecionar crédito ou débito
+    if ((method === 'CREDIT' || method === 'DEBIT') && savedCards.length === 0) {
+      loadSavedCards();
+    }
+  };
+
+  const handleAddCard = async (cardData: any) => {
+    if (!user?.sub) return;
+
+    try {
+      await paymentsService.addPaymentMethod(user.sub, cardData);
+      toast.success('Cartão adicionado com sucesso!');
+      await loadSavedCards(); // Recarregar lista
+      setShowAddCardModal(false);
+    } catch (error) {
+      console.error('Erro ao adicionar cartão:', error);
+      toast.error('Erro ao adicionar cartão');
+      throw error;
+    }
   };
 
   const calculateDuration = () => {
@@ -110,6 +186,12 @@ export const PaymentImproved = () => {
   const handleConfirmPayment = async () => {
     console.log('🚀 selectedPaymentMethod ::', selectedPaymentMethod);
     if (!bookingData) return;
+
+    // ✅ VALIDAR ANTES de criar agendamento
+    if ((selectedPaymentMethod === 'CREDIT' || selectedPaymentMethod === 'DEBIT') && !selectedCard) {
+      toast.error('Por favor, selecione um cartão ou adicione um novo');
+      return;
+    }
 
     setProcessing(true);
 
@@ -239,45 +321,48 @@ export const PaymentImproved = () => {
         });
 
       } else if (selectedPaymentMethod === "CREDIT" || selectedPaymentMethod === "DEBIT") {
-        console.log('💳 Entering CARD payment flow (Checkout Pro redirect)');
+        console.log('💳 Entering CARD payment flow');
         console.log('🔐 Device ID:', deviceId);
+        console.log('🃏 Selected Card:', selectedCard);
 
-        // 💳 CARD: Checkout Pro - Redirect to Mercado Pago secure page
-        toast.loading('Preparando pagamento seguro...', { id: 'card-loading' });
+        // 💳 CARD: Usar cartão salvo para pagamento
+        toast.loading('Processando pagamento...', { id: 'card-loading' });
 
-        const preference = await paymentsService.createPreference({
-          appointmentId: appointmentId,
-          amount: bookingData.totalPrice,
-          method: selectedPaymentMethod === 'CREDIT' ? 'CREDIT_CARD' : 'DEBIT_CARD',
-          description: `Agendamento - ${bookingData.selectedServices.map(s => s.name).join(', ')}`,
-          metadata: {
-            deviceId: deviceId || 'unknown',
-            mpInitialized: mpInitialized,
-            userAgent: navigator.userAgent,
+        try {
+          const cardPayment = await paymentsService.createCardPayment({
+            appointmentId: appointmentId,
+            amount: bookingData.totalPrice,
+            cardToken: selectedCard, // Usar o ID do cartão salvo como token
+            description: `Agendamento - ${bookingData.selectedServices.map(s => s.name).join(', ')}`,
+            installments: 1,
+          });
+
+          console.log('✅ Pagamento com cartão processado:', cardPayment);
+
+          if (cardPayment.status === 'approved' || cardPayment.status === 'paid') {
+            toast.success('Pagamento aprovado!', { id: 'card-loading' });
+
+            // Limpar localStorage de booking
+            localStorage.removeItem('selectedServices');
+            localStorage.removeItem('bookingData');
+            localStorage.removeItem('finalBookingData');
+
+            navigate(`/booking-confirmation/${appointmentId}`);
+          } else if (cardPayment.status === 'pending') {
+            toast.info('Pagamento em análise. Aguarde a confirmação.', { id: 'card-loading' });
+
+            // Limpar localStorage de booking
+            localStorage.removeItem('selectedServices');
+            localStorage.removeItem('bookingData');
+            localStorage.removeItem('finalBookingData');
+
+            navigate(`/payment-pending/${appointmentId}`);
+          } else {
+            throw new Error('Pagamento não aprovado');
           }
-        });
-
-        console.log('🔗 Preference criada:', preference);
-        console.log('🔗 Payment URL:', preference.paymentUrl);
-
-        if (preference.paymentUrl) {
-          toast.success('Redirecionando para pagamento seguro...', { id: 'card-loading' });
-
-          // Limpar localStorage de booking
-          localStorage.removeItem('selectedServices');
-          localStorage.removeItem('bookingData');
-          localStorage.removeItem('finalBookingData');
-
-          // Redirect to Mercado Pago (secure PCI-compliant form)
-          setTimeout(() => {
-            if (preference.paymentUrl) {
-              window.location.href = preference.paymentUrl;
-            }
-          }, 1000);
-          return;
-        } else {
-          console.error('❌ paymentUrl não encontrado:', preference);
-          toast.error('Erro: Link de pagamento não foi gerado. Tente novamente.', { id: 'card-loading' });
+        } catch (error: any) {
+          console.error('❌ Erro no pagamento com cartão:', error);
+          toast.error(error.response?.data?.message || 'Erro ao processar pagamento. Tente novamente.', { id: 'card-loading' });
           setProcessing(false);
           return;
         }
@@ -432,6 +517,98 @@ export const PaymentImproved = () => {
               ))}
             </div>
           </div>
+
+          {/* Cartões Salvos (mostrar apenas quando crédito ou débito estiver selecionado) */}
+          {(selectedPaymentMethod === 'CREDIT' || selectedPaymentMethod === 'DEBIT') && (
+            <div className="w-full">
+              <div className="flex items-center justify-between mb-3">
+                <Title>Selecione um cartão:</Title>
+                <button
+                  onClick={() => setShowAddCardModal(true)}
+                  className="flex items-center gap-2 text-[#6C8762] font-medium text-sm hover:underline"
+                >
+                  <img src={getIcons("card_add")} alt="Adicionar" className="w-5 h-5" />
+                  Adicionar cartão
+                </button>
+              </div>
+
+              {loadingCards ? (
+                <div className="flex justify-center py-4">
+                  <div className="loading loading-spinner loading-md"></div>
+                </div>
+              ) : savedCards.length > 0 ? (
+                <div className="space-y-2">
+                  {savedCards.map((card) => (
+                    <button
+                      key={card.id}
+                      onClick={() => setSelectedCard(card.id)}
+                      className={cn(
+                        "w-full p-4 rounded-lg border text-left transition-colors",
+                        selectedCard === card.id
+                          ? "bg-[#6C8762] bg-opacity-10 border-[#6C8762]"
+                          : "bg-white border-gray-300 hover:border-[#6C8762]"
+                      )}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <img
+                            src={getPaymentMethodIcon("card_credit")}
+                            alt="Cartão"
+                            className="w-8 h-8"
+                          />
+                          <div>
+                            <Text className="font-medium">
+                              {card.brand} •••• {card.last4}
+                            </Text>
+                            <Text className="text-sm text-gray-600">
+                              {card.cardholderName}
+                            </Text>
+                            <Text className="text-xs text-gray-500">
+                              Validade: {card.expiryMonth}/{card.expiryYear}
+                            </Text>
+                          </div>
+                        </div>
+                        <input
+                          type="radio"
+                          checked={selectedCard === card.id}
+                          readOnly
+                          className="radio radio-success"
+                        />
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <Card className="w-full p-6">
+                  <div className="text-center">
+                    <img
+                      src={getIcons("card_add")}
+                      alt="Sem cartões"
+                      className="w-16 h-16 mx-auto mb-3 opacity-50"
+                    />
+                    <Text className="text-gray-600 mb-3">
+                      Você ainda não tem cartões salvos
+                    </Text>
+                    <button
+                      onClick={() => setShowAddCardModal(true)}
+                      className="px-4 py-2 bg-[#6C8762] text-white rounded-lg text-sm font-medium hover:bg-[#5a6f52]"
+                    >
+                      Adicionar primeiro cartão
+                    </button>
+                  </div>
+                </Card>
+              )}
+            </div>
+          )}
+
+          {/* Modal para adicionar cartão */}
+          {showAddCardModal && (
+            <AddCardModal
+              isOpen={showAddCardModal}
+              onClose={() => setShowAddCardModal(false)}
+              addPaymentMethod={handleAddCard}
+            />
+          )}
 
           {/* Informações importantes */}
           <div className="w-full bg-yellow-50 border border-yellow-200 rounded-lg p-4">

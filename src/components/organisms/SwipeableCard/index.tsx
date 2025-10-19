@@ -172,8 +172,8 @@ export const ServiceIcons = ({ services }: { services: any }) => {
   return (
     <div className="flex items-center w-full mb-2">
       {displayedServices.map((service: any, index: Key | null | undefined) => {
-        // Prioridade: 1) URL do backend, 2) Match por nome, 3) Fallback
-        const imageUrl = service.service_icon || getServiceIconByName(service.service_name);
+        // Prioridade: 1) service_image_url (URL completa), 2) service_icon, 3) Match por nome, 4) Fallback
+        const imageUrl = service.service_image_url || service.service_icon || getServiceIconByName(service.service_name);
 
         return (
           <div key={index} className="-ml-4 first:ml-0">
@@ -183,7 +183,6 @@ export const ServiceIcons = ({ services }: { services: any }) => {
                 src={imageUrl}
                 className="w-[calc(100%-15px)] h-[calc(100%-15px)] object-cover"
                 onError={(e) => {
-                  console.error('❌ Erro ao carregar imagem:', imageUrl, 'para serviço:', service.service_name);
                   e.currentTarget.src = getServices("fallback");
                 }}
               />

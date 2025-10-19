@@ -24,7 +24,7 @@ export const AddCardModal = ({
   ];
 
   return (
-    <dialog open={isOpen} className="modal z-50">
+    <dialog open={isOpen} className="modal z-[9999]">
       <div className="modal-box bg-white w-full max-w-11/12 md:max-w-md">
         <button
           onClick={onClose}

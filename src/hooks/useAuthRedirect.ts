@@ -19,14 +19,17 @@ export const useAuthRedirect = () => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
+      const currentPath = window.location.pathname;
+      const isCurrentPublic = PUBLIC_ROUTES.some((route) => currentPath.startsWith(route));
+
       if (session) {
-        if (isPublicRoute) {
-          navigate("/");
+        if (isCurrentPublic) {
+          navigate("/", { replace: true });
         }
       } else {
         setAuth(null);
-        if (!isPublicRoute) {
-          navigate("/signin");
+        if (!isCurrentPublic) {
+          navigate("/signin", { replace: true });
         }
       }
       setIsLoading(false);
@@ -34,7 +37,7 @@ export const useAuthRedirect = () => {
 
     return () => subscription.unsubscribe();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pathname]);
+  }, []);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -48,8 +51,11 @@ export const useAuthRedirect = () => {
 
       setAuth(customUser);
 
-      if (!data.session && !isPublicRoute) {
-        navigate("/signin");
+      const currentPath = window.location.pathname;
+      const isCurrentPublic = PUBLIC_ROUTES.some((route) => currentPath.startsWith(route));
+
+      if (!data.session && !isCurrentPublic) {
+        navigate("/signin", { replace: true });
       }
       setIsLoading(false);
     };

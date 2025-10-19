@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { getIcons } from "@/assets/icons";
-import { Header } from "@/components/organisms";
+import { Header, AddCardModal } from "@/components/organisms";
 import { Layout } from "@/components/templates";
 import { useOrder } from "@/store/useOrderStore";
 import {
@@ -13,11 +13,22 @@ import {
   formatPercentage,
   formatCustomDateTime,
   getPaymentMethodIcon,
+  cn,
 } from "@/utils/utils";
 import { useAuth } from "@/context/AuthContext";
 import { CircleIcon, Loading, Text, Title } from "@/components/elements";
 import { appointmentsService, paymentsService } from "@/services";
 import { logger } from "@/utils/logger";
+
+interface SavedCard {
+  id: string;
+  last4: string;
+  brand: string;
+  expiryMonth: string;
+  expiryYear: string;
+  cardholderName: string;
+  isDefault?: boolean;
+}
 
 export const Confirm = () => {
   const { user } = useAuth();
@@ -28,11 +39,94 @@ export const Confirm = () => {
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isPromoModalOpen, setIsPromoModalOpen] = useState(false);
 
+  // Estados para cartões salvos
+  const [savedCards, setSavedCards] = useState<SavedCard[]>([]);
+  const [selectedCard, setSelectedCard] = useState<string | null>(null);
+  const [loadingCards, setLoadingCards] = useState(false);
+  const [showAddCardModal, setShowAddCardModal] = useState(false);
+
   // Calcular totais quando os serviços mudam
   useEffect(() => {
     currentOrder.calculateTotals();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentOrder.services, currentOrder.promotionCode]);
+
+  // Carregar cartões salvos quando selecionar crédito ou débito
+  const loadSavedCards = async () => {
+    if (!user?.id) {
+      console.log('❌ User não está logado, não pode carregar cartões');
+      return;
+    }
+
+    console.log('🔄 Carregando cartões salvos para user:', user.id);
+    setLoadingCards(true);
+    try {
+      const cards = await paymentsService.getPaymentMethods(user.id);
+      console.log('✅ Cartões carregados do backend:', cards);
+      console.log('✅ Quantidade de cartões:', cards.length);
+      setSavedCards(cards);
+
+      // Selecionar cartão padrão automaticamente
+      const defaultCard = cards.find((card: SavedCard) => card.isDefault);
+      if (defaultCard) {
+        setSelectedCard(defaultCard.id);
+        console.log('✅ Cartão padrão selecionado:', defaultCard.id);
+      } else {
+        console.log('ℹ️ Nenhum cartão padrão encontrado');
+      }
+    } catch (error: any) {
+      console.error('❌ Erro ao carregar cartões:', error);
+      console.error('❌ Resposta do servidor:', error.response?.data);
+      toast.error('Erro ao carregar cartões salvos');
+    } finally {
+      setLoadingCards(false);
+    }
+  };
+
+  const handleAddCard = async (cardData: any) => {
+    if (!user?.id) {
+      console.error('❌ User não está logado');
+      return;
+    }
+
+    console.log('🔵 Iniciando adição de cartão:', cardData);
+    console.log('🔵 User ID:', user.id);
+
+    try {
+      const result = await paymentsService.addPaymentMethod(user.id, cardData);
+      console.log('✅ Cartão adicionado no backend:', result);
+
+      toast.success('Cartão adicionado com sucesso!');
+
+      console.log('🔄 Recarregando lista de cartões...');
+      await loadSavedCards(); // Recarregar lista
+
+      setShowAddCardModal(false);
+      setIsPaymentModalOpen(true); // Reabrir modal de pagamento
+    } catch (error: any) {
+      console.error('❌ Erro ao adicionar cartão:', error);
+      console.error('❌ Resposta do servidor:', error.response?.data);
+      toast.error(error.response?.data?.message || 'Erro ao adicionar cartão');
+      throw error;
+    }
+  };
+
+  const handleOpenAddCardModal = () => {
+    setIsPaymentModalOpen(false); // Fechar modal de pagamento
+    setShowAddCardModal(true); // Abrir modal de adicionar cartão
+  };
+
+  const handleCloseAddCardModal = () => {
+    setShowAddCardModal(false);
+    setIsPaymentModalOpen(true); // Reabrir modal de pagamento
+  };
+
+  // Carregar cartões quando o método de pagamento mudar para CREDIT ou DEBIT
+  useEffect(() => {
+    if ((currentOrder.paymentMethod === 'CREDIT' || currentOrder.paymentMethod === 'DEBIT') && savedCards.length === 0) {
+      loadSavedCards();
+    }
+  }, [currentOrder.paymentMethod]);
 
   const handleDeleteService = (serviceId: string) => {
     currentOrder.toggleService({
@@ -84,6 +178,12 @@ export const Confirm = () => {
   };
 
   const handleConfirmAppointment = async () => {
+    // ✅ VALIDAR CARTÃO ANTES de processar
+    if ((currentOrder.paymentMethod === 'CREDIT' || currentOrder.paymentMethod === 'DEBIT') && !selectedCard) {
+      toast.error('Por favor, selecione um cartão ou adicione um novo');
+      return;
+    }
+
     setLoading(true);
     try {
       if (!user) {
@@ -216,23 +316,39 @@ export const Confirm = () => {
           throw error;
         }
       }
-      // Cartão: Salvar dados e redirecionar para página de cartão
-      else if (currentOrder.paymentMethod === 'CREDIT_CARD' || currentOrder.paymentMethod === 'DEBIT_CARD') {
-        // Salvar dados do pagamento pendente
-        localStorage.setItem('pendingCardPayment', JSON.stringify({
-          appointmentId: createdAppointment.id,
-          amount: currentOrder.total,
-          method: currentOrder.paymentMethod,
-          description: `Agendamento de ${currentOrder.services.map(s => s.name).join(', ')}`,
-        }));
+      // Cartão: Processar pagamento com cartão salvo
+      else if (currentOrder.paymentMethod === 'CREDIT' || currentOrder.paymentMethod === 'DEBIT') {
+        console.log('💳 Processando pagamento com cartão salvo:', selectedCard);
 
-        // Limpar pedido
-        currentOrder.clearOrder();
+        try {
+          const cardPayment = await paymentsService.createCardPayment({
+            appointmentId: createdAppointment.id,
+            amount: currentOrder.total || 0,
+            cardToken: selectedCard!, // Usar o ID do cartão salvo
+            description: `Agendamento - ${currentOrder.services.map(s => s.name).join(', ')}`,
+            installments: 1,
+          });
 
-        toast.success('Redirecionando para pagamento com cartão...');
-        navigate(`/payment/card/${createdAppointment.id}`);
+          console.log('✅ Pagamento com cartão processado:', cardPayment);
+
+          if (cardPayment.status === 'approved' || cardPayment.status === 'paid') {
+            toast.success('Pagamento aprovado!');
+            currentOrder.clearOrder();
+            navigate(`/booking-confirmation/${createdAppointment.id}`);
+          } else if (cardPayment.status === 'pending') {
+            toast.info('Pagamento em análise. Aguarde a confirmação.');
+            currentOrder.clearOrder();
+            navigate(`/payment/pending`);
+          } else {
+            throw new Error('Pagamento não aprovado');
+          }
+        } catch (error: any) {
+          console.error('❌ Erro ao processar pagamento com cartão:', error);
+          toast.error(error.response?.data?.message || 'Erro ao processar pagamento. Tente novamente.');
+          throw error;
+        }
       }
-      // Outros métodos (CASH, WALLET)
+      // Outros métodos (WALLET)
       else {
         currentOrder.clearOrder();
         toast.success('Agendamento confirmado!');
@@ -248,8 +364,12 @@ export const Confirm = () => {
 
   const handleSelectPaymentMethod = (methodId: string) => {
     currentOrder.setPaymentMethod(methodId);
-    currentOrder.calculateTotals(); // Adicione esta linha
-    setIsPaymentModalOpen(false);
+    currentOrder.calculateTotals();
+
+    // Resetar cartão selecionado quando mudar de método
+    setSelectedCard(null);
+
+    // NÃO fechar modal automaticamente - usuário precisa confirmar o cartão
   };
 
   return (
@@ -475,8 +595,124 @@ export const Confirm = () => {
                 </div>
               ))}
             </div>
+
+            {/* Seção de Cartões Salvos */}
+            {(currentOrder.paymentMethod === 'CREDIT' || currentOrder.paymentMethod === 'DEBIT') && (
+              <div className="mt-6 border-t pt-4">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="font-bold text-md">Selecione um cartão:</h3>
+                  <button
+                    type="button"
+                    onClick={handleOpenAddCardModal}
+                    className="text-[#6C8762] font-medium text-sm hover:underline flex items-center gap-1"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                    Adicionar
+                  </button>
+                </div>
+
+                {loadingCards ? (
+                  <div className="flex justify-center py-4">
+                    <div className="loading loading-spinner loading-md"></div>
+                  </div>
+                ) : savedCards.length > 0 ? (
+                  <div className="space-y-2">
+                    {savedCards.map((card) => (
+                      <button
+                        key={card.id}
+                        onClick={() => setSelectedCard(card.id)}
+                        className={cn(
+                          "w-full p-3 rounded-lg border text-left transition-colors flex items-center gap-3",
+                          selectedCard === card.id
+                            ? "bg-[#6C8762] bg-opacity-10 border-[#6C8762]"
+                            : "bg-white border-gray-300 hover:border-[#6C8762]"
+                        )}
+                      >
+                        <img
+                          src={getIcons(getPaymentMethodIcon("credit_card"))}
+                          alt="Cartão"
+                          className="w-8 h-8"
+                        />
+                        <div className="flex-1">
+                          <Text className="font-medium text-sm">
+                            {card.brand} •••• {card.last4}
+                          </Text>
+                          <Text className="text-xs text-gray-600">
+                            {card.cardholderName}
+                          </Text>
+                          <Text className="text-xs text-gray-500">
+                            Val: {card.expiryMonth}/{card.expiryYear}
+                          </Text>
+                        </div>
+                        <input
+                          type="radio"
+                          checked={selectedCard === card.id}
+                          readOnly
+                          className="radio radio-success"
+                        />
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-4 bg-gray-50 rounded-lg">
+                    <Text className="text-gray-600 mb-3">
+                      Você ainda não tem cartões salvos
+                    </Text>
+                    <button
+                      type="button"
+                      onClick={handleOpenAddCardModal}
+                      className="px-4 py-2 bg-[#6C8762] text-white rounded-lg text-sm font-medium hover:bg-[#5a6f52]"
+                    >
+                      Adicionar primeiro cartão
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Botões de Ação */}
+            <div className="mt-6 flex gap-3">
+              <button
+                onClick={() => setIsPaymentModalOpen(false)}
+                className="flex-1 px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => {
+                  // Validar se método foi selecionado
+                  if (!currentOrder.paymentMethod) {
+                    toast.error('Selecione um método de pagamento');
+                    return;
+                  }
+
+                  // Validar cartão se for CREDIT ou DEBIT
+                  if ((currentOrder.paymentMethod === 'CREDIT' || currentOrder.paymentMethod === 'DEBIT') && !selectedCard) {
+                    toast.error('Selecione um cartão');
+                    return;
+                  }
+
+                  // Fechar modal
+                  setIsPaymentModalOpen(false);
+                }}
+                className="flex-1 px-4 py-3 rounded-lg bg-[#6C8762] text-white font-medium hover:bg-[#5a6f52] transition-colors"
+              >
+                Confirmar
+              </button>
+            </div>
           </div>
         </dialog>
+
+        {/* Modal para Adicionar Cartão */}
+        {showAddCardModal && (
+          <AddCardModal
+            isOpen={showAddCardModal}
+            onClose={handleCloseAddCardModal}
+            addPaymentMethod={handleAddCard}
+          />
+        )}
 
         {/* Modal de Código Promocional */}
         <dialog open={isPromoModalOpen} className="modal">

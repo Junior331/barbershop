@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { useResetPassword } from "./useResetPassword";
 import { getIcons } from "@/assets/icons";
 import { getImage } from "@/assets/images";
-import { Loading } from "@/components/atoms";
+import { Loading } from "@/components/elements";
 
 export const ResetPassword = () => {
   const { formik, loading, error } = useResetPassword();
