@@ -2,9 +2,10 @@ import axios, { AxiosError, AxiosResponse } from 'axios';
 import { cookieUtils, COOKIE_NAMES } from '@/utils/cookies';
 import { logger } from '@/utils/logger';
 import toast from 'react-hot-toast';
+import { tenantConfig } from '@/config/tenant.config';
 
-// Base URL da API - Usando a nova URL do backend
-const BASE_URL = import.meta.env.VITE_API_URL || 'https://barbearia-backend-develop.onrender.com';
+// Base URL da API - Multi-tenant aware
+const BASE_URL = tenantConfig.apiUrl;
 
 // Tipos para melhor tipagem
 export interface ApiResponse<T = any> {
@@ -48,6 +49,9 @@ api.interceptors.request.use(
 
     // Adicionar headers customizados se necessário
     config.headers['X-Requested-With'] = 'XMLHttpRequest';
+
+    // Adicionar tenant ID no header para multi-tenancy
+    config.headers['X-Tenant-Slug'] = tenantConfig.slug;
 
     // Log apenas em desenvolvimento
     if (import.meta.env.VITE_DEV_MODE === 'true') {

@@ -11,7 +11,15 @@
     <!-- MercadoPago SDK for secure payments and device fingerprinting -->
     <script src="https://sdk.mercadopago.com/js/v2"></script>
 
-    <title>Barbershop</title>
+    <!-- Tenant Custom Colors -->
+    <style>
+      :root {
+        --color-primary: %VITE_PRIMARY_COLOR%;
+        --color-secondary: %VITE_SECONDARY_COLOR%;
+      }
+    </style>
+
+    <title>%VITE_TENANT_NAME%</title>
   </head>
   <body>
     <div id="root"></div>
