@@ -1,5 +1,5 @@
-import { useState, useEffect, useMemo } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../context/AuthContext";
 import { PUBLIC_ROUTES } from "../utils/emptys";
@@ -7,7 +7,6 @@ import { PUBLIC_ROUTES } from "../utils/emptys";
 export const useAuthRedirect = () => {
   const { setAuth } = useAuth();
   const navigate = useNavigate();
-  const { pathname } = useLocation();
 
   const [isLoading, setIsLoading] = useState(true);
 
