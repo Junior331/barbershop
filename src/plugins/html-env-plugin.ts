@@ -17,7 +17,7 @@ export function htmlEnvPlugin(): Plugin {
         // Se não encontrar a variável, usar um fallback
         if (!value || value === match) {
           const defaults: Record<string, string> = {
-            'VITE_TENANT_NAME': 'Barbershop teste',
+            'VITE_TENANT_NAME': 'Barbershop',
             'VITE_PRIMARY_COLOR': '#3b82f6',
             'VITE_SECONDARY_COLOR': '#8b5cf6',
           };
