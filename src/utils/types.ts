@@ -122,6 +122,7 @@ export interface IOrderState {
 export interface IUserData {
   // Campos do Supabase Auth
   id: string;
+  sub?: string; // Subject identifier from auth token
   city: string;
   state: string;
   email: string;

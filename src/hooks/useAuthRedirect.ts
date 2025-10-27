@@ -10,10 +10,6 @@ export const useAuthRedirect = () => {
   const { pathname } = useLocation();
 
   const [isLoading, setIsLoading] = useState(true);
-  const isPublicRoute = useMemo(
-    () => PUBLIC_ROUTES.some((route) => pathname.startsWith(route)),
-    [pathname]
-  );
 
   useEffect(() => {
     const {

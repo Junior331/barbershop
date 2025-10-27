@@ -336,7 +336,7 @@ export const Confirm = () => {
             currentOrder.clearOrder();
             navigate(`/booking-confirmation/${createdAppointment.id}`);
           } else if (cardPayment.status === 'pending') {
-            toast.info('Pagamento em análise. Aguarde a confirmação.');
+            toast('Pagamento em análise. Aguarde a confirmação.');
             currentOrder.clearOrder();
             navigate(`/payment/pending`);
           } else {

@@ -332,7 +332,7 @@ export const PaymentImproved = () => {
           const cardPayment = await paymentsService.createCardPayment({
             appointmentId: appointmentId,
             amount: bookingData.totalPrice,
-            cardToken: selectedCard, // Usar o ID do cartão salvo como token
+            cardToken: selectedCard ?? '', // Usar o ID do cartão salvo como token
             description: `Agendamento - ${bookingData.selectedServices.map(s => s.name).join(', ')}`,
             installments: 1,
           });
@@ -349,7 +349,7 @@ export const PaymentImproved = () => {
 
             navigate(`/booking-confirmation/${appointmentId}`);
           } else if (cardPayment.status === 'pending') {
-            toast.info('Pagamento em análise. Aguarde a confirmação.', { id: 'card-loading' });
+            toast('Pagamento em análise. Aguarde a confirmação.', { id: 'card-loading' });
 
             // Limpar localStorage de booking
             localStorage.removeItem('selectedServices');
